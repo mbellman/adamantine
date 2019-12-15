@@ -1,8 +1,9 @@
-#include "OpenGLVideoController.h"
 #include "SDL.h"
 #include "glew.h"
 #include "SDL_opengl.h"
 #include "glut.h"
+#include "OpenGLVideoController.h"
+#include "ShaderLoader.h"
 
 SDL_Window* OpenGLVideoController::getWindow(const char* title, Region2d<int> region) {
   return SDL_CreateWindow(title, region.x, region.y, region.width, region.height, SDL_WINDOW_OPENGL);
@@ -48,26 +49,10 @@ void OpenGLVideoController::init() {
   glBindVertexArray(vao);
 
   // Create vertex shader
-  GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+  ShaderLoader shaderLoader;
 
-  const GLchar* vertexShaderSource[] =
-  {
-    "#version 140\nin vec2 position; void main() { gl_Position = vec4( position.x, position.y, 0, 1 ); }"
-  };
-
-  glShaderSource(vertexShader, 1, vertexShaderSource, NULL);
-  glCompileShader(vertexShader);
-
-  // Create fragment shader
-  GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-  const GLchar* fragmentShaderSource[] =
-  {
-    "#version 140\nout vec4 color; void main() { color = vec4( 1.0, 0.0, 1.0, 1.0 ); }"
-  };
-
-  glShaderSource(fragmentShader, 1, fragmentShaderSource, 0);
-  glCompileShader(fragmentShader);
+  GLuint vertexShader = shaderLoader.load(GL_VERTEX_SHADER, "./shaders/vertex.glsl");
+  GLuint fragmentShader = shaderLoader.load(GL_FRAGMENT_SHADER, "./shaders/fragment.glsl");
 
   // Combine shaders
   GLuint glProgram = glCreateProgram();
