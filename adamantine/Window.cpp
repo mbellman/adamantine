@@ -1,16 +1,17 @@
-#include "Window.h";
-
-Window::Window(const char* title, int x, int y, int width, int height) {
-  SDL_Init(SDL_INIT_VIDEO);
-
-  sdlWindow = SDL_CreateWindow(title, x, y, width, height, SDL_WINDOW_OPENGL);
-
-  poll();
-}
+#include "Window.h"
+#include "SDL.h"
 
 Window::~Window() {
-  SDL_DestroyWindow(sdlWindow);
-  SDL_Quit();
+  videoController->destroy();
+
+  delete videoController;
+}
+
+void Window::open(const char* title, Region2d<int> region) {
+  SDL_Init(SDL_INIT_EVERYTHING);
+
+  videoController->createWindow(title, region);
+  videoController->init();
 }
 
 void Window::poll() {
@@ -26,6 +27,11 @@ void Window::poll() {
       }
     }
 
+    videoController->render();
     SDL_Delay(1);
   }
+}
+
+void Window::setVideoController(AbstractVideoController* videoController) {
+  this->videoController = videoController;
 }

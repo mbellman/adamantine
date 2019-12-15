@@ -1,13 +1,18 @@
 #pragma once
 
-#include "SDL.h";
+#include "SDL.h"
+#include "Geometry.h"
+#include "AbstractVideoController.h"
 
 class Window {
 public:
-  Window(const char* title, int x, int y, int width, int height);
   ~Window();
+
+  void open(const char* title, Region2d<int> region);
+  void poll();
+  void setVideoController(AbstractVideoController* videoController);
+
 private:
   SDL_Window* sdlWindow = 0;
-
-  void poll();
+  AbstractVideoController* videoController = 0;
 };
