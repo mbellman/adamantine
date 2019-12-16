@@ -1,8 +1,9 @@
 #pragma once
 
 #include "SDL.h"
-#include "Geometry.h"
+#include "Math.h"
 #include "AbstractVideoController.h"
+#include "Stats.h"
 
 class Window {
 public:
@@ -13,6 +14,8 @@ public:
   void setVideoController(AbstractVideoController* videoController);
 
 private:
-  SDL_Window* sdlWindow = 0;
   AbstractVideoController* videoController = 0;
+  Stats stats;
+
+  void handleStats();
 };

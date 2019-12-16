@@ -1,3 +1,6 @@
+#include <cmath>
+#include <cstdio>
+
 #include "SDL.h"
 #include "glew.h"
 #include "SDL_opengl.h"
@@ -5,25 +8,24 @@
 #include "OpenGLVideoController.h"
 #include "ShaderLoader.h"
 
-SDL_Window* OpenGLVideoController::getWindow(const char* title, Region2d<int> region) {
+SDL_Window* OpenGLVideoController::createWindow(const char* title, Region2d<int> region) {
   return SDL_CreateWindow(title, region.x, region.y, region.width, region.height, SDL_WINDOW_OPENGL);
 }
 
-void OpenGLVideoController::destroy() {
+void OpenGLVideoController::onDestroy() {
   SDL_GL_DeleteContext(glContext);
 }
 
-void OpenGLVideoController::init() {
+void OpenGLVideoController::onInit() {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-  SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-  SDL_GL_SetSwapInterval(1);
-
   glContext = SDL_GL_CreateContext(sdlWindow);
+
+  SDL_GL_SetSwapInterval(0);
 
   glewExperimental = true;
   glewInit();
@@ -48,11 +50,9 @@ void OpenGLVideoController::init() {
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 
-  // Create vertex shader
-  ShaderLoader shaderLoader;
-
-  GLuint vertexShader = shaderLoader.load(GL_VERTEX_SHADER, "./shaders/vertex.glsl");
-  GLuint fragmentShader = shaderLoader.load(GL_FRAGMENT_SHADER, "./shaders/fragment.glsl");
+  // Create shaders
+  GLuint vertexShader = ShaderLoader::loadVertexShader("./shaders/vertex.glsl");
+  GLuint fragmentShader = ShaderLoader::loadFragmentShader("./shaders/fragment.glsl");
 
   // Combine shaders
   GLuint glProgram = glCreateProgram();
@@ -70,13 +70,17 @@ void OpenGLVideoController::init() {
 
   glVertexAttribPointer(positionAttribute, 2, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(positionAttribute);
+
+  time = glGetUniformLocation(glProgram, "time");
 }
 
-void OpenGLVideoController::render() {
+void OpenGLVideoController::onRender() {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
+  glUniform1f(time, SDL_GetTicks() / 500.0f);
   glDrawArrays(GL_TRIANGLES, 0, 3);
 
   SDL_GL_SwapWindow(sdlWindow);
+  glFinish();
 }

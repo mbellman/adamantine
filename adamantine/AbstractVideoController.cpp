@@ -5,8 +5,12 @@ AbstractVideoController::~AbstractVideoController() {
   SDL_Quit();
 }
 
-void AbstractVideoController::createWindow(const char* title, Region2d<int> region) {
-  sdlWindow = getWindow(title, region);
+SDL_Window* AbstractVideoController::getWindow() {
+  return sdlWindow;
 }
 
-void AbstractVideoController::destroy() {}
+void AbstractVideoController::initWindow(const char* title, Region2d<int> region) {
+  sdlWindow = createWindow(title, region);
+}
+
+void AbstractVideoController::onDestroy() {}

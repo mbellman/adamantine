@@ -1,8 +1,9 @@
 #pragma once
 
-#include "SDL.h"
 #include "glut.h"
 
 struct ShaderLoader {
-  GLuint load(GLenum shaderType, const char* path);
+  static GLuint load(GLenum shaderType, const char* path);
+  static GLuint loadFragmentShader(const char* path);
+  static GLuint loadVertexShader(const char* path);
 };

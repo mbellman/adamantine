@@ -124,14 +124,16 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OpenGLVideoController.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
+    <ClCompile Include="Stats.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractVideoController.h" />
     <ClInclude Include="FileLoader.h" />
-    <ClInclude Include="Geometry.h" />
+    <ClInclude Include="Math.h" />
     <ClInclude Include="OpenGLVideoController.h" />
     <ClInclude Include="ShaderLoader.h" />
+    <ClInclude Include="Stats.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
