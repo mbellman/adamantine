@@ -37,6 +37,12 @@ void Window::poll() {
         case SDL_QUIT:
           isClosed = true;
           break;
+        case SDL_MOUSEBUTTONDOWN:
+          if (event.button.clicks == 2) {
+            videoController->toggleFullScreen();
+          }
+
+          break;
       }
     }
 

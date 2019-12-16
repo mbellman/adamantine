@@ -122,8 +122,10 @@
     <ClCompile Include="AbstractVideoController.cpp" />
     <ClCompile Include="FileLoader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OpenGLPipeline.cpp" />
     <ClCompile Include="OpenGLVideoController.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
+    <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Stats.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -131,8 +133,10 @@
     <ClInclude Include="AbstractVideoController.h" />
     <ClInclude Include="FileLoader.h" />
     <ClInclude Include="Math.h" />
+    <ClInclude Include="OpenGLPipeline.h" />
     <ClInclude Include="OpenGLVideoController.h" />
     <ClInclude Include="ShaderLoader.h" />
+    <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Stats.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

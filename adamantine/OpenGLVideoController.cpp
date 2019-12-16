@@ -6,6 +6,8 @@
 #include "SDL_opengl.h"
 #include "glut.h"
 #include "OpenGLVideoController.h"
+#include "OpenGLPipeline.h"
+#include "ShaderProgram.h"
 #include "ShaderLoader.h"
 
 SDL_Window* OpenGLVideoController::createWindow(const char* title, Region2d<int> region) {
@@ -32,46 +34,28 @@ void OpenGLVideoController::onInit() {
 
   // Vertices
   float vertices[] = {
-    0.0f,  0.5f,
-    0.5f, -0.5f,
-    -0.5f, -0.5f
+    0.0f,  0.5f, 0.0f, 1.0f, 1.0f,
+    0.5f, -0.5f, 1.0f, 0.0f, 1.0f,
+    -0.5f, -0.5f, 1.0f, 1.0f, 0.0f
   };
 
-  // Create VBO
-  GLuint vbo;
+  pipeline.createVertexBuffer();
+  pipeline.createVertexArray();
+  pipeline.bufferVertices(sizeof(vertices), vertices);
 
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  shaderProgram.create();
+  shaderProgram.attachShader(ShaderLoader::loadVertexShader("./shaders/vertex.glsl"));
+  shaderProgram.attachShader(ShaderLoader::loadFragmentShader("./shaders/fragment.glsl"));
+  shaderProgram.activate();
+  shaderProgram.setFragmentShaderOutput("color");
 
-  // Create VAO
-  GLuint vao;
+  VertexShaderInput<float> vertexPositionInput = { "position", 2, GL_FLOAT, 5, 0 };
+  VertexShaderInput<float> vertexColorInput = { "vertexColor", 3, GL_FLOAT, 5, 2 };
 
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
+  shaderProgram.setVertexShaderInput(vertexPositionInput);
+  shaderProgram.setVertexShaderInput(vertexColorInput);
 
-  // Create shaders
-  GLuint vertexShader = ShaderLoader::loadVertexShader("./shaders/vertex.glsl");
-  GLuint fragmentShader = ShaderLoader::loadFragmentShader("./shaders/fragment.glsl");
-
-  // Combine shaders
-  GLuint glProgram = glCreateProgram();
-
-  glAttachShader(glProgram, vertexShader);
-  glAttachShader(glProgram, fragmentShader);
-  
-  // Fragment data output
-  glBindFragDataLocation(glProgram, 0, "color");
-
-  glLinkProgram(glProgram);
-  glUseProgram(glProgram);
-
-  GLint positionAttribute = glGetAttribLocation(glProgram, "position");
-
-  glVertexAttribPointer(positionAttribute, 2, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(positionAttribute);
-
-  time = glGetUniformLocation(glProgram, "time");
+  time = shaderProgram.createUniformInput("time");
 }
 
 void OpenGLVideoController::onRender() {
@@ -83,4 +67,8 @@ void OpenGLVideoController::onRender() {
 
   SDL_GL_SwapWindow(sdlWindow);
   glFinish();
+}
+
+void OpenGLVideoController::onScreenSizeChange(int width, int height) {
+  glViewport(0, 0, width, height);
 }

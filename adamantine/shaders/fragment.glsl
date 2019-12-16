@@ -1,12 +1,17 @@
 #version 140
 
 uniform float time;
+
+in vec3 fragmentColor;
+
 out vec4 color;
 
-void main() {
-  float r = abs(sin(time * 1.01));
-  float g = abs(cos(time * 1.03));
-  float b = abs(sin(time * 1.1));
+const float HALF_PI = 3.141592 / 2.0;
 
-  color = vec4(r, g, b, 1.0);
+void main() {
+  float r = abs(sin(fragmentColor.x + time));
+  float g = abs(cos(fragmentColor.y + time));
+  float b = abs(sin(fragmentColor.z + time + HALF_PI));
+
+  color = vec4(vec3(r, g, b), 1.0);
 }

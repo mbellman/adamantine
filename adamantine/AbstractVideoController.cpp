@@ -14,3 +14,23 @@ void AbstractVideoController::initWindow(const char* title, Region2d<int> region
 }
 
 void AbstractVideoController::onDestroy() {}
+
+void AbstractVideoController::onScreenSizeChange(int width, int height) {}
+
+void AbstractVideoController::toggleFullScreen() {
+  int flags = SDL_GetWindowFlags(sdlWindow);
+  bool isFullScreen = flags & SDL_WINDOW_FULLSCREEN;
+
+  SDL_DisplayMode display;
+
+  SDL_GetDesktopDisplayMode(0, &display);
+
+  int fullScreenFlags = isFullScreen ? 0 : SDL_WINDOW_FULLSCREEN;
+  int updatedWidth = isFullScreen ? 640 : display.w;
+  int updatedHeight = isFullScreen ? 480 : display.h;
+
+  SDL_SetWindowFullscreen(sdlWindow, isFullScreen ? 0 : SDL_WINDOW_FULLSCREEN);
+  SDL_SetWindowSize(sdlWindow, updatedWidth, updatedHeight);
+
+  onScreenSizeChange(updatedWidth, updatedHeight);
+}

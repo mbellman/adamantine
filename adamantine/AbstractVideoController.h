@@ -13,6 +13,8 @@ public:
   virtual void onDestroy();
   virtual void onInit() = 0;
   virtual void onRender() = 0;
+  virtual void onScreenSizeChange(int width, int height);
+  virtual void toggleFullScreen() final;
 
 protected:
   SDL_Window* sdlWindow = 0;
