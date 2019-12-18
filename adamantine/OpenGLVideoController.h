@@ -1,8 +1,12 @@
 #pragma once
 
+#include <vector>
+
 #include "AbstractVideoController.h"
-#include "OpenGLPipeline.h"
 #include "ShaderProgram.h"
+#include "VertexPipeline.h"
+#include "Scene.h"
+#include "Geometry.h"
 #include "glut.h"
 
 class OpenGLVideoController final : public AbstractVideoController {
@@ -15,7 +19,11 @@ public:
 
 private:
   SDL_GLContext glContext;
-  OpenGLPipeline pipeline;
   ShaderProgram shaderProgram;
+  std::vector<VertexPipeline*> pipelines;
+  Scene scene;
+  GLint cameraMatrix;
   GLint time;
+
+  void createVertexPipelineFromObject(Object* object);
 };

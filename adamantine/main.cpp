@@ -5,7 +5,7 @@ int main(int argc, char *argv[]) {
   Window window;
 
   window.setVideoController(new OpenGLVideoController());
-  window.open("Adamantine", { 100, 100, 640, 480 });
+  window.open("Adamantine", { 100, 100, 1200, 720 });
   window.poll();
 
   return 0;

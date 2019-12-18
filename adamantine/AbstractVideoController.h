@@ -5,7 +5,7 @@
 
 class AbstractVideoController {
 public:
-  ~AbstractVideoController();
+  virtual ~AbstractVideoController();
 
   virtual SDL_Window* createWindow(const char* title, Region2d<int> region) = 0;
   virtual SDL_Window* getWindow() final;
