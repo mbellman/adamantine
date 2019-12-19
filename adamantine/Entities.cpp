@@ -29,8 +29,32 @@ Object::~Object() {
   vertices.clear();
 }
 
+const Matrix4& Object::getMatrix() const {
+  return matrix;
+}
+
 const std::vector<Polygon*>& Object::getPolygons() const {
   return polygons;
+}
+
+void Object::recomputeMatrix() {
+  matrix = Matrix4::translate(position) * Matrix4::rotate(orientation) * Matrix4::scale({ scale, scale, scale });
+
+  for (int i = 0; i < 16; i++) {
+    printf("M: %f\n", matrix.m[i]);
+  }
+}
+
+void Object::setScale(float scale) {
+  this->scale = scale;
+
+  recomputeMatrix();
+}
+
+void Object::setPosition(const Vec3f& position) {
+  this->position = position;
+
+  recomputeMatrix();
 }
 
 /**

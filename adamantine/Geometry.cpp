@@ -1,25 +1,11 @@
 #include "Geometry.h"
 
-Vec3f Vec3f::operator+(const Vec3f& vector) const {
-  return {
-    x + vector.x,
-    y + vector.y,
-    z + vector.z
-  };
-}
-
-Vec3f Vec3f::operator-(const Vec3f& vector) const {
-  return {
-    x - vector.x,
-    y - vector.y,
-    z - vector.z
-  };
-}
-
-Vec3f Vec3f::operator*(float scalar) const {
-  return {
-    x * scalar,
-    y * scalar,
-    z * scalar
-  };
+/**
+ * Polygon
+ * -------
+ */
+Polygon::Polygon(Vertex3d* v1, Vertex3d* v2, Vertex3d* v3) {
+  vertices[0] = v1;
+  vertices[1] = v2;
+  vertices[2] = v3;
 }

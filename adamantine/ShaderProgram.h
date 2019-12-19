@@ -19,7 +19,7 @@ public:
   void activate();
   void attachShader(GLuint shader);
   void create();
-  GLint createUniformInput(const char* name);
+  GLint getUniformLocation(const char* name);
   void setFragmentShaderOutput(const char* name);
 
   template<typename T>

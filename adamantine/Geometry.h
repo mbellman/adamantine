@@ -27,9 +27,7 @@ struct Vertex3d {
  */
 struct Polygon {
   Polygon() {};
-  Polygon(Vertex3d* v1, Vertex3d* v2, Vertex3d* v3) : v1(v1), v2(v2), v3(v3) {};
+  Polygon(Vertex3d* v1, Vertex3d* v2, Vertex3d* v3);
 
-  Vertex3d* v1 = nullptr;
-  Vertex3d* v2 = nullptr;
-  Vertex3d* v3 = nullptr;
+  Vertex3d* vertices[3];
 };

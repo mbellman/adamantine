@@ -14,12 +14,21 @@
 #include "Math.h"
 #include "Entities.h"
 
-void OpenGLVideoController::createVertexPipelineFromObject(Object* object) {
-  const std::vector<Polygon*>& polygons = object->getPolygons();
-}
-
 SDL_Window* OpenGLVideoController::createWindow(const char* title, Region2d<int> region) {
   return SDL_CreateWindow(title, region.x, region.y, region.width, region.height, SDL_WINDOW_OPENGL);
+}
+
+Matrix4 OpenGLVideoController::createProjectionMatrix() {
+  return {
+    1.0f, 0.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 1.0f, 0.0f
+  };
+}
+
+Matrix4 OpenGLVideoController::createViewMatrix() {
+  return Matrix4::fromMatrix3(scene.getCamera().getRotationMatrix());
 }
 
 void OpenGLVideoController::onDestroy() {
@@ -40,54 +49,41 @@ void OpenGLVideoController::onInit() {
   glewExperimental = true;
   glewInit();
 
+  Cube* cube = new Cube();
+
+  cube->setPosition({ 0.0f, 0.0f, -50.0f });
+  cube->setScale(15.0f);
+
+  scene.addObject(cube);
+
   shaderProgram.create();
   shaderProgram.attachShader(ShaderLoader::loadVertexShader("./shaders/vertex.glsl"));
   shaderProgram.attachShader(ShaderLoader::loadFragmentShader("./shaders/fragment.glsl"));
   shaderProgram.activate();
   shaderProgram.setFragmentShaderOutput("color");
 
-  VertexShaderInput<float> vertexPositionInput = { "position", 2, GL_FLOAT, 5, 0 };
-  VertexShaderInput<float> vertexColorInput = { "vertexColor", 3, GL_FLOAT, 5, 2 };
+  VertexShaderInput<float> vertexPositionInput = { "vertexPosition", 3, GL_FLOAT, 6, 0 };
+  VertexShaderInput<float> vertexColorInput = { "vertexColor", 3, GL_FLOAT, 6, 3 };
 
   shaderProgram.setVertexShaderInput(vertexPositionInput);
   shaderProgram.setVertexShaderInput(vertexColorInput);
-
-  Cube* cube = new Cube();
-
-  cube->position = { 0.0f, 0.0f, -10.0f };
-
-  scene.addObject(cube);
-  createVertexPipelineFromObject(cube);
-
-  cameraMatrix = shaderProgram.createUniformInput("cameraMatrix");
-  time = shaderProgram.createUniformInput("time");
 }
 
 void OpenGLVideoController::onRender() {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  Matrix3 rotationMatrix = scene.getCamera().getRotationMatrix();
+  glUniform1f(shaderProgram.getUniformLocation("time"), SDL_GetTicks() / 500.0f);
+  glUniformMatrix4fv(shaderProgram.getUniformLocation("projectionMatrix"), 0, GL_FALSE, createProjectionMatrix().m);
+  glUniformMatrix4fv(shaderProgram.getUniformLocation("viewMatrix"), 0, GL_FALSE, createViewMatrix().m);
 
-  glUniform1f(time, SDL_GetTicks() / 500.0f);
+  for (auto* openGLObject : scene.getOpenGLObjects()) {
+    const Object* baseObject = openGLObject->baseObject;
 
-  for (auto* object : scene.getObjects()) {
-    const Vec3f& position = object->position;
-    const Vec3f& orientation = object->orientation;
+    glUniformMatrix4fv(shaderProgram.getUniformLocation("modelMatrix"), 0, GL_FALSE, baseObject->getMatrix().m);
 
-    glLoadIdentity();
-    glScalef(object->scale, object->scale, object->scale);
-    glRotatef(orientation.x, 1.0f, 0.0f, 0.0f);
-    glRotatef(orientation.y, 0.0f, 1.0f, 0.0f);
-    glRotatef(orientation.z, 0.0f, 0.0f, 1.0f);
-    glTranslatef(position.x, position.y, position.z);
-
-    // glUniformMatrix3fv(cameraMatrix, 0, GL_FALSE, rotationMatrix);
-  }
-
-  for (auto* pipeline : pipelines) {
-    pipeline->useArray();
-    glDrawArrays(GL_TRIANGLES, 0, 10000);
+    openGLObject->pipeline->useVAO();
+    glDrawArrays(GL_TRIANGLES, 0, baseObject->getPolygons().size() * 3);
   }
 
   SDL_GL_SwapWindow(sdlWindow);

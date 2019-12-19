@@ -15,7 +15,7 @@ void ShaderProgram::create() {
   program = glCreateProgram();
 }
 
-GLint ShaderProgram::createUniformInput(const char* name) {
+GLint ShaderProgram::getUniformLocation(const char* name) {
   return glGetUniformLocation(program, name);
 }
 

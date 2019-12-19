@@ -8,8 +8,8 @@ public:
   VertexPipeline();
 
   void bufferVertices(int size, const float* vertices);
-  void useArray();
-  void useBuffer();
+  void useVAO();
+  void useVBO();
 
 private:
   GLuint vao;

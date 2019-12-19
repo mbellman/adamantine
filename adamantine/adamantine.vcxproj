@@ -120,8 +120,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AbstractVideoController.cpp" />
+    <ClCompile Include="Entities.cpp" />
     <ClCompile Include="FileLoader.cpp" />
+    <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Math.cpp" />
+    <ClCompile Include="OpenGLScene.cpp" />
     <ClCompile Include="VertexPipeline.cpp" />
     <ClCompile Include="OpenGLVideoController.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
@@ -134,6 +138,8 @@
     <ClInclude Include="FileLoader.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="Math.h" />
+    <ClInclude Include="Entities.h" />
+    <ClInclude Include="OpenGLScene.h" />
     <ClInclude Include="VertexPipeline.h" />
     <ClInclude Include="OpenGLVideoController.h" />
     <ClInclude Include="ShaderLoader.h" />

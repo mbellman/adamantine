@@ -5,8 +5,9 @@
 #include "AbstractVideoController.h"
 #include "ShaderProgram.h"
 #include "VertexPipeline.h"
-#include "Scene.h"
+#include "OpenGLScene.h"
 #include "Geometry.h"
+#include "Entities.h"
 #include "glut.h"
 
 class OpenGLVideoController final : public AbstractVideoController {
@@ -20,10 +21,8 @@ public:
 private:
   SDL_GLContext glContext;
   ShaderProgram shaderProgram;
-  std::vector<VertexPipeline*> pipelines;
-  Scene scene;
-  GLint cameraMatrix;
-  GLint time;
+  OpenGLScene scene;
 
-  void createVertexPipelineFromObject(Object* object);
+  Matrix4 createProjectionMatrix();
+  Matrix4 createViewMatrix();
 };

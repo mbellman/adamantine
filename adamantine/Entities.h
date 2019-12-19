@@ -17,15 +17,22 @@ struct Camera : Entity {
 
 class Object : public Entity {
 public:
+  // TODO represent scale as a Vec3f
   float scale;
 
   virtual ~Object();
 
+  const Matrix4& getMatrix() const;
   const std::vector<Polygon*>& getPolygons() const;
+  void setScale(float scale);
+  void setPosition(const Vec3f& position);
 
 protected:
   std::vector<Vertex3d*> vertices;
   std::vector<Polygon*> polygons;
+  Matrix4 matrix;
+
+  void recomputeMatrix();
 };
 
 class Cube : public Object {

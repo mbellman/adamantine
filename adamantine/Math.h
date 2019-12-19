@@ -57,6 +57,22 @@ struct Matrix3 {
 };
 
 /**
+ * A 4x4 transformation matrix.
+ */
+struct Matrix4 {
+  float m[16];
+
+  static Matrix4 fromMatrix3(const Matrix3& matrix);
+  static Matrix4 identity();
+  static Matrix4 rotate(const Vec3f& rotation);
+  static Matrix4 scale(const Vec3f& scale);
+  static Matrix4 translate(const Vec3f& translation);
+
+  Matrix4 operator*(const Matrix4& matrix);
+  Vec3f operator*(const Vec3f& vector);
+};
+
+/**
  * A quaternion.
  */
 struct Quaternion {
