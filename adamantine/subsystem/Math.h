@@ -45,8 +45,14 @@ struct Vec3f : Vec2f {
   float z = 0.0f;
 
   Vec3f operator+(const Vec3f& vector) const;
+  void operator+=(const Vec3f& vector);
   Vec3f operator-(const Vec3f& vector) const;
+  void operator-=(const Vec3f& vector);
   Vec3f operator*(float scalar) const;
+  void operator*=(float scalar);
+
+  float magnitude() const;
+  Vec3f unit() const;
 };
 
 /**

@@ -12,8 +12,10 @@ public:
 
   const Camera& getCamera() const;
   const EntityContainer& getEntityContainer() const;
+  bool isActive() const;
   virtual void onInit();
   virtual void onUpdate(int dt);
+  virtual void pollInput() final;
 
 protected:
   EntityContainer entities;

@@ -13,9 +13,18 @@ void AbstractVideoController::initWindow(const char* title, Region2d<int> region
   sdlWindow = createWindow(title, region);
 }
 
+bool AbstractVideoController::isActive() const {
+  return scene->isActive();
+}
+
 void AbstractVideoController::onDestroy() {}
 
 void AbstractVideoController::onScreenSizeChange(int width, int height) {}
+
+void AbstractVideoController::update() {
+  scene->pollInput();
+  scene->onUpdate(16);
+}
 
 void AbstractVideoController::setScene(AbstractScene* scene) {
   this->scene = scene;

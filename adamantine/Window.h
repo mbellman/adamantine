@@ -11,7 +11,7 @@ public:
   ~Window();
 
   void open(const char* title, Region2d<int> region);
-  void poll();
+  void run();
   void setVideoController(AbstractVideoController* videoController);
 
 private:

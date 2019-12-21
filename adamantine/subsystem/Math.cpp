@@ -15,6 +15,12 @@ Vec3f Vec3f::operator+(const Vec3f& vector) const {
   };
 }
 
+void Vec3f::operator+=(const Vec3f& vector) {
+  x += vector.x;
+  y += vector.y;
+  z += vector.z;
+}
+
 Vec3f Vec3f::operator-(const Vec3f& vector) const {
   return {
     x - vector.x,
@@ -23,11 +29,37 @@ Vec3f Vec3f::operator-(const Vec3f& vector) const {
   };
 }
 
+void Vec3f::operator-=(const Vec3f& vector) {
+  x -= vector.x;
+  y -= vector.y;
+  z -= vector.z;
+}
+
 Vec3f Vec3f::operator*(float scalar) const {
   return {
     x * scalar,
     y * scalar,
     z * scalar
+  };
+}
+
+void Vec3f::operator*=(float scalar) {
+  x *= scalar;
+  y *= scalar;
+  z *= scalar;
+}
+
+float Vec3f::magnitude() const {
+  return sqrtf(x*x + y*y + z*z);
+}
+
+Vec3f Vec3f::unit() const {
+  float m = magnitude();
+
+  return {
+    x / m,
+    y / m,
+    z / m
   };
 }
 

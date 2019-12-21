@@ -26,27 +26,10 @@ void Window::open(const char* title, Region2d<int> region) {
   videoController->onInit();
 }
 
-void Window::poll() {
-  bool isClosed = false;
-  SDL_Event event;
-
-  while (!isClosed) {
+void Window::run() {
+  while (!videoController->isActive()) {
     stats.trackFrameStart();
-
-    while (SDL_PollEvent(&event)) {
-      switch (event.type) {
-        case SDL_QUIT:
-          isClosed = true;
-          break;
-        case SDL_MOUSEBUTTONDOWN:
-          if (event.button.clicks == 2) {
-            videoController->toggleFullScreen();
-          }
-
-          break;
-      }
-    }
-
+    videoController->update();
     videoController->onRender();
     stats.trackFrameEnd();
     handleStats();

@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
 
   window.setVideoController(controller);
   window.open("Adamantine", { 100, 100, 1200, 720 });
-  window.poll();
+  window.run();
 
   return 0;
 }

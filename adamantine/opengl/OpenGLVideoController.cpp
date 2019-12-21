@@ -36,7 +36,13 @@ Matrix4 OpenGLVideoController::createProjectionMatrix(float fov, float aspectRat
 Matrix4 OpenGLVideoController::createViewMatrix() {
   const Camera& camera = scene->getCamera();
 
-  return (Matrix4::translate(camera.position) * Matrix4::rotate(camera.orientation)).transpose();
+  Matrix4 translation = Matrix4::translate({
+    camera.position.x,
+    camera.position.y,
+    camera.position.z * -1.0f
+  });
+
+  return (Matrix4::rotate(camera.orientation) * translation).transpose();
 }
 
 void OpenGLVideoController::onDestroy() {

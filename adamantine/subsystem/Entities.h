@@ -19,7 +19,11 @@ struct Entity {
 };
 
 struct Camera : Entity {
-  Matrix3 getRotationMatrix() const;
+  // TODO Create 'Orientation' struct with below methods
+  Vec3f getDirection() const;
+  Vec3f getLeftDirection() const;
+  Vec3f getOrientationDirection(const Vec3f& o) const;
+  Vec3f getRightDirection() const;
 };
 
 class Object : public Entity {

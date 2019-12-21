@@ -1,15 +1,46 @@
+#include <cmath>
+
+#include "SDL.h"
 #include "subsystem/Entities.h"
 
 /**
  * Camera
  * ------
  */
-Matrix3 Camera::getRotationMatrix() const {
-  Quaternion q1 = Quaternion::fromAxisAngle(orientation.x, 1, 0, 0);
-  Quaternion q2 = Quaternion::fromAxisAngle(orientation.y, 0, 1, 0);
-  Quaternion q3 = Quaternion::fromAxisAngle(orientation.z, 0, 0, 1);
+Vec3f Camera::getDirection() const {
+  return getOrientationDirection(orientation);
+}
 
-  return (q1 * q2 * q2).toMatrix3();
+Vec3f Camera::getLeftDirection() const {
+  return getOrientationDirection({
+    orientation.x,
+    orientation.y - 90.0f,
+    orientation.z
+  });
+}
+
+Vec3f Camera::getOrientationDirection(const Vec3f& o) const {
+  constexpr float DEG_TO_RAD = M_PI / 180.0f;
+  float pitch = o.x * DEG_TO_RAD;
+  float yaw = o.y * DEG_TO_RAD;
+  float roll = o.z * DEG_TO_RAD;
+  float p = std::abs(cosf(pitch));
+
+  Vec3f direction = {
+    -sinf(yaw) * p,
+    sinf(pitch),
+    cosf(yaw) * p
+  };
+
+  return direction.unit();
+}
+
+Vec3f Camera::getRightDirection() const {
+  return getOrientationDirection({
+    orientation.x,
+    orientation.y + 90.0f,
+    orientation.z
+  });
 }
 
 /**
