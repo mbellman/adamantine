@@ -3,11 +3,11 @@
 #include <vector>
 
 #include "AbstractVideoController.h"
-#include "ShaderProgram.h"
-#include "VertexPipeline.h"
-#include "OpenGLScene.h"
-#include "Geometry.h"
-#include "Entities.h"
+#include "opengl/ShaderProgram.h"
+#include "opengl/VertexPipeline.h"
+#include "opengl/OpenGLScene.h"
+#include "subsystem/Geometry.h"
+#include "subsystem/Entities.h"
 #include "glut.h"
 
 class OpenGLVideoController final : public AbstractVideoController {

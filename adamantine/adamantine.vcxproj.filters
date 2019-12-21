@@ -21,37 +21,37 @@
     <ClCompile Include="Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OpenGLVideoController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AbstractVideoController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ShaderLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FileLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Stats.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderProgram.cpp">
+    <ClCompile Include="opengl\OpenGLScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VertexPipeline.cpp">
+    <ClCompile Include="opengl\OpenGLVideoController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Geometry.cpp">
+    <ClCompile Include="opengl\ShaderLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Math.cpp">
+    <ClCompile Include="opengl\ShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Entities.cpp">
+    <ClCompile Include="opengl\VertexPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OpenGLScene.cpp">
+    <ClCompile Include="subsystem\Entities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="subsystem\FileLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="subsystem\Geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="subsystem\Math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,34 +62,34 @@
     <ClInclude Include="AbstractVideoController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OpenGLVideoController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FileLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Stats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Math.h">
+    <ClInclude Include="subsystem\FileLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderProgram.h">
+    <ClInclude Include="subsystem\Entities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry.h">
+    <ClInclude Include="subsystem\Geometry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VertexPipeline.h">
+    <ClInclude Include="subsystem\Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Entities.h">
+    <ClInclude Include="opengl\OpenGLScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OpenGLScene.h">
+    <ClInclude Include="opengl\OpenGLVideoController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\ShaderLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\ShaderProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl\VertexPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

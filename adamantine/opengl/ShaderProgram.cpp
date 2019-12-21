@@ -1,7 +1,7 @@
 #include "glew.h"
 #include "glut.h"
-#include "ShaderProgram.h"
-#include "ShaderLoader.h"
+#include "opengl/ShaderProgram.h"
+#include "opengl/ShaderLoader.h"
 
 ShaderProgram::~ShaderProgram() {
   glDeleteProgram(program);

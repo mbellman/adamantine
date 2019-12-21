@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "Math.h"
-#include "Geometry.h"
+#include "subsystem/Math.h"
+#include "subsystem/Geometry.h"
 
 struct Entity {
   Vec3f position;

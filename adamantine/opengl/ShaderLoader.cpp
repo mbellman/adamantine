@@ -2,8 +2,8 @@
 #include <fstream>
 
 #include "glew.h"
-#include "ShaderLoader.h"
-#include "FileLoader.h"
+#include "opengl/ShaderLoader.h"
+#include "subsystem/FileLoader.h"
 
 GLuint ShaderLoader::load(GLenum shaderType, const char* path) {
   GLuint shader = glCreateShader(shaderType);

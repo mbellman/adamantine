@@ -1,6 +1,6 @@
-#include "VertexPipeline.h"
 #include "glew.h"
 #include "glut.h"
+#include "opengl/VertexPipeline.h"
 
 VertexPipeline::VertexPipeline() {
   glGenVertexArrays(1, &vao);

@@ -7,13 +7,12 @@
 #include "glew.h"
 #include "SDL_opengl.h"
 #include "glut.h"
-#include "OpenGLVideoController.h"
-#include "VertexPipeline.h"
-#include "ShaderProgram.h"
-#include "ShaderLoader.h"
-#include "Math.h"
-#include "Entities.h"
-#include "glut.h"
+#include "opengl/OpenGLVideoController.h"
+#include "opengl/VertexPipeline.h"
+#include "opengl/ShaderProgram.h"
+#include "opengl/ShaderLoader.h"
+#include "subsystem/Math.h"
+#include "subsystem/Entities.h"
 
 SDL_Window* OpenGLVideoController::createWindow(const char* title, Region2d<int> region) {
   return SDL_CreateWindow(title, region.x, region.y, region.width, region.height, SDL_WINDOW_OPENGL);

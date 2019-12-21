@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SDL.h"
-#include "Math.h"
+#include "subsystem/Math.h"
 
 class AbstractVideoController {
 public:

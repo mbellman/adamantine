@@ -1,5 +1,5 @@
 #include "Window.h"
-#include "OpenGLVideoController.h"
+#include "opengl/OpenGLVideoController.h"
 
 int main(int argc, char *argv[]) {
   Window window;

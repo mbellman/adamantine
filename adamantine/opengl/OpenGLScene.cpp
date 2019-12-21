@@ -1,4 +1,4 @@
-#include "OpenGLScene.h"
+#include "opengl/OpenGLScene.h"
 
 /**
  * OpenGLObject

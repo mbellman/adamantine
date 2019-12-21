@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "Entities.h"
-#include "VertexPipeline.h"
+#include "subsystem/Entities.h"
+#include "opengl/VertexPipeline.h"
 
 struct OpenGLObject {
   OpenGLObject(Object* baseObject, VertexPipeline* pipeline) : baseObject(baseObject), pipeline(pipeline) {};

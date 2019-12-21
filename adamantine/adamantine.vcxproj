@@ -94,7 +94,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\external\GLEW\include;$(SolutionDir)\external\GLUT\include;$(SolutionDir)\external\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\adamantine;$(SolutionDir)\external\GLEW\include;$(SolutionDir)\external\GLUT\include;$(SolutionDir)\external\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -120,31 +120,31 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AbstractVideoController.cpp" />
-    <ClCompile Include="Entities.cpp" />
-    <ClCompile Include="FileLoader.cpp" />
-    <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Math.cpp" />
-    <ClCompile Include="OpenGLScene.cpp" />
-    <ClCompile Include="VertexPipeline.cpp" />
-    <ClCompile Include="OpenGLVideoController.cpp" />
-    <ClCompile Include="ShaderLoader.cpp" />
-    <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="opengl\OpenGLScene.cpp" />
+    <ClCompile Include="opengl\OpenGLVideoController.cpp" />
+    <ClCompile Include="opengl\ShaderLoader.cpp" />
+    <ClCompile Include="opengl\ShaderProgram.cpp" />
+    <ClCompile Include="opengl\VertexPipeline.cpp" />
     <ClCompile Include="Stats.cpp" />
+    <ClCompile Include="subsystem\Entities.cpp" />
+    <ClCompile Include="subsystem\FileLoader.cpp" />
+    <ClCompile Include="subsystem\Geometry.cpp" />
+    <ClCompile Include="subsystem\Math.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractVideoController.h" />
-    <ClInclude Include="FileLoader.h" />
-    <ClInclude Include="Geometry.h" />
-    <ClInclude Include="Math.h" />
-    <ClInclude Include="Entities.h" />
-    <ClInclude Include="OpenGLScene.h" />
-    <ClInclude Include="VertexPipeline.h" />
-    <ClInclude Include="OpenGLVideoController.h" />
-    <ClInclude Include="ShaderLoader.h" />
-    <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="opengl\OpenGLScene.h" />
+    <ClInclude Include="opengl\OpenGLVideoController.h" />
+    <ClInclude Include="opengl\ShaderLoader.h" />
+    <ClInclude Include="opengl\ShaderProgram.h" />
+    <ClInclude Include="opengl\VertexPipeline.h" />
+    <ClInclude Include="subsystem\Entities.h" />
+    <ClInclude Include="subsystem\FileLoader.h" />
     <ClInclude Include="Stats.h" />
+    <ClInclude Include="subsystem\Geometry.h" />
+    <ClInclude Include="subsystem\Math.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
