@@ -38,11 +38,7 @@ const std::vector<Polygon*>& Object::getPolygons() const {
 }
 
 void Object::recomputeMatrix() {
-  matrix = Matrix4::translate(position) * Matrix4::rotate(orientation) * Matrix4::scale({ scale, scale, scale });
-
-  for (int i = 0; i < 16; i++) {
-    printf("M: %f\n", matrix.m[i]);
-  }
+  matrix = (Matrix4::translate(position) * Matrix4::rotate(orientation) * Matrix4::scale({ scale, scale, scale })).transpose();
 }
 
 void Object::setScale(float scale) {

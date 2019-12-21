@@ -1,4 +1,5 @@
 #include <cmath>
+#include <cstdio>
 
 #include "Math.h"
 
@@ -78,7 +79,7 @@ Matrix4 Matrix4::translate(const Vec3f& translation) {
   };
 }
 
-Matrix4 Matrix4::operator*(const Matrix4& matrix) {
+Matrix4 Matrix4::operator*(const Matrix4& matrix) const {
   Matrix4 product;
 
   for (int r = 0; r < 4; r++) {
@@ -94,11 +95,22 @@ Matrix4 Matrix4::operator*(const Matrix4& matrix) {
   return product;
 }
 
-Vec3f Matrix4::operator*(const Vec3f& vector) {
+void Matrix4::debug() const {
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      printf("[ %f ] ", m[i * 4 + j]);
+    }
+
+    printf("\n");
+  }
+}
+
+Matrix4 Matrix4::transpose() const {
   return {
-    m[0] * vector.x + m[1] * vector.y + m[2] * vector.z + m[3],
-    m[4] * vector.x + m[5] * vector.y + m[6] * vector.z + m[7],
-    m[8] * vector.x + m[9] * vector.y + m[10] * vector.z + m[11]
+    m[0], m[4], m[8], m[12],
+    m[1], m[5], m[9], m[13],
+    m[2], m[6], m[10], m[14],
+    m[3], m[7], m[11], m[15]
   };
 }
 

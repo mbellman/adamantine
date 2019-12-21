@@ -18,7 +18,7 @@ struct Camera : Entity {
 class Object : public Entity {
 public:
   // TODO represent scale as a Vec3f
-  float scale;
+  float scale = 1.0f;
 
   virtual ~Object();
 

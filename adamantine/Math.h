@@ -68,8 +68,10 @@ struct Matrix4 {
   static Matrix4 scale(const Vec3f& scale);
   static Matrix4 translate(const Vec3f& translation);
 
-  Matrix4 operator*(const Matrix4& matrix);
-  Vec3f operator*(const Vec3f& vector);
+  Matrix4 operator*(const Matrix4& matrix) const;
+
+  void debug() const;
+  Matrix4 transpose() const;
 };
 
 /**

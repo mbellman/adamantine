@@ -23,6 +23,6 @@ private:
   ShaderProgram shaderProgram;
   OpenGLScene scene;
 
-  Matrix4 createProjectionMatrix();
+  Matrix4 createProjectionMatrix(float fov, float aspectRatio, float near, float far);
   Matrix4 createViewMatrix();
 };

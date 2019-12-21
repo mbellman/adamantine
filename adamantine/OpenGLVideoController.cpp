@@ -13,22 +13,30 @@
 #include "ShaderLoader.h"
 #include "Math.h"
 #include "Entities.h"
+#include "glut.h"
 
 SDL_Window* OpenGLVideoController::createWindow(const char* title, Region2d<int> region) {
   return SDL_CreateWindow(title, region.x, region.y, region.width, region.height, SDL_WINDOW_OPENGL);
 }
 
-Matrix4 OpenGLVideoController::createProjectionMatrix() {
-  return {
-    1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f
+Matrix4 OpenGLVideoController::createProjectionMatrix(float fov, float aspectRatio, float near, float far) {
+  constexpr float DEG_TO_RAD = M_PI / 180.0f;
+  float f = 1.0f / tanf(fov / 2.0f * DEG_TO_RAD);
+
+  Matrix4 projection = {
+    f / aspectRatio, 0.0f, 0.0f, 0.0f,
+    0.0f, f, 0.0f, 0.0f,
+    0.0f, 0.0f, (far + near) / (near - far), (2 * far * near) / (near - far),
+    0.0f, 0.0f, -1.0f, 0.0f
   };
+
+  return projection.transpose();
 }
 
 Matrix4 OpenGLVideoController::createViewMatrix() {
-  return Matrix4::fromMatrix3(scene.getCamera().getRotationMatrix());
+  const Camera& camera = scene.getCamera();
+
+  return (Matrix4::translate(camera.position) * Matrix4::rotate(camera.orientation)).transpose();
 }
 
 void OpenGLVideoController::onDestroy() {
@@ -51,8 +59,8 @@ void OpenGLVideoController::onInit() {
 
   Cube* cube = new Cube();
 
-  cube->setPosition({ 0.0f, 0.0f, -50.0f });
-  cube->setScale(15.0f);
+  cube->setPosition({ 0, 0, -50.0f });
+  cube->setScale(5.0f);
 
   scene.addObject(cube);
 
@@ -73,14 +81,18 @@ void OpenGLVideoController::onRender() {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glUniform1f(shaderProgram.getUniformLocation("time"), SDL_GetTicks() / 500.0f);
-  glUniformMatrix4fv(shaderProgram.getUniformLocation("projectionMatrix"), 0, GL_FALSE, createProjectionMatrix().m);
-  glUniformMatrix4fv(shaderProgram.getUniformLocation("viewMatrix"), 0, GL_FALSE, createViewMatrix().m);
+  Matrix4 projection = createProjectionMatrix(45.0f, 1200.0f / 720.0f, 1.0f, 1000.0f);
+
+  float time = SDL_GetTicks() / 500.0f;
+
+  glUniform1f(shaderProgram.getUniformLocation("time"), time);
+  glUniformMatrix4fv(shaderProgram.getUniformLocation("projectionMatrix"), 1, GL_FALSE, projection.m);
+  glUniformMatrix4fv(shaderProgram.getUniformLocation("viewMatrix"), 1, GL_FALSE, createViewMatrix().m);
 
   for (auto* openGLObject : scene.getOpenGLObjects()) {
     const Object* baseObject = openGLObject->baseObject;
 
-    glUniformMatrix4fv(shaderProgram.getUniformLocation("modelMatrix"), 0, GL_FALSE, baseObject->getMatrix().m);
+    glUniformMatrix4fv(shaderProgram.getUniformLocation("modelMatrix"), 1, GL_FALSE, baseObject->getMatrix().m);
 
     openGLObject->pipeline->useVAO();
     glDrawArrays(GL_TRIANGLES, 0, baseObject->getPolygons().size() * 3);
