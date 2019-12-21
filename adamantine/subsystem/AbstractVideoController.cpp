@@ -1,4 +1,4 @@
-#include "AbstractVideoController.h"
+#include "subsystem/AbstractVideoController.h"
 
 AbstractVideoController::~AbstractVideoController() {
   SDL_DestroyWindow(sdlWindow);
@@ -16,6 +16,10 @@ void AbstractVideoController::initWindow(const char* title, Region2d<int> region
 void AbstractVideoController::onDestroy() {}
 
 void AbstractVideoController::onScreenSizeChange(int width, int height) {}
+
+void AbstractVideoController::setScene(AbstractScene* scene) {
+  this->scene = scene;
+}
 
 void AbstractVideoController::toggleFullScreen() {
   int flags = SDL_GetWindowFlags(sdlWindow);

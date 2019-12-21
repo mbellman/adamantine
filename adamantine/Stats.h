@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Math.h"
 #include "SDL.h"
+#include "subsystem/Math.h"
 
 typedef int SDL_Tick;
 

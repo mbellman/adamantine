@@ -76,7 +76,13 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\demo;$(SolutionDir)\adamantine;$(SolutionDir)\external\GLEW\include;$(SolutionDir)\external\GLUT\include;$(SolutionDir)\external\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)\external\GLUT\lib;$(SolutionDir)\external\GLEW\lib;$(SolutionDir)\external\SDL2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -94,7 +100,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\adamantine;$(SolutionDir)\external\GLEW\include;$(SolutionDir)\external\GLUT\include;$(SolutionDir)\external\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\demo;$(SolutionDir)\adamantine;$(SolutionDir)\external\GLEW\include;$(SolutionDir)\external\GLUT\include;$(SolutionDir)\external\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -119,33 +125,54 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AbstractVideoController.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="opengl\OpenGLScene.cpp" />
-    <ClCompile Include="opengl\OpenGLVideoController.cpp" />
-    <ClCompile Include="opengl\ShaderLoader.cpp" />
-    <ClCompile Include="opengl\ShaderProgram.cpp" />
-    <ClCompile Include="opengl\VertexPipeline.cpp" />
-    <ClCompile Include="Stats.cpp" />
-    <ClCompile Include="subsystem\Entities.cpp" />
-    <ClCompile Include="subsystem\FileLoader.cpp" />
-    <ClCompile Include="subsystem\Geometry.cpp" />
-    <ClCompile Include="subsystem\Math.cpp" />
-    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="adamantine\opengl\OpenGLScene.cpp" />
+    <ClCompile Include="adamantine\opengl\OpenGLVideoController.cpp" />
+    <ClCompile Include="adamantine\opengl\ShaderLoader.cpp" />
+    <ClCompile Include="adamantine\opengl\ShaderProgram.cpp" />
+    <ClCompile Include="adamantine\opengl\VertexPipeline.cpp" />
+    <ClCompile Include="adamantine\Stats.cpp" />
+    <ClCompile Include="adamantine\subsystem\AbstractScene.cpp" />
+    <ClCompile Include="adamantine\subsystem\AbstractVideoController.cpp" />
+    <ClCompile Include="adamantine\subsystem\Entities.cpp" />
+    <ClCompile Include="adamantine\subsystem\EntityContainer.cpp" />
+    <ClCompile Include="adamantine\subsystem\FileLoader.cpp" />
+    <ClCompile Include="adamantine\subsystem\Geometry.cpp" />
+    <ClCompile Include="adamantine\subsystem\InputSystem.cpp" />
+    <ClCompile Include="adamantine\subsystem\Math.cpp" />
+    <ClCompile Include="adamantine\Window.cpp" />
+    <ClCompile Include="demo\DefaultScene.cpp" />
+    <ClCompile Include="demo\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AbstractVideoController.h" />
+    <ClInclude Include="adamantine\opengl\OpenGLScene.h" />
+    <ClInclude Include="adamantine\opengl\OpenGLVideoController.h" />
+    <ClInclude Include="adamantine\opengl\ShaderLoader.h" />
+    <ClInclude Include="adamantine\opengl\ShaderProgram.h" />
+    <ClInclude Include="adamantine\opengl\VertexPipeline.h" />
+    <ClInclude Include="adamantine\Stats.h" />
+    <ClInclude Include="adamantine\subsystem\AbstractScene.h" />
+    <ClInclude Include="adamantine\subsystem\AbstractVideoController.h" />
+    <ClInclude Include="adamantine\subsystem\Entities.h" />
+    <ClInclude Include="adamantine\subsystem\EntityContainer.h" />
+    <ClInclude Include="adamantine\subsystem\FileLoader.h" />
+    <ClInclude Include="adamantine\subsystem\Geometry.h" />
+    <ClInclude Include="adamantine\subsystem\InputSystem.h" />
+    <ClInclude Include="adamantine\subsystem\Math.h" />
+    <ClInclude Include="adamantine\Window.h" />
+    <ClInclude Include="demo\DefaultScene.h" />
+    <ClInclude Include="subsystem\AbstractVideoController.h" />
     <ClInclude Include="opengl\OpenGLScene.h" />
     <ClInclude Include="opengl\OpenGLVideoController.h" />
     <ClInclude Include="opengl\ShaderLoader.h" />
     <ClInclude Include="opengl\ShaderProgram.h" />
     <ClInclude Include="opengl\VertexPipeline.h" />
     <ClInclude Include="subsystem\Entities.h" />
+    <ClInclude Include="subsystem\EntityContainer.h" />
     <ClInclude Include="subsystem\FileLoader.h" />
-    <ClInclude Include="Stats.h" />
     <ClInclude Include="subsystem\Geometry.h" />
+    <ClInclude Include="subsystem\InputSystem.h" />
     <ClInclude Include="subsystem\Math.h" />
-    <ClInclude Include="Window.h" />
+    <ClInclude Include="subsystem\AbstractScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

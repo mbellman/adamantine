@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.329
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "adamantine", "adamantine\adamantine.vcxproj", "{DD7E5269-D331-4DC4-BFD7-F06188FC2987}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "adamantine", "adamantine.vcxproj", "{DD7E5269-D331-4DC4-BFD7-F06188FC2987}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +26,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {39195DCA-49A3-4393-A80F-A7DA1872D771}
+		SolutionGuid = {25C07FDC-1377-4310-97E7-42622CEAF208}
 	EndGlobalSection
 EndGlobal

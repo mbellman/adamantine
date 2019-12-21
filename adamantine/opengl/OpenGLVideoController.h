@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "AbstractVideoController.h"
+#include "subsystem/AbstractVideoController.h"
 #include "opengl/ShaderProgram.h"
 #include "opengl/VertexPipeline.h"
 #include "opengl/OpenGLScene.h"
@@ -21,7 +21,6 @@ public:
 private:
   SDL_GLContext glContext;
   ShaderProgram shaderProgram;
-  OpenGLScene scene;
 
   Matrix4 createProjectionMatrix(float fov, float aspectRatio, float near, float far);
   Matrix4 createViewMatrix();

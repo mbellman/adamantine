@@ -6,9 +6,16 @@
 #include "subsystem/Geometry.h"
 
 struct Entity {
+  virtual ~Entity() {};
+
   Vec3f position;
   Vec3f velocity;
   Vec3f orientation;
+
+  template<typename T>
+  bool isOfType() {
+    return dynamic_cast<T*>(this) != 0;
+  }
 };
 
 struct Camera : Entity {

@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <filesystem>
 
 #include "SDL.h"
 #include "glew.h"
@@ -33,7 +34,7 @@ Matrix4 OpenGLVideoController::createProjectionMatrix(float fov, float aspectRat
 }
 
 Matrix4 OpenGLVideoController::createViewMatrix() {
-  const Camera& camera = scene.getCamera();
+  const Camera& camera = scene->getCamera();
 
   return (Matrix4::translate(camera.position) * Matrix4::rotate(camera.orientation)).transpose();
 }
@@ -56,16 +57,11 @@ void OpenGLVideoController::onInit() {
   glewExperimental = true;
   glewInit();
 
-  Cube* cube = new Cube();
-
-  cube->setPosition({ 0, 0, -50.0f });
-  cube->setScale(5.0f);
-
-  scene.addObject(cube);
+  scene->onInit();
 
   shaderProgram.create();
-  shaderProgram.attachShader(ShaderLoader::loadVertexShader("./shaders/vertex.glsl"));
-  shaderProgram.attachShader(ShaderLoader::loadFragmentShader("./shaders/fragment.glsl"));
+  shaderProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/vertex.glsl"));
+  shaderProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/fragment.glsl"));
   shaderProgram.activate();
   shaderProgram.setFragmentShaderOutput("color");
 
@@ -80,21 +76,15 @@ void OpenGLVideoController::onRender() {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  Matrix4 projection = createProjectionMatrix(45.0f, 1200.0f / 720.0f, 1.0f, 1000.0f);
-
-  float time = SDL_GetTicks() / 500.0f;
-
-  glUniform1f(shaderProgram.getUniformLocation("time"), time);
-  glUniformMatrix4fv(shaderProgram.getUniformLocation("projectionMatrix"), 1, GL_FALSE, projection.m);
+  glUniform1f(shaderProgram.getUniformLocation("time"), SDL_GetTicks() / 500.0f);
+  glUniformMatrix4fv(shaderProgram.getUniformLocation("projectionMatrix"), 1, GL_FALSE, createProjectionMatrix(45.0f, 1200.0f / 720.0f, 1.0f, 1000.0f).m);
   glUniformMatrix4fv(shaderProgram.getUniformLocation("viewMatrix"), 1, GL_FALSE, createViewMatrix().m);
 
-  for (auto* openGLObject : scene.getOpenGLObjects()) {
-    const Object* baseObject = openGLObject->baseObject;
+  for (auto* object : scene->getEntityContainer().getObjects()) {
+    glUniformMatrix4fv(shaderProgram.getUniformLocation("modelMatrix"), 1, GL_FALSE, object->getMatrix().m);
 
-    glUniformMatrix4fv(shaderProgram.getUniformLocation("modelMatrix"), 1, GL_FALSE, baseObject->getMatrix().m);
-
-    openGLObject->pipeline->useVAO();
-    glDrawArrays(GL_TRIANGLES, 0, baseObject->getPolygons().size() * 3);
+    ((OpenGLObject*)object)->pipeline->useVAO();
+    glDrawArrays(GL_TRIANGLES, 0, object->getPolygons().size() * 3);
   }
 
   SDL_GL_SwapWindow(sdlWindow);

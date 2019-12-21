@@ -2,6 +2,7 @@
 
 #include "SDL.h"
 #include "subsystem/Math.h"
+#include "subsystem/AbstractScene.h"
 
 class AbstractVideoController {
 public:
@@ -14,8 +15,10 @@ public:
   virtual void onInit() = 0;
   virtual void onRender() = 0;
   virtual void onScreenSizeChange(int width, int height);
+  virtual void setScene(AbstractScene* scene);
   virtual void toggleFullScreen() final;
 
 protected:
-  SDL_Window* sdlWindow = 0;
+  SDL_Window* sdlWindow = nullptr;
+  AbstractScene* scene = nullptr;
 };

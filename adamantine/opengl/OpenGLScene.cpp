@@ -5,7 +5,6 @@
  * ------------
  */
 OpenGLObject::~OpenGLObject() {
-  delete baseObject;
   delete pipeline;
 }
 
@@ -13,15 +12,7 @@ OpenGLObject::~OpenGLObject() {
  * OpenGLScene
  * -----------
  */
-OpenGLScene::~OpenGLScene() {
-  for (auto* openGLObject : openGLObjects) {
-    delete openGLObject;
-  }
-
-  openGLObjects.clear();
-}
-
-void OpenGLScene::addObject(Object* object) {
+VertexPipeline* OpenGLScene::createVertexPipeline(Object* object) {
   const std::vector<Polygon*>& polygons = object->getPolygons();
   int vertexBufferSize = polygons.size() * 3 * 6;
   float* vertexBuffer = new float[vertexBufferSize];
@@ -48,15 +39,5 @@ void OpenGLScene::addObject(Object* object) {
 
   delete[] vertexBuffer;
 
-  OpenGLObject* openGLObject = new OpenGLObject(object, pipeline);
-
-  openGLObjects.push_back(openGLObject);
-}
-
-const Camera& OpenGLScene::getCamera() const {
-  return camera;
-}
-
-const std::vector<OpenGLObject*>& OpenGLScene::getOpenGLObjects() const {
-  return openGLObjects;
+  return pipeline;
 }

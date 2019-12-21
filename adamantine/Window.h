@@ -2,7 +2,8 @@
 
 #include "SDL.h"
 #include "Math.h"
-#include "AbstractVideoController.h"
+#include "subsystem/AbstractVideoController.h"
+#include "subsystem/InputSystem.h"
 #include "Stats.h"
 
 class Window {
@@ -15,6 +16,7 @@ public:
 
 private:
   AbstractVideoController* videoController = 0;
+  InputSystem inputSystem;
   Stats stats;
 
   void handleStats();

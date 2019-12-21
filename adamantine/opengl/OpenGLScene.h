@@ -3,25 +3,26 @@
 #include <vector>
 
 #include "subsystem/Entities.h"
+#include "subsystem/AbstractScene.h"
 #include "opengl/VertexPipeline.h"
 
-struct OpenGLObject {
-  OpenGLObject(Object* baseObject, VertexPipeline* pipeline) : baseObject(baseObject), pipeline(pipeline) {};
+struct OpenGLObject : public Object {
   ~OpenGLObject();
 
-  Object* baseObject;
   VertexPipeline* pipeline;
 };
 
-class OpenGLScene {
-public:
-  ~OpenGLScene();
+class OpenGLScene : public AbstractScene {
+protected:
+  template<typename T>
+  OpenGLObject* create() {
+    auto* object = (OpenGLObject*)(new T());
 
-  void addObject(Object* object);
-  const Camera& getCamera() const;
-  const std::vector<OpenGLObject*>& getOpenGLObjects() const;
+    object->pipeline = createVertexPipeline(object);
+
+    return object;
+  }
 
 private:
-  Camera camera;
-  std::vector<OpenGLObject*> openGLObjects;
+  VertexPipeline* createVertexPipeline(Object* object);
 };
