@@ -12,18 +12,15 @@ Vec3f Camera::getDirection() const {
 }
 
 Vec3f Camera::getLeftDirection() const {
-  return getOrientationDirection({
-    orientation.x,
-    orientation.y - 90.0f,
-    orientation.z
-  });
+  constexpr float RAD_90 = 90.0f * M_PI / 180.0f;
+
+  return getOrientationDirection({ 0, orientation.y - RAD_90, 0 });
 }
 
 Vec3f Camera::getOrientationDirection(const Vec3f& o) const {
-  constexpr float DEG_TO_RAD = M_PI / 180.0f;
-  float pitch = o.x * DEG_TO_RAD;
-  float yaw = o.y * DEG_TO_RAD;
-  float roll = o.z * DEG_TO_RAD;
+  float pitch = o.x;
+  float yaw = o.y;
+  float roll = o.z;
   float p = std::abs(cosf(pitch));
 
   Vec3f direction = {
@@ -35,12 +32,10 @@ Vec3f Camera::getOrientationDirection(const Vec3f& o) const {
   return direction.unit();
 }
 
-Vec3f Camera::getRightDirection() const {
-  return getOrientationDirection({
-    orientation.x,
-    orientation.y + 90.0f,
-    orientation.z
-  });
+Vec3f Camera::getRightDirection() const {  
+  constexpr float RAD_90 = 90.0f * M_PI / 180.0f;
+
+  return getOrientationDirection({ 0, orientation.y + RAD_90, 0 });
 }
 
 /**
@@ -69,7 +64,11 @@ const std::vector<Polygon*>& Object::getPolygons() const {
 }
 
 void Object::recomputeMatrix() {
-  matrix = (Matrix4::translate(position) * Matrix4::rotate(orientation) * Matrix4::scale({ scale, scale, scale })).transpose();
+  matrix = (
+    Matrix4::translate({ position.x, position.y, -1.0f * position.z }) *
+    Matrix4::rotate(orientation) *
+    Matrix4::scale({ scale, scale, scale })
+  ).transpose();
 }
 
 void Object::setScale(float scale) {

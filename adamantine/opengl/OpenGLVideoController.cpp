@@ -36,13 +36,7 @@ Matrix4 OpenGLVideoController::createProjectionMatrix(float fov, float aspectRat
 Matrix4 OpenGLVideoController::createViewMatrix() {
   const Camera& camera = scene->getCamera();
 
-  Matrix4 translation = Matrix4::translate({
-    camera.position.x,
-    camera.position.y,
-    camera.position.z * -1.0f
-  });
-
-  return (Matrix4::rotate(camera.orientation) * translation).transpose();
+  return (Matrix4::rotate(camera.orientation) * Matrix4::translate(camera.position)).transpose();
 }
 
 void OpenGLVideoController::onDestroy() {
@@ -74,8 +68,12 @@ void OpenGLVideoController::onInit() {
   VertexShaderInput<float> vertexPositionInput = { "vertexPosition", 3, GL_FLOAT, 6, 0 };
   VertexShaderInput<float> vertexColorInput = { "vertexColor", 3, GL_FLOAT, 6, 3 };
 
-  shaderProgram.setVertexShaderInput(vertexPositionInput);
-  shaderProgram.setVertexShaderInput(vertexColorInput);
+  for (auto* object : scene->getEntityContainer().getObjects()) {
+    ((OpenGLObject*)object)->pipeline->useVAO();
+
+    shaderProgram.setVertexShaderInput(vertexPositionInput);
+    shaderProgram.setVertexShaderInput(vertexColorInput);
+  }
 }
 
 void OpenGLVideoController::onRender() {
@@ -83,7 +81,7 @@ void OpenGLVideoController::onRender() {
   glClear(GL_COLOR_BUFFER_BIT);
 
   glUniform1f(shaderProgram.getUniformLocation("time"), SDL_GetTicks() / 500.0f);
-  glUniformMatrix4fv(shaderProgram.getUniformLocation("projectionMatrix"), 1, GL_FALSE, createProjectionMatrix(45.0f, 1200.0f / 720.0f, 1.0f, 1000.0f).m);
+  glUniformMatrix4fv(shaderProgram.getUniformLocation("projectionMatrix"), 1, GL_FALSE, createProjectionMatrix(45.0f, 1200.0f / 720.0f, 1.0f, 10000.0f).m);
   glUniformMatrix4fv(shaderProgram.getUniformLocation("viewMatrix"), 1, GL_FALSE, createViewMatrix().m);
 
   for (auto* object : scene->getEntityContainer().getObjects()) {

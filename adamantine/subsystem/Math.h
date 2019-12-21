@@ -51,6 +51,7 @@ struct Vec3f : Vec2f {
   Vec3f operator*(float scalar) const;
   void operator*=(float scalar);
 
+  void debug() const;
   float magnitude() const;
   Vec3f unit() const;
 };

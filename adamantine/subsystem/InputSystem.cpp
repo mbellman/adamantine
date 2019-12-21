@@ -71,6 +71,7 @@ void InputSystem::poll() {
         handleKeyUp(event.key.keysym.sym);
         break;
       case SDL_MOUSEBUTTONDOWN:
+      case SDL_MOUSEBUTTONUP:
         fireInputHandlers(mouseButtonHandlers, event.button);
         break;
       case SDL_MOUSEMOTION:
