@@ -6,10 +6,16 @@
 #include "subsystem/AbstractScene.h"
 #include "opengl/VertexPipeline.h"
 
-struct OpenGLObject : public Object {
+class OpenGLObject : public Object {
+public:
   ~OpenGLObject();
 
-  VertexPipeline* pipeline;
+  void draw();
+  void initialize();
+  void use();
+
+private:
+  VertexPipeline* pipeline = nullptr;
 };
 
 class OpenGLScene : public AbstractScene {
@@ -18,11 +24,8 @@ protected:
   OpenGLObject* create() {
     auto* object = (OpenGLObject*)(new T());
 
-    object->pipeline = createVertexPipeline(object);
+    object->initialize();
 
     return object;
   }
-
-private:
-  VertexPipeline* createVertexPipeline(Object* object);
 };

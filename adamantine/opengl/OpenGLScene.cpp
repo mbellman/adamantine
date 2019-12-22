@@ -1,3 +1,4 @@
+#include "glew.h"
 #include "opengl/OpenGLScene.h"
 
 /**
@@ -8,36 +9,39 @@ OpenGLObject::~OpenGLObject() {
   delete pipeline;
 }
 
-/**
- * OpenGLScene
- * -----------
- */
-VertexPipeline* OpenGLScene::createVertexPipeline(Object* object) {
-  const std::vector<Polygon*>& polygons = object->getPolygons();
-  int vertexBufferSize = polygons.size() * 3 * 6;
+void OpenGLObject::draw() {
+  use();
+
+  glDrawArrays(GL_TRIANGLES, 0, getPolygons().size() * 3);
+}
+
+void OpenGLObject::initialize() {
+  int vertexBufferSize = getPolygons().size() * 3 * 6;
   float* vertexBuffer = new float[vertexBufferSize];
-  int i = 0;
+  int idx = 0;
 
   // TODO figure out how to recycle vertices
-  for (auto* polygon : polygons) {
+  for (auto* polygon : getPolygons()) {
     for (int v = 0; v < 3; v++) {
       const Vertex3d& vertex = *polygon->vertices[v];
 
-      vertexBuffer[i++] = vertex.position.x;
-      vertexBuffer[i++] = vertex.position.y;
-      vertexBuffer[i++] = vertex.position.z;
+      vertexBuffer[idx++] = vertex.position.x;
+      vertexBuffer[idx++] = vertex.position.y;
+      vertexBuffer[idx++] = vertex.position.z;
 
-      vertexBuffer[i++] = vertex.color.x;
-      vertexBuffer[i++] = vertex.color.y;
-      vertexBuffer[i++] = vertex.color.z;
+      vertexBuffer[idx++] = vertex.color.x;
+      vertexBuffer[idx++] = vertex.color.y;
+      vertexBuffer[idx++] = vertex.color.z;
     }
   }
 
-  VertexPipeline* pipeline = new VertexPipeline();
+  pipeline = new VertexPipeline();
 
   pipeline->bufferVertices(vertexBufferSize * sizeof(float), vertexBuffer);
 
   delete[] vertexBuffer;
+}
 
-  return pipeline;
+void OpenGLObject::use() {
+  pipeline->useVAO();
 }

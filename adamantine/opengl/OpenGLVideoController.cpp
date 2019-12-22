@@ -69,7 +69,7 @@ void OpenGLVideoController::onInit() {
   VertexShaderInput<float> vertexColorInput = { "vertexColor", 3, GL_FLOAT, 6, 3 };
 
   for (auto* object : scene->getEntityContainer().getObjects()) {
-    ((OpenGLObject*)object)->pipeline->useVAO();
+    ((OpenGLObject*)object)->use();
 
     shaderProgram.setVertexShaderInput(vertexPositionInput);
     shaderProgram.setVertexShaderInput(vertexColorInput);
@@ -87,8 +87,7 @@ void OpenGLVideoController::onRender() {
   for (auto* object : scene->getEntityContainer().getObjects()) {
     glUniformMatrix4fv(shaderProgram.getUniformLocation("modelMatrix"), 1, GL_FALSE, object->getMatrix().m);
 
-    ((OpenGLObject*)object)->pipeline->useVAO();
-    glDrawArrays(GL_TRIANGLES, 0, object->getPolygons().size() * 3);
+    ((OpenGLObject*)object)->draw();
   }
 
   SDL_GL_SwapWindow(sdlWindow);
