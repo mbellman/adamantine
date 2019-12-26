@@ -6,8 +6,11 @@
 #include "subsystem/Geometry.h"
 
 struct Entity {
+  Entity();
   virtual ~Entity() {};
 
+  static int total;
+  int id;
   Vec3f position;
   Vec3f velocity;
   Vec3f orientation;

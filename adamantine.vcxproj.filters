@@ -24,9 +24,6 @@
     <ClCompile Include="adamantine\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="adamantine\opengl\OpenGLScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="adamantine\opengl\OpenGLVideoController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,9 +33,6 @@
     <ClCompile Include="adamantine\opengl\ShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="adamantine\opengl\VertexPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="adamantine\subsystem\AbstractScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -46,9 +40,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="adamantine\subsystem\Entities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="adamantine\subsystem\EntityContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="adamantine\subsystem\FileLoader.cpp">
@@ -64,6 +55,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="demo\DefaultScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="adamantine\opengl\OpenGLPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="adamantine\subsystem\Stage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="adamantine\subsystem\RNG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -113,9 +113,6 @@
     <ClInclude Include="adamantine\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="adamantine\opengl\OpenGLScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="adamantine\opengl\OpenGLVideoController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -125,9 +122,6 @@
     <ClInclude Include="adamantine\opengl\ShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="adamantine\opengl\VertexPipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="adamantine\subsystem\AbstractScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -135,9 +129,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="adamantine\subsystem\Entities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="adamantine\subsystem\EntityContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="adamantine\subsystem\FileLoader.h">
@@ -153,6 +144,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="demo\DefaultScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="adamantine\opengl\OpenGLPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="adamantine\subsystem\Stage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="adamantine\subsystem\RNG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

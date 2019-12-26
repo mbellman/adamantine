@@ -1,8 +1,8 @@
 #pragma once
 
-#include "opengl/OpenGLScene.h"
+#include "subsystem/AbstractScene.h"
 
-class DefaultScene : public OpenGLScene {
+class DefaultScene : public AbstractScene {
 public:
   void onInit() override;
   void onUpdate(int dt) override;

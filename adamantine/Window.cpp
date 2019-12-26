@@ -5,6 +5,7 @@
 #include "SDL.h"
 #include "subsystem/InputSystem.h"
 #include "Stats.h"
+#include "subsystem/RNG.h"
 
 Window::~Window() {
   videoController->onDestroy();

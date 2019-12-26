@@ -3,6 +3,8 @@
 #include "glew.h"
 #include "glut.h"
 
+#include <cstdio>
+
 template<typename T>
 struct VertexShaderInput {
   const char* name;

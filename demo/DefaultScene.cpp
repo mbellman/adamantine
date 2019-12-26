@@ -1,11 +1,11 @@
+#include <cmath>
+
 #include "DefaultScene.h"
 #include "subsystem/Entities.h"
 
-#include <cmath>
-
 void DefaultScene::onInit() {
   for (int i = 0; i < 10000; i++) {
-    auto* cube = create<Cube>();
+    auto* cube = new Cube();
     float r = 50.0f + i * 2.0f;
     float x = r * sinf(i * 0.1f);
     float z = r * cosf(i * 0.1f);
@@ -13,7 +13,7 @@ void DefaultScene::onInit() {
     cube->setPosition({ x, 0.0f, z });
     cube->setScale(5.0f);
 
-    entities.add(cube);
+    stage.add(cube);
   }
 
   inputSystem.onMouseMotion([=](const SDL_MouseMotionEvent& event) {

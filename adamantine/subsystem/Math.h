@@ -57,7 +57,7 @@ struct Vec3f : Vec2f {
 };
 
 /**
- * A 3x3 float matrix.
+ * A 3x3 transformation matrix.
  */
 struct Matrix3 {
   float m11, m12, m13, m21, m22, m23, m31, m32, m33;

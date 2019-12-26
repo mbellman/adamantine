@@ -2,6 +2,17 @@
 
 #include "SDL.h"
 #include "subsystem/Entities.h"
+#include "subsystem/RNG.h"
+
+/**
+ * Entity
+ * ------
+ */
+Entity::Entity() {
+  id = Entity::total++;
+}
+
+int Entity::total = 0;
 
 /**
  * Camera
@@ -94,7 +105,7 @@ Cube::Cube() {
     Vertex3d* vertex = new Vertex3d();
 
     vertex->position = position;
-    vertex->color = { 1.0f, 1.0f, 1.0f };
+    vertex->color = { RNG::random(), RNG::random(), RNG::random() };
 
     vertices.push_back(vertex);
   }
