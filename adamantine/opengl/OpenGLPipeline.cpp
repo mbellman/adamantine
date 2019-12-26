@@ -5,9 +5,8 @@
 OpenGLPipeline::OpenGLPipeline() {
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
-
-  useVAO();
-  useVBO();
+  
+  use();
 }
 
 void OpenGLPipeline::createFromObject(const Object* object) {
@@ -39,16 +38,12 @@ void OpenGLPipeline::createFromObject(const Object* object) {
 }
 
 void OpenGLPipeline::render() {
-  useVAO();
-  useVBO();
+  use();
 
   glDrawArrays(GL_TRIANGLES, 0, totalVertices);
 }
 
-void OpenGLPipeline::useVAO() {
+void OpenGLPipeline::use() {
   glBindVertexArray(vao);
-}
-
-void OpenGLPipeline::useVBO() {
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
 }

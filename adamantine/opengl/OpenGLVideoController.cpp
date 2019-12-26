@@ -107,8 +107,7 @@ void OpenGLVideoController::onInit() {
   scene->onInit();
 
   for (auto [ key, pipeline ] : pipelines) {
-    pipeline->useVBO();
-    pipeline->useVAO();
+    pipeline->use();
 
     shaderProgram.setVertexShaderInput(vertexPositionInput);
     shaderProgram.setVertexShaderInput(vertexColorInput);

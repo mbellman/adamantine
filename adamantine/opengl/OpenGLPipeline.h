@@ -10,8 +10,7 @@ public:
 
   void createFromObject(const Object* object);
   void render();
-  void useVAO();
-  void useVBO();
+  void use();
 
 private:
   GLuint vao;
