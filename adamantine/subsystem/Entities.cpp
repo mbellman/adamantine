@@ -95,6 +95,50 @@ void Object::setPosition(const Vec3f& position) {
 }
 
 /**
+ * Mesh
+ * ----
+ */
+Mesh::Mesh(int w, int h, float tileSize) {
+  // Add vertices
+  for (int i = 0; i < h + 1; i++) {
+    for (int j = 0; j < w + 1; j++) {
+      Vertex3d* vertex = new Vertex3d();
+
+      vertex->position = {
+        j * tileSize,
+        RNG::random() * 5.0f,
+        -i * tileSize
+      };
+
+      vertex->color = { RNG::random(), RNG::random(), RNG::random() };
+
+      vertices.push_back(vertex);
+    }
+  }
+
+  // Add polygons
+  int totalPolygons = w * h * 2;
+
+  for (int p = 0; p < totalPolygons; p++) {
+    int tileIndex = p / 2;
+    int rowIndex = tileIndex / w;
+    int vOffset = rowIndex * (w + 1) + tileIndex % w;
+    bool isTopPolygon = p % 2 == 0;
+    int v1i = isTopPolygon ? vOffset : vOffset + 1;
+    int v2i = vOffset + w + 1;
+    int v3i = isTopPolygon ? vOffset + 1 : vOffset + w + 2;
+
+    Polygon* polygon = new Polygon();
+
+    polygon->vertices[0] = vertices.at(v1i);
+    polygon->vertices[1] = vertices.at(v2i);
+    polygon->vertices[2] = vertices.at(v3i);
+
+    polygons.push_back(polygon);
+  }
+}
+
+/**
  * Cube
  * ----
  */

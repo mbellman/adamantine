@@ -16,6 +16,12 @@ void DefaultScene::onInit() {
     stage.add(cube);
   }
 
+  auto* mesh = new Mesh(100, 100, 10.0f);
+
+  mesh->setPosition({ -500.0f, -50.0f, 500.0f });
+
+  stage.add(mesh);
+
   inputSystem.onMouseMotion([=](const SDL_MouseMotionEvent& event) {
     if (SDL_GetRelativeMouseMode()) {
       camera.orientation.x += event.yrel / 1000.0f;

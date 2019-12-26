@@ -49,6 +49,11 @@ protected:
   void recomputeMatrix();
 };
 
+class Mesh : public Object {
+public:
+  Mesh(int w, int h, float tileSize);
+};
+
 class Cube : public Object {
 public:
   Cube();
