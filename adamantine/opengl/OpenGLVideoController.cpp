@@ -81,11 +81,11 @@ void OpenGLVideoController::onInit() {
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
   glContext = SDL_GL_CreateContext(sdlWindow);
-
-  SDL_GL_SetSwapInterval(0);
-
   glewExperimental = true;
+
   glewInit();
+  glEnable(GL_DEPTH_TEST);
+  SDL_GL_SetSwapInterval(0);
 
   shaderProgram.create();
   shaderProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/vertex.glsl"));
@@ -116,7 +116,7 @@ void OpenGLVideoController::onInit() {
 
 void OpenGLVideoController::onRender() {
   glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glUniform1f(shaderProgram.getUniformLocation("time"), SDL_GetTicks() / 500.0f);
   glUniformMatrix4fv(shaderProgram.getUniformLocation("projectionMatrix"), 1, GL_FALSE, createProjectionMatrix(45.0f, 1200.0f / 720.0f, 1.0f, 10000.0f).m);
