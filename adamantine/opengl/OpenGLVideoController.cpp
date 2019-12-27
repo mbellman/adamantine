@@ -1,8 +1,5 @@
 #include <cmath>
-#include <cstdio>
-#include <cstdlib>
 #include <ctime>
-#include <filesystem>
 
 #include "SDL.h"
 #include "glew.h"
@@ -14,6 +11,16 @@
 #include "opengl/ShaderLoader.h"
 #include "subsystem/Math.h"
 #include "subsystem/Entities.h"
+
+OpenGLVideoController::OpenGLVideoController() {
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+  SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+  SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+}
 
 OpenGLVideoController::~OpenGLVideoController() {
   for (auto [ key, pipeline ] : pipelines) {
@@ -74,17 +81,12 @@ void OpenGLVideoController::onEntityRemoved(Entity* entity) {
 }
 
 void OpenGLVideoController::onInit() {
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
   glContext = SDL_GL_CreateContext(sdlWindow);
   glewExperimental = true;
 
   glewInit();
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_MULTISAMPLE);
   SDL_GL_SetSwapInterval(0);
 
   shaderProgram.create();

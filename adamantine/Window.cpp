@@ -7,6 +7,10 @@
 #include "Stats.h"
 #include "subsystem/RNG.h"
 
+Window::Window() {
+  SDL_Init(SDL_INIT_EVERYTHING);
+}
+
 Window::~Window() {
   videoController->onDestroy();
 
@@ -21,8 +25,6 @@ void Window::handleStats() {
 }
 
 void Window::open(const char* title, Region2d<int> region) {
-  SDL_Init(SDL_INIT_EVERYTHING);
-
   videoController->initWindow(title, region);
   videoController->onInit();
 }

@@ -8,6 +8,7 @@
 
 class Window {
 public:
+  Window();
   ~Window();
 
   void open(const char* title, Region2d<int> region);

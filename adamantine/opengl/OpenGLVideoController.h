@@ -12,6 +12,7 @@
 
 class OpenGLVideoController final : public AbstractVideoController {
 public:
+  OpenGLVideoController();
   ~OpenGLVideoController();
 
   SDL_Window* createWindow(const char* title, Region2d<int> region) override;
