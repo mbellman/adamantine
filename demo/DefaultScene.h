@@ -5,5 +5,5 @@
 class DefaultScene : public AbstractScene {
 public:
   void onInit() override;
-  void onUpdate(int dt) override;
+  void onUpdate(float dt) override;
 };

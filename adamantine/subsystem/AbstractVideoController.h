@@ -18,7 +18,7 @@ public:
   virtual void onScreenSizeChange(int width, int height);
   virtual void setScene(AbstractScene* scene);
   virtual void toggleFullScreen() final;
-  virtual void update() final;
+  virtual void update(float dt) final;
 
 protected:
   SDL_Window* sdlWindow = nullptr;

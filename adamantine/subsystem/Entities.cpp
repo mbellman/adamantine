@@ -3,6 +3,7 @@
 #include "SDL.h"
 #include "subsystem/Entities.h"
 #include "subsystem/RNG.h"
+#include "subsystem/Geometry.h"
 
 /**
  * Entity
@@ -66,6 +67,16 @@ Object::~Object() {
   vertices.clear();
 }
 
+void Object::addPolygon(int v1index, int v2index, int v3index) {
+  Polygon* polygon = new Polygon();
+
+  polygon->vertices[0] = vertices[v1index];
+  polygon->vertices[1] = vertices[v2index];
+  polygon->vertices[2] = vertices[v3index];
+
+  polygons.push_back(polygon);
+}
+
 const Matrix4& Object::getMatrix() const {
   return matrix;
 }
@@ -88,6 +99,12 @@ void Object::setScale(float scale) {
   recomputeMatrix();
 }
 
+void Object::setOrientation(const Vec3f& orientation) {
+  this->orientation = orientation;
+
+  recomputeMatrix();
+}
+
 void Object::setPosition(const Vec3f& position) {
   this->position = position;
 
@@ -99,15 +116,23 @@ void Object::setPosition(const Vec3f& position) {
  * ----
  */
 Mesh::Mesh(int w, int h, float tileSize) {
+  width = w;
+  height = h;
+
   // Add vertices
+  Vec2f offset = {
+    (w + 1) * tileSize * -0.5f,
+    (h + 1) * tileSize * -0.5f
+  };
+
   for (int i = 0; i < h + 1; i++) {
     for (int j = 0; j < w + 1; j++) {
       Vertex3d* vertex = new Vertex3d();
 
       vertex->position = {
-        j * tileSize,
-        RNG::random() * 5.0f,
-        -i * tileSize
+        j * tileSize + offset.x,
+        0.0f,
+        i * tileSize + offset.y
       };
 
       vertex->color = { RNG::random(), RNG::random(), RNG::random() };
@@ -128,13 +153,17 @@ Mesh::Mesh(int w, int h, float tileSize) {
     int v2i = vOffset + w + 1;
     int v3i = isTopPolygon ? vOffset + 1 : vOffset + w + 2;
 
-    Polygon* polygon = new Polygon();
+    addPolygon(v1i, v2i, v3i);
+  }
+}
 
-    polygon->vertices[0] = vertices.at(v1i);
-    polygon->vertices[1] = vertices.at(v2i);
-    polygon->vertices[2] = vertices.at(v3i);
+void Mesh::defineOffsets(std::function<void(Vec3f&, int, int)> offsetHandler) {
+  for (int i = 0; i < (height + 1); i++) {
+    for (int j = 0; j < (width + 1); j++) {
+      int idx = i * (width + 1) + j;
 
-    polygons.push_back(polygon);
+      offsetHandler(vertices[idx]->position, j, i);
+    }
   }
 }
 

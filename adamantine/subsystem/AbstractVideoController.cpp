@@ -21,9 +21,9 @@ void AbstractVideoController::onDestroy() {}
 
 void AbstractVideoController::onScreenSizeChange(int width, int height) {}
 
-void AbstractVideoController::update() {
+void AbstractVideoController::update(float dt) {
   scene->pollInput();
-  scene->onUpdate(16);
+  scene->onUpdate(dt);
 }
 
 void AbstractVideoController::setScene(AbstractScene* scene) {

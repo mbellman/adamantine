@@ -17,7 +17,7 @@ public:
   void onEntityAdded(EntityHandler handler);
   void onEntityRemoved(EntityHandler handler);
   virtual void onInit();
-  virtual void onUpdate(int dt);
+  virtual void onUpdate(float dt);
   virtual void pollInput() final;
 
 protected:

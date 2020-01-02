@@ -27,7 +27,7 @@ void AbstractScene::onEntityRemoved(EntityHandler handler) {
 
 void AbstractScene::onInit() {}
 
-void AbstractScene::onUpdate(int dt) {}
+void AbstractScene::onUpdate(float dt) {}
 
 void AbstractScene::pollInput() {
   inputSystem.poll();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 
 #include "subsystem/Math.h"
 #include "subsystem/Geometry.h"
@@ -39,6 +40,7 @@ public:
   const Matrix4& getMatrix() const;
   const std::vector<Polygon*>& getPolygons() const;
   void setScale(float scale);
+  void setOrientation(const Vec3f& orientation);
   void setPosition(const Vec3f& position);
 
 protected:
@@ -46,12 +48,19 @@ protected:
   std::vector<Polygon*> polygons;
   Matrix4 matrix;
 
+  void addPolygon(int v1index, int v2index, int v3index);
   void recomputeMatrix();
 };
 
 class Mesh : public Object {
 public:
   Mesh(int w, int h, float tileSize);
+
+  void defineOffsets(std::function<void(Vec3f&, int, int)> offsetHandler);
+
+private:
+  int width;
+  int height;
 };
 
 class Cube : public Object {
