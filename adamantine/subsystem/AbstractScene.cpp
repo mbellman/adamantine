@@ -9,6 +9,10 @@ const Camera& AbstractScene::getCamera() const {
   return camera;
 }
 
+const SceneSettings& AbstractScene::getSettings() const {
+  return settings;
+}
+
 const Stage& AbstractScene::getStage() const {
   return stage;
 }

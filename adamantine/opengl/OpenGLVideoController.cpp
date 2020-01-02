@@ -117,7 +117,9 @@ void OpenGLVideoController::onInit() {
 }
 
 void OpenGLVideoController::onRender() {
-  glClearColor(0, 0, 0, 1);
+  const Vec3f& backgroundColor = scene->getSettings().backgroundColor;
+
+  glClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glUniform1f(shaderProgram.getUniformLocation("time"), SDL_GetTicks() / 500.0f);

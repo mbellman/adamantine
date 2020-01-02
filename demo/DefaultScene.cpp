@@ -5,6 +5,12 @@
 #include "subsystem/RNG.h"
 
 void DefaultScene::onInit() {
+  settings.backgroundColor = {
+    0.5f,
+    0.0f,
+    0.3f
+  };
+
   auto* mesh = new Mesh(100, 100, 10.0f);
 
   mesh->setPosition({ 0.0f, -20.0f, 0.0f });
