@@ -5,6 +5,7 @@
 
 #include "subsystem/Math.h"
 #include "subsystem/Geometry.h"
+#include "subsystem/ObjLoader.h"
 
 struct Entity {
   Entity();
@@ -34,11 +35,13 @@ class Object : public Entity {
 public:
   // TODO represent scale as a Vec3f
   float scale = 1.0f;
+  std::function<void(float)> onUpdate = nullptr;
 
   virtual ~Object();
 
   const Matrix4& getMatrix() const;
   const std::vector<Polygon*>& getPolygons() const;
+  void rotate(const Vec3f& rotation);
   void setScale(float scale);
   void setOrientation(const Vec3f& orientation);
   void setPosition(const Vec3f& position);
@@ -49,6 +52,10 @@ protected:
   Matrix4 matrix;
 
   void addPolygon(int v1index, int v2index, int v3index);
+  void addVertex(const Vec3f& position);
+  void addVertex(const Vec3f& position, const Vec3f& color);
+  void addVertex(const Vec3f& position, const Vec2f& uv);
+  void addVertex(const Vec3f& position, const Vec3f& color, const Vec2f& uv);
   void recomputeMatrix();
 };
 
@@ -70,4 +77,13 @@ public:
 private:
   static Vec3f corners[8];
   static int faces[6][4];
+};
+
+class Model : public Object {
+public:
+  Model(const ObjLoader& loader);
+
+private:
+  void buildTexturedModel(const ObjLoader& loader);
+  void buildUntexturedModel(const ObjLoader& loader);
 };

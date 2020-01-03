@@ -24,6 +24,13 @@ void AbstractVideoController::onScreenSizeChange(int width, int height) {}
 void AbstractVideoController::update(float dt) {
   scene->pollInput();
   scene->onUpdate(dt);
+  scene->updateRunningTime(dt);
+
+  for (auto* object : scene->getStage().getObjects()) {
+    if (object->onUpdate) {
+      object->onUpdate(dt);
+    }
+  }
 }
 
 void AbstractVideoController::setScene(AbstractScene* scene) {

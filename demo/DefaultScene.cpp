@@ -3,6 +3,7 @@
 #include "DefaultScene.h"
 #include "subsystem/Entities.h"
 #include "subsystem/RNG.h"
+#include "subsystem/ObjLoader.h"
 
 void DefaultScene::onInit() {
   settings.backgroundColor = {
@@ -25,11 +26,27 @@ void DefaultScene::onInit() {
   cube1->setPosition({ -25.0f, 10.0f, 50.0f });
   cube1->setOrientation({ 1.5f, 0.7f, 2.1f });
 
+  cube1->onUpdate = [=](float dt) {
+    cube1->rotate({
+      0.5f * dt,
+      0.5f * dt,
+      0.5f * dt
+    });
+  };
+
   auto* cube2 = new Cube();
 
   cube2->setScale(4.0f);
   cube2->setPosition({ 0.0f, 7.0f, 50.0f });
   cube2->setOrientation({ 0.3f, 1.1f, 0.8f });
+
+  cube2->onUpdate = [=](float dt) {
+    cube2->rotate({
+      0.5f * dt,
+      0.5f * dt,
+      0.5f * dt
+    });
+  };
 
   auto* cube3 = new Cube();
 
@@ -37,10 +54,46 @@ void DefaultScene::onInit() {
   cube3->setPosition({ 15.0f, 4.0f, 50.0f });
   cube3->setOrientation({ 0.9f, 2.5f, 3.1f });
 
+  cube3->onUpdate = [=](float dt) {
+    cube3->rotate({
+      0.5f * dt,
+      0.5f * dt,
+      0.5f * dt
+    });
+  };
+
+  ObjLoader daVinci("./demo/da-vinci.obj");
+
+  auto* model = new Model(daVinci);
+
+  model->setScale(30.0f);
+  model->setPosition({ 0.0f, 15.0f, 250.0f });
+
+  model->onUpdate = [=](float dt) {
+    model->rotate({ 0.0f, dt * 0.5f, 0.0f });
+  };
+
+  auto* tinyCube = new Cube();
+
+  tinyCube->setScale(3.0f);
+  tinyCube->setPosition({ 0.0f, 15.0f, 250.0f });
+
+  tinyCube->onUpdate = [=](float dt) {
+    tinyCube->setPosition({
+      0.0f + 40.0f * sinf(getRunningTime()),
+      15.0f,
+      250.0f + 40.0f * cosf(getRunningTime())
+    });
+
+    tinyCube->rotate({ 0.0f, -dt, 0.0f });
+  };
+
   stage.add(mesh);
   stage.add(cube1);
   stage.add(cube2);
   stage.add(cube3);
+  stage.add(model);
+  stage.add(tinyCube);
 
   inputSystem.onMouseMotion([=](const SDL_MouseMotionEvent& event) {
     if (SDL_GetRelativeMouseMode()) {

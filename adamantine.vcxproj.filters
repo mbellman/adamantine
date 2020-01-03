@@ -66,6 +66,12 @@
     <ClCompile Include="adamantine\subsystem\RNG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="adamantine\subsystem\AbstractLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="adamantine\subsystem\ObjLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="subsystem\FileLoader.h">
@@ -153,6 +159,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="adamantine\subsystem\RNG.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="adamantine\subsystem\AbstractLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="adamantine\subsystem\ObjLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

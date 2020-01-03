@@ -131,6 +131,7 @@
     <ClCompile Include="adamantine\opengl\ShaderLoader.cpp" />
     <ClCompile Include="adamantine\opengl\ShaderProgram.cpp" />
     <ClCompile Include="adamantine\Stats.cpp" />
+    <ClCompile Include="adamantine\subsystem\AbstractLoader.cpp" />
     <ClCompile Include="adamantine\subsystem\AbstractScene.cpp" />
     <ClCompile Include="adamantine\subsystem\AbstractVideoController.cpp" />
     <ClCompile Include="adamantine\subsystem\Entities.cpp" />
@@ -138,6 +139,7 @@
     <ClCompile Include="adamantine\subsystem\Geometry.cpp" />
     <ClCompile Include="adamantine\subsystem\InputSystem.cpp" />
     <ClCompile Include="adamantine\subsystem\Math.cpp" />
+    <ClCompile Include="adamantine\subsystem\ObjLoader.cpp" />
     <ClCompile Include="adamantine\subsystem\RNG.cpp" />
     <ClCompile Include="adamantine\subsystem\Stage.cpp" />
     <ClCompile Include="adamantine\Window.cpp" />
@@ -150,6 +152,7 @@
     <ClInclude Include="adamantine\opengl\ShaderLoader.h" />
     <ClInclude Include="adamantine\opengl\ShaderProgram.h" />
     <ClInclude Include="adamantine\Stats.h" />
+    <ClInclude Include="adamantine\subsystem\AbstractLoader.h" />
     <ClInclude Include="adamantine\subsystem\AbstractScene.h" />
     <ClInclude Include="adamantine\subsystem\AbstractVideoController.h" />
     <ClInclude Include="adamantine\subsystem\Entities.h" />
@@ -157,6 +160,7 @@
     <ClInclude Include="adamantine\subsystem\Geometry.h" />
     <ClInclude Include="adamantine\subsystem\InputSystem.h" />
     <ClInclude Include="adamantine\subsystem\Math.h" />
+    <ClInclude Include="adamantine\subsystem\ObjLoader.h" />
     <ClInclude Include="adamantine\subsystem\RNG.h" />
     <ClInclude Include="adamantine\subsystem\Stage.h" />
     <ClInclude Include="adamantine\Window.h" />

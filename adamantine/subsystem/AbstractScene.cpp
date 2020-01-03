@@ -1,12 +1,18 @@
 #include "subsystem/AbstractScene.h"
 #include "subsystem/RNG.h"
 
+#include <cstdio>
+
 AbstractScene::AbstractScene() {
   RNG::seed();
 }
 
 const Camera& AbstractScene::getCamera() const {
   return camera;
+}
+
+float AbstractScene::getRunningTime() {
+  return runningTime;
 }
 
 const SceneSettings& AbstractScene::getSettings() const {
@@ -35,4 +41,7 @@ void AbstractScene::onUpdate(float dt) {}
 
 void AbstractScene::pollInput() {
   inputSystem.poll();
+}
+void AbstractScene::updateRunningTime(float dt) {
+  runningTime += dt;
 }

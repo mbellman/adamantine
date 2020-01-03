@@ -24,10 +24,16 @@ public:
   virtual void onInit();
   virtual void onUpdate(float dt);
   virtual void pollInput() final;
+  virtual void updateRunningTime(float dt) final;
 
 protected:
   Stage stage;
   Camera camera;
   InputSystem inputSystem;
   SceneSettings settings;
+
+  float getRunningTime();
+
+private:
+  float runningTime = 0.0f;
 };

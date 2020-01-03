@@ -18,6 +18,7 @@ struct Vertex3d {
 
   Vec3f position;
   Vec3f color;
+  Vec2f uv;
 };
 
 /**
