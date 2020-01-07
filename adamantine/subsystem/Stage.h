@@ -12,6 +12,7 @@ public:
   ~Stage();
 
   void add(Entity* entity);
+  const std::vector<Light*>& getLights() const;
   const std::vector<Object*>& getObjects() const;
   void onEntityAdded(EntityHandler handler);
   void onEntityRemoved(EntityHandler handler);
@@ -19,6 +20,7 @@ public:
 
 private:
   std::vector<Object*> objects;
+  std::vector<Light*> lights;
   EntityHandler entityAddedHandler = nullptr;
   EntityHandler entityRemovedHandler = nullptr;
 };

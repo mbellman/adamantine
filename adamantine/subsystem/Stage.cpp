@@ -13,11 +13,17 @@ Stage::~Stage() {
 void Stage::add(Entity* entity) {
   if (entity->isOfType<Object>()) {
     objects.push_back((Object*)entity);
+  } else if (entity->isOfType<Light>()) {
+    lights.push_back((Light*)entity);
   }
 
   if (entityAddedHandler) {
     entityAddedHandler(entity);
   }
+}
+
+const std::vector<Light*>& Stage::getLights() const {
+  return lights;
 }
 
 const std::vector<Object*>& Stage::getObjects() const {
@@ -35,6 +41,8 @@ void Stage::onEntityRemoved(EntityHandler handler) {
 void Stage::remove(Entity* entity) {
   if (entity->isOfType<Object>()) {
     objects.erase(std::remove(objects.begin(), objects.end(), entity), objects.end());
+  } else if (entity->isOfType<Light>()) {
+    lights.erase(std::remove(lights.begin(), lights.end(), entity), lights.end());
   }
 
   if (entityRemovedHandler) {

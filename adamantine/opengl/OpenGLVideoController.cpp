@@ -85,8 +85,12 @@ void OpenGLVideoController::onInit() {
   glewExperimental = true;
 
   glewInit();
+
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_MULTISAMPLE);
+  glCullFace(GL_BACK);
+  glEnable(GL_CULL_FACE);
+ 
   SDL_GL_SetSwapInterval(0);
 
   shaderProgram.create();

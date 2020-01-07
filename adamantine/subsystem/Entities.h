@@ -14,7 +14,6 @@ struct Entity {
   static int total;
   int id;
   Vec3f position;
-  Vec3f velocity;
   Vec3f orientation;
 
   template<typename T>
@@ -23,11 +22,25 @@ struct Entity {
   }
 };
 
-struct Camera : Entity {
+class Light : public Entity {
+public:
+  enum LightType {
+    POINT = 0,
+    DIRECTIONAL = 1
+  };
+
+  Vec3f color;
+  Vec3f direction;
+
+  virtual ~Light() {};
+};
+
+class Camera : public Entity {
+public:
   // TODO Create 'Orientation' struct with below methods
   Vec3f getDirection() const;
   Vec3f getLeftDirection() const;
-  Vec3f getOrientationDirection(const Vec3f& o) const;
+  Vec3f getOrientationDirection(const Vec3f& orientation) const;
   Vec3f getRightDirection() const;
 };
 
@@ -57,6 +70,7 @@ protected:
   void addVertex(const Vec3f& position, const Vec2f& uv);
   void addVertex(const Vec3f& position, const Vec3f& color, const Vec2f& uv);
   void recomputeMatrix();
+  void updateNormals();
 };
 
 class Mesh : public Object {

@@ -32,16 +32,16 @@ Vec3f Camera::getLeftDirection() const {
   return getOrientationDirection({ 0, orientation.y - RAD_90, 0 });
 }
 
-Vec3f Camera::getOrientationDirection(const Vec3f& o) const {
-  float pitch = o.x;
-  float yaw = o.y;
-  float roll = o.z;
-  float p = std::abs(cosf(pitch));
+Vec3f Camera::getOrientationDirection(const Vec3f& orientation) const {
+  float pitch = orientation.x;
+  float yaw = orientation.y;
+  float roll = orientation.z;
+  float pitchFactor = std::abs(cosf(pitch));
 
   Vec3f direction = {
-    -sinf(yaw) * p,
+    -sinf(yaw) * pitchFactor,
     sinf(pitch),
-    cosf(yaw) * p
+    cosf(yaw) * pitchFactor
   };
 
   return direction.unit();
@@ -76,6 +76,10 @@ void Object::addPolygon(int v1index, int v2index, int v3index) {
   polygon->vertices[0] = vertices[v1index];
   polygon->vertices[1] = vertices[v2index];
   polygon->vertices[2] = vertices[v3index];
+
+  vertices[v1index]->polygons.push_back(polygon);
+  vertices[v2index]->polygons.push_back(polygon);
+  vertices[v3index]->polygons.push_back(polygon);
 
   polygons.push_back(polygon);
 }
@@ -142,6 +146,16 @@ void Object::setPosition(const Vec3f& position) {
   recomputeMatrix();
 }
 
+void Object::updateNormals() {
+  for (auto* polygon : polygons) {
+    polygon->updateNormal();
+  }
+
+  for (auto* vertex : vertices) {
+    vertex->updateNormal();
+  }
+}
+
 /**
  * Mesh
  * ----
@@ -159,13 +173,10 @@ Mesh::Mesh(int w, int h, float tileSize) {
   for (int i = 0; i < h + 1; i++) {
     for (int j = 0; j < w + 1; j++) {
       Vertex3d* vertex = new Vertex3d();
+      float x = j * tileSize + offset.x;
+      float z = i * tileSize + offset.y;
 
-      vertex->position = {
-        j * tileSize + offset.x,
-        0.0f,
-        i * tileSize + offset.y
-      };
-
+      vertex->position = { x, 0.0f, z };
       vertex->color = { RNG::random(), RNG::random(), RNG::random() };
 
       vertices.push_back(vertex);
@@ -224,7 +235,7 @@ Cube::Cube() {
     }
 
     polygons.push_back(new Polygon(verts[0], verts[1], verts[2]));
-    polygons.push_back(new Polygon(verts[0], verts[3], verts[2]));
+    polygons.push_back(new Polygon(verts[0], verts[2], verts[3]));
   }
 }
 
@@ -243,10 +254,10 @@ Vec3f Cube::corners[8] = {
 // The six cube faces, each defined by
 // four corner indices.
 int Cube::faces[6][4] = {
-  { 0, 1, 2, 3 }, // Back
-  { 3, 2, 6, 7 }, // Top
-  { 7, 6, 5, 4 }, // Front
-  { 4, 5, 1, 0 }, // Bottom
+  { 3, 2, 1, 0 }, // Back
+  { 7, 6, 2, 3 }, // Top
+  { 4, 5, 6, 7 }, // Front
+  { 0, 1, 5, 4 }, // Bottom
   { 0, 4, 7, 3 }, // Left
   { 5, 1, 2, 6 }  // Right
 };

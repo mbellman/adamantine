@@ -44,6 +44,8 @@ struct Vec3f : Vec2f {
 
   float z = 0.0f;
 
+  static Vec3f crossProduct(const Vec3f& v1, const Vec3f& v2);
+
   Vec3f operator+(const Vec3f& vector) const;
   void operator+=(const Vec3f& vector);
   Vec3f operator-(const Vec3f& vector) const;
