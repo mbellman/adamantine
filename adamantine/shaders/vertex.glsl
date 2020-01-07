@@ -6,7 +6,9 @@ uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 
 in vec3 vertexPosition;
+in vec3 vertexNormal;
 in vec3 vertexColor;
+in vec2 vertexUv;
 
 out vec3 fragmentColor;
 

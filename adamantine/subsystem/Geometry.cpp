@@ -31,4 +31,5 @@ void Polygon::updateNormal() {
   const Vec3f& v3 = vertices[2]->position;
 
   normal = Vec3f::crossProduct(v2 - v1, v3 - v1);
+  normal.z *= -1.0f;
 }

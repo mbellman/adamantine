@@ -21,9 +21,9 @@ struct Vertex3d {
   Vertex3d() {};
 
   Vec3f position;
+  Vec3f normal;
   Vec3f color;
   Vec2f uv;
-  Vec3f normal;
   std::vector<Polygon*> polygons;
 
   void updateNormal();

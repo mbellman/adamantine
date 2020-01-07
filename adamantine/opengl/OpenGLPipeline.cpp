@@ -26,9 +26,9 @@ void OpenGLPipeline::createFromObject(const Object* object) {
       buffer[idx++] = vertex.position.y;
       buffer[idx++] = vertex.position.z;
 
-      buffer[idx++] = vertex.color.x;
-      buffer[idx++] = vertex.color.y;
-      buffer[idx++] = vertex.color.z;
+      buffer[idx++] = vertex.normal.x;
+      buffer[idx++] = vertex.normal.y;
+      buffer[idx++] = vertex.normal.z;
     }
   }
 

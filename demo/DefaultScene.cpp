@@ -88,12 +88,20 @@ void DefaultScene::onInit() {
     tinyCube->rotate({ 0.0f, -dt, 0.0f });
   };
 
+  ObjLoader teapot("./demo/teapot.obj");
+
+  auto* model2 = new Model(teapot);
+
+  model2->setScale(15.0f);
+  model2->setPosition({ 100.0f, 0.0f, 300.0f });
+
   stage.add(mesh);
   stage.add(cube1);
   stage.add(cube2);
   stage.add(cube3);
   stage.add(model);
   stage.add(tinyCube);
+  stage.add(model2);
 
   inputSystem.onMouseMotion([=](const SDL_MouseMotionEvent& event) {
     if (SDL_GetRelativeMouseMode()) {

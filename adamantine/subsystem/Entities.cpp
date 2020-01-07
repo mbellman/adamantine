@@ -197,6 +197,8 @@ Mesh::Mesh(int w, int h, float tileSize) {
 
     addPolygon(v1i, v2i, v3i);
   }
+
+  updateNormals();
 }
 
 void Mesh::defineOffsets(std::function<void(Vec3f&, int, int)> offsetHandler) {
@@ -207,6 +209,8 @@ void Mesh::defineOffsets(std::function<void(Vec3f&, int, int)> offsetHandler) {
       offsetHandler(vertices[idx]->position, j, i);
     }
   }
+
+  updateNormals();
 }
 
 /**
@@ -217,26 +221,24 @@ Cube::Cube() {
   // Add vertices
   for (int c = 0; c < 8; c++) {
     Vec3f position = Cube::corners[c];
-    Vertex3d* vertex = new Vertex3d();
 
-    vertex->position = position;
-    vertex->color = { RNG::random(), RNG::random(), RNG::random() };
-
-    vertices.push_back(vertex);
+    addVertex(position, { RNG::random(), RNG::random(), RNG::random() });
   }
 
   // Add polygons
   for (int f = 0; f < 6; f++) {
     int (&corners)[4] = Cube::faces[f];
-    Vertex3d* verts[4];
+    int vIndexes[4];
 
     for (int i = 0; i < 4; i++) {
-      verts[i] = vertices[corners[i]];
+      vIndexes[i] = corners[i];
     }
 
-    polygons.push_back(new Polygon(verts[0], verts[1], verts[2]));
-    polygons.push_back(new Polygon(verts[0], verts[2], verts[3]));
+    addPolygon(vIndexes[0], vIndexes[1], vIndexes[2]);
+    addPolygon(vIndexes[0], vIndexes[2], vIndexes[3]);
   }
+
+  updateNormals();
 }
 
 // Unit cube corners as 3-vectors.
@@ -274,6 +276,8 @@ Model::Model(const ObjLoader& loader) {
   } else {
     buildUntexturedModel(loader);
   }
+
+  updateNormals();
 }
 
 void Model::buildTexturedModel(const ObjLoader& loader) {
