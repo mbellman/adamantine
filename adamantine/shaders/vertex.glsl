@@ -14,5 +14,8 @@ out vec3 fragmentColor;
 
 void main() {
   gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
-  fragmentColor = vertexColor;
+
+  mat3 normMatrix = transpose(inverse(mat3(modelMatrix)));
+
+  fragmentColor = normalize(normMatrix * vertexColor);
 }
