@@ -68,7 +68,12 @@ void OpenGLVideoController::onDestroy() {
 
 void OpenGLVideoController::onEntityAdded(Entity* entity) {
   if (entity->isOfType<Object>()) {
-    pipelines.emplace(entity->id, createOpenGLPipeline((Object*)entity));
+    auto* pipeline = createOpenGLPipeline((Object*)entity);
+
+    pipeline->bind();
+    shaderProgram.bindVertexInputs();
+
+    pipelines.emplace(entity->id, pipeline);
   }
 }
 
@@ -99,8 +104,14 @@ void OpenGLVideoController::onInit() {
   shaderProgram.activate();
   shaderProgram.setFragmentShaderOutput("color");
 
-  VertexShaderInput<float> vertexPositionInput = { "vertexPosition", 3, GL_FLOAT, 6, 0 };
-  VertexShaderInput<float> vertexColorInput = { "vertexColor", 3, GL_FLOAT, 6, 3 };
+  VertexShaderInput vertexShaderInputs[4] = {
+    { "vertexPosition", 3, GL_FLOAT },
+    { "vertexNormal", 3, GL_FLOAT},
+    { "vertexColor", 3, GL_FLOAT },
+    { "vertexUv", 2, GL_FLOAT }
+  };
+
+  shaderProgram.saveVertexInputs<float>(4, vertexShaderInputs);
 
   scene->onEntityAdded([=](auto* entity) {
     onEntityAdded(entity);
@@ -111,13 +122,6 @@ void OpenGLVideoController::onInit() {
   });
 
   scene->onInit();
-
-  for (auto [ key, pipeline ] : pipelines) {
-    pipeline->use();
-
-    shaderProgram.setVertexShaderInput(vertexPositionInput);
-    shaderProgram.setVertexShaderInput(vertexColorInput);
-  }
 }
 
 void OpenGLVideoController::onRender() {
@@ -126,7 +130,6 @@ void OpenGLVideoController::onRender() {
   glClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glUniform1f(shaderProgram.getUniformLocation("time"), SDL_GetTicks() / 500.0f);
   glUniformMatrix4fv(shaderProgram.getUniformLocation("projectionMatrix"), 1, GL_FALSE, createProjectionMatrix(45.0f, 1200.0f / 720.0f, 1.0f, 10000.0f).m);
   glUniformMatrix4fv(shaderProgram.getUniformLocation("viewMatrix"), 1, GL_FALSE, createViewMatrix().m);
 

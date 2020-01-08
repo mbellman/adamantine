@@ -8,9 +8,9 @@ class OpenGLPipeline {
 public:
   OpenGLPipeline();
 
+  void bind();
   void createFromObject(const Object* object);
   void render();
-  void use();
 
 private:
   GLuint vao;

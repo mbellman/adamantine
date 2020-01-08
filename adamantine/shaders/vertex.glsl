@@ -1,6 +1,5 @@
 #version 140
 
-uniform float time;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
@@ -12,10 +11,25 @@ in vec2 vertexUv;
 
 out vec3 fragmentColor;
 
+vec4 position() {
+  return projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
+}
+
+vec3 normal() {
+  mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
+
+  return normalize(normalMatrix * vertexNormal);
+}
+
+vec3 color() {
+  return vertexColor;
+}
+
+vec2 uv() {
+  return vertexUv;
+}
+
 void main() {
-  gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
-
-  mat3 normMatrix = transpose(inverse(mat3(modelMatrix)));
-
-  fragmentColor = normalize(normMatrix * vertexColor);
+  gl_Position = position();
+  fragmentColor = normal();
 }
