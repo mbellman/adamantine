@@ -25,9 +25,8 @@ GLint ShaderProgram::getUniformLocation(const char* name) {
   return glGetUniformLocation(program, name);
 }
 
-void ShaderProgram::activate() {
+void ShaderProgram::link() {
   glLinkProgram(program);
-  glUseProgram(program);
 }
 
 void ShaderProgram::setFragmentShaderOutput(const char* name) {
@@ -39,4 +38,8 @@ void ShaderProgram::setVertexAttribute(const VertexAttribute& attribute) {
 
   glEnableVertexAttribArray(location);
   glVertexAttribPointer(location, attribute.size, attribute.type, GL_FALSE, attribute.stride, (void*)attribute.offset);
+}
+
+void ShaderProgram::use() {
+  glUseProgram(program);
 }

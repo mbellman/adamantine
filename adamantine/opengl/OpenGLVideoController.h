@@ -6,6 +6,7 @@
 #include "subsystem/AbstractVideoController.h"
 #include "opengl/ShaderProgram.h"
 #include "opengl/OpenGLPipeline.h"
+#include "opengl/GBuffer.h"
 #include "subsystem/Geometry.h"
 #include "subsystem/Entities.h"
 #include "glut.h"
@@ -23,7 +24,9 @@ public:
 
 private:
   SDL_GLContext glContext;
-  ShaderProgram shaderProgram;
+  ShaderProgram geometry;
+  ShaderProgram lighting;
+  GBuffer gBuffer;
   std::map<int, OpenGLPipeline*> pipelines;
 
   OpenGLPipeline* createOpenGLPipeline(const Object* object);

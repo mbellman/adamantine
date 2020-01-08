@@ -1,4 +1,4 @@
-#version 140
+#version 330 core
 
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
@@ -10,6 +10,7 @@ in vec3 vertexColor;
 in vec2 vertexUv;
 
 out vec3 fragmentColor;
+out vec3 fragmentNormal;
 
 vec4 position() {
   return projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
@@ -31,5 +32,7 @@ vec2 uv() {
 
 void main() {
   gl_Position = position();
-  fragmentColor = normal();
+
+  fragmentColor = color();
+  fragmentNormal = normal();
 }

@@ -23,11 +23,11 @@ class ShaderProgram {
 public:
   ~ShaderProgram();
 
-  void activate();
   void attachShader(GLuint shader);
   void bindVertexInputs();
   void create();
   GLint getUniformLocation(const char* name);
+  void link();
 
   template<typename T>
   void saveVertexInputs(int number, const VertexShaderInput* inputs) {
@@ -54,6 +54,7 @@ public:
   }
 
   void setFragmentShaderOutput(const char* name);
+  void use();
 
 private:
   GLuint program = -1;

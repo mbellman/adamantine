@@ -18,8 +18,6 @@ OpenGLVideoController::OpenGLVideoController() {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-  SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-  SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 }
 
 OpenGLVideoController::~OpenGLVideoController() {
@@ -71,7 +69,7 @@ void OpenGLVideoController::onEntityAdded(Entity* entity) {
     auto* pipeline = createOpenGLPipeline((Object*)entity);
 
     pipeline->bind();
-    shaderProgram.bindVertexInputs();
+    geometry.bindVertexInputs();
 
     pipelines.emplace(entity->id, pipeline);
   }
@@ -92,17 +90,21 @@ void OpenGLVideoController::onInit() {
   glewInit();
 
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_MULTISAMPLE);
   glCullFace(GL_BACK);
   glEnable(GL_CULL_FACE);
- 
+
   SDL_GL_SetSwapInterval(0);
 
-  shaderProgram.create();
-  shaderProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/vertex.glsl"));
-  shaderProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/fragment.glsl"));
-  shaderProgram.activate();
-  shaderProgram.setFragmentShaderOutput("color");
+  lighting.create();
+  lighting.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/l-vertex.glsl"));
+  lighting.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/l-fragment.glsl"));
+  lighting.link();
+
+  geometry.create();
+  geometry.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/g-vertex.glsl"));
+  geometry.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/g-fragment.glsl"));
+  geometry.link();
+  geometry.use();
 
   VertexShaderInput vertexShaderInputs[4] = {
     { "vertexPosition", 3, GL_FLOAT },
@@ -111,7 +113,7 @@ void OpenGLVideoController::onInit() {
     { "vertexUv", 2, GL_FLOAT }
   };
 
-  shaderProgram.saveVertexInputs<float>(4, vertexShaderInputs);
+  geometry.saveVertexInputs<float>(4, vertexShaderInputs);
 
   scene->onEntityAdded([=](auto* entity) {
     onEntityAdded(entity);
@@ -122,22 +124,32 @@ void OpenGLVideoController::onInit() {
   });
 
   scene->onInit();
+
+  gBuffer.initialize(1200, 720);
 }
 
 void OpenGLVideoController::onRender() {
   const Vec3f& backgroundColor = scene->getSettings().backgroundColor;
 
-  glClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z, 1);
+  gBuffer.allowWriting();
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glUniformMatrix4fv(shaderProgram.getUniformLocation("projectionMatrix"), 1, GL_FALSE, createProjectionMatrix(45.0f, 1200.0f / 720.0f, 1.0f, 10000.0f).m);
-  glUniformMatrix4fv(shaderProgram.getUniformLocation("viewMatrix"), 1, GL_FALSE, createViewMatrix().m);
+  glUniformMatrix4fv(geometry.getUniformLocation("projectionMatrix"), 1, GL_FALSE, createProjectionMatrix(45.0f, 1200.0f / 720.0f, 1.0f, 10000.0f).m);
+  glUniformMatrix4fv(geometry.getUniformLocation("viewMatrix"), 1, GL_FALSE, createViewMatrix().m);
 
   for (auto* object : scene->getStage().getObjects()) {
-    glUniformMatrix4fv(shaderProgram.getUniformLocation("modelMatrix"), 1, GL_FALSE, object->getMatrix().m);
+    glUniformMatrix4fv(geometry.getUniformLocation("modelMatrix"), 1, GL_FALSE, object->getMatrix().m);
 
     pipelines.at(object->id)->render();
   }
+
+  gBuffer.useDefaultFrameBuffer();
+  gBuffer.allowReading();
+  gBuffer.attach(GBuffer::Attachment::COLOR);
+
+  glClear(GL_COLOR_BUFFER_BIT);
+  glBlitFramebuffer(0, 0, 1200, 720, 0, 0, 1200, 720, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
   SDL_GL_SwapWindow(sdlWindow);
   glFinish();

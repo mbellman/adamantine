@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="adamantine\opengl\GBuffer.cpp" />
     <ClCompile Include="adamantine\opengl\OpenGLPipeline.cpp" />
     <ClCompile Include="adamantine\opengl\OpenGLVideoController.cpp" />
     <ClCompile Include="adamantine\opengl\ShaderLoader.cpp" />
@@ -147,6 +148,7 @@
     <ClCompile Include="demo\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="adamantine\opengl\GBuffer.h" />
     <ClInclude Include="adamantine\opengl\OpenGLPipeline.h" />
     <ClInclude Include="adamantine\opengl\OpenGLVideoController.h" />
     <ClInclude Include="adamantine\opengl\ShaderLoader.h" />
