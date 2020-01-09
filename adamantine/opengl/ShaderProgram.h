@@ -30,7 +30,7 @@ public:
   void link();
 
   template<typename T>
-  void saveVertexInputs(int number, const VertexShaderInput* inputs) {
+  void setVertexInputs(int number, const VertexShaderInput* inputs) {
     int stride = 0;
     int offset = 0;
 

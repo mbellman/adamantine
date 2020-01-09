@@ -27,8 +27,11 @@ private:
   ShaderProgram geometry;
   ShaderProgram lighting;
   GBuffer gBuffer;
+  OpenGLPipeline* lightingPipeline = nullptr;
   std::map<int, OpenGLPipeline*> pipelines;
 
+  void createLightingProgram();
+  void createGeometryProgram();
   OpenGLPipeline* createOpenGLPipeline(const Object* object);
   Matrix4 createProjectionMatrix(float fov, float aspectRatio, float near, float far);
   Matrix4 createViewMatrix();

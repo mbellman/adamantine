@@ -2,6 +2,8 @@
 #include "glut.h"
 #include "opengl/OpenGLPipeline.h"
 
+#include <cstdio>
+
 OpenGLPipeline::OpenGLPipeline() {
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
@@ -9,15 +11,18 @@ OpenGLPipeline::OpenGLPipeline() {
   bind();
 }
 
+void OpenGLPipeline::bind() {
+  glBindVertexArray(vao);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+}
+
 void OpenGLPipeline::createFromObject(const Object* object) {
-  // Store the number of vertices for subsequent draw calls
-  totalVertices = object->getPolygons().size() * 3;
+  setTotalVertices(object->getPolygons().size() * 3);
 
   int bufferSize = totalVertices * 11;
   float* buffer = new float[bufferSize];
   int idx = 0;
 
-  // TODO figure out how to recycle vertices
   for (auto* polygon : object->getPolygons()) {
     for (int v = 0; v < 3; v++) {
       const Vertex3d& vertex = *polygon->vertices[v];
@@ -39,9 +44,13 @@ void OpenGLPipeline::createFromObject(const Object* object) {
     }
   }
 
-  glBufferData(GL_ARRAY_BUFFER, bufferSize * sizeof(float), buffer, GL_STATIC_DRAW);
+  pipe(bufferSize, buffer);
 
   delete[] buffer;
+}
+
+void OpenGLPipeline::pipe(int size, float* buffer) {
+  glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), buffer, GL_STATIC_DRAW);
 }
 
 void OpenGLPipeline::render() {
@@ -50,7 +59,6 @@ void OpenGLPipeline::render() {
   glDrawArrays(GL_TRIANGLES, 0, totalVertices);
 }
 
-void OpenGLPipeline::bind() {
-  glBindVertexArray(vao);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+void OpenGLPipeline::setTotalVertices(int totalVertices) {
+  this->totalVertices = totalVertices;
 }

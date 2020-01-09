@@ -5,19 +5,20 @@ class GBuffer {
 public:
   enum Attachment {
     COLOR = GL_COLOR_ATTACHMENT0,
-    NORMAL = GL_COLOR_ATTACHMENT1,
+    NORMAL_DEPTH = GL_COLOR_ATTACHMENT1,
     DEPTH = GL_DEPTH_ATTACHMENT
   };
 
-  void allowReading();
-  void allowWriting();
   void attach(Attachment attachment);
+  void bindTextures();
   void initialize(int width, int height);
+  void startReading();
+  void startWriting();
   void useDefaultFrameBuffer();
 
 private:
   GLuint buffer;
-  GLuint colorBuffer;
-  GLuint normalBuffer;
-  GLuint depthBuffer;
+  GLuint colorTexture;
+  GLuint normalDepthTexture;
+  GLuint depthRBO;
 };

@@ -1,5 +1,6 @@
 #include <cmath>
 #include <ctime>
+#include <cstdio>
 
 #include "SDL.h"
 #include "glew.h"
@@ -26,6 +27,59 @@ OpenGLVideoController::~OpenGLVideoController() {
   }
 
   pipelines.clear();
+
+  delete lightingPipeline;
+}
+
+void OpenGLVideoController::createGeometryProgram() {
+  geometry.create();
+  geometry.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/g-vertex.glsl"));
+  geometry.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/g-fragment.glsl"));
+  geometry.link();
+  geometry.use();
+
+  VertexShaderInput vertexShaderInputs[] = {
+    { "vertexPosition", 3, GL_FLOAT },
+    { "vertexNormal", 3, GL_FLOAT},
+    { "vertexColor", 3, GL_FLOAT },
+    { "vertexUv", 2, GL_FLOAT }
+  };
+
+  geometry.setVertexInputs<float>(4, vertexShaderInputs);
+}
+
+void OpenGLVideoController::createLightingProgram() {
+  lighting.create();
+  lighting.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/l-vertex.glsl"));
+  lighting.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/l-fragment.glsl"));
+  lighting.link();
+  lighting.use();
+
+  glUniform1i(lighting.getUniformLocation("colorTexture"), 0);
+  glUniform1i(lighting.getUniformLocation("normalDepthTexture"), 1);
+
+  VertexShaderInput inputs[] = {
+    { "vertexPosition", 2, GL_FLOAT },
+    { "vertexUv", 2, GL_FLOAT }
+  };
+
+  lighting.setVertexInputs<float>(2, inputs);
+
+  float lightingQuad[] = {
+    -1.0f, 1.0f, 0.0f, 1.0f,
+    1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f,
+    1.0f, -1.0f, 1.0f, 0.0f
+  };
+
+  lightingPipeline = new OpenGLPipeline();
+
+  lighting.bindVertexInputs();
+
+  lightingPipeline->pipe(24, lightingQuad);
+  lightingPipeline->setTotalVertices(6);
 }
 
 OpenGLPipeline* OpenGLVideoController::createOpenGLPipeline(const Object* object) {
@@ -95,25 +149,8 @@ void OpenGLVideoController::onInit() {
 
   SDL_GL_SetSwapInterval(0);
 
-  lighting.create();
-  lighting.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/l-vertex.glsl"));
-  lighting.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/l-fragment.glsl"));
-  lighting.link();
-
-  geometry.create();
-  geometry.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/g-vertex.glsl"));
-  geometry.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/g-fragment.glsl"));
-  geometry.link();
-  geometry.use();
-
-  VertexShaderInput vertexShaderInputs[4] = {
-    { "vertexPosition", 3, GL_FLOAT },
-    { "vertexNormal", 3, GL_FLOAT},
-    { "vertexColor", 3, GL_FLOAT },
-    { "vertexUv", 2, GL_FLOAT }
-  };
-
-  geometry.saveVertexInputs<float>(4, vertexShaderInputs);
+  createLightingProgram();
+  createGeometryProgram();
 
   scene->onEntityAdded([=](auto* entity) {
     onEntityAdded(entity);
@@ -131,8 +168,12 @@ void OpenGLVideoController::onInit() {
 void OpenGLVideoController::onRender() {
   const Vec3f& backgroundColor = scene->getSettings().backgroundColor;
 
-  gBuffer.allowWriting();
+  // Geometry pass
+  gBuffer.startWriting();
+  geometry.use();
 
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glUniformMatrix4fv(geometry.getUniformLocation("projectionMatrix"), 1, GL_FALSE, createProjectionMatrix(45.0f, 1200.0f / 720.0f, 1.0f, 10000.0f).m);
@@ -144,12 +185,18 @@ void OpenGLVideoController::onRender() {
     pipelines.at(object->id)->render();
   }
 
+  // Lighting pass
   gBuffer.useDefaultFrameBuffer();
-  gBuffer.allowReading();
-  gBuffer.attach(GBuffer::Attachment::COLOR);
 
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
   glClear(GL_COLOR_BUFFER_BIT);
-  glBlitFramebuffer(0, 0, 1200, 720, 0, 0, 1200, 720, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+  gBuffer.startReading();
+  gBuffer.bindTextures();
+
+  lighting.use();
+  lightingPipeline->render();
 
   SDL_GL_SwapWindow(sdlWindow);
   glFinish();
