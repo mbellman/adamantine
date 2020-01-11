@@ -11,6 +11,10 @@ const Camera& AbstractScene::getCamera() const {
   return camera;
 }
 
+InputSystem& AbstractScene::getInputSystem() {
+  return inputSystem;
+}
+
 float AbstractScene::getRunningTime() {
   return runningTime;
 }
@@ -21,10 +25,6 @@ const SceneSettings& AbstractScene::getSettings() const {
 
 const Stage& AbstractScene::getStage() const {
   return stage;
-}
-
-bool AbstractScene::isActive() const {
-  return inputSystem.didCloseWindow();
 }
 
 void AbstractScene::onEntityAdded(EntityHandler handler) {
@@ -39,9 +39,6 @@ void AbstractScene::onInit() {}
 
 void AbstractScene::onUpdate(float dt) {}
 
-void AbstractScene::pollInput() {
-  inputSystem.poll();
-}
 void AbstractScene::updateRunningTime(float dt) {
   runningTime += dt;
 }

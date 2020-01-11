@@ -2,6 +2,7 @@
 
 uniform sampler2D colorTexture;
 uniform sampler2D normalDepthTexture;
+uniform sampler2D positionTexture;
 
 in vec2 fragmentUv;
 

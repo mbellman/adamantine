@@ -21,16 +21,14 @@ enum Key {
 
 class InputSystem {
 public:
-  bool didCloseWindow() const;
+  void handleEvent(const SDL_Event& event);
   bool isKeyHeld(Key key) const;
   void onKeyDown(KeyboardHandler handler);
   void onMouseButton(MouseButtonHandler handler);
   void onMouseMotion(MouseMotionHandler handler);
-  void poll();
 
 private:
   int keyState = 0;
-  bool didReceiveQuitEvent = false;
   std::vector<KeyboardHandler> keyboardHandlers;
   std::vector<MouseMotionHandler> mouseMotionHandlers;
   std::vector<MouseButtonHandler> mouseButtonHandlers;

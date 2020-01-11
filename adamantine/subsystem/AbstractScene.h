@@ -16,14 +16,13 @@ public:
   virtual ~AbstractScene() {};
 
   const Camera& getCamera() const;
-  const SceneSettings& getSettings() const;
-  const Stage& getStage() const;
-  bool isActive() const;
+  virtual InputSystem& getInputSystem() final;
+  virtual const SceneSettings& getSettings() const final;
+  virtual const Stage& getStage() const final;
   void onEntityAdded(EntityHandler handler);
   void onEntityRemoved(EntityHandler handler);
   virtual void onInit();
   virtual void onUpdate(float dt);
-  virtual void pollInput() final;
   virtual void updateRunningTime(float dt) final;
 
 protected:

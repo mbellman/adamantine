@@ -38,10 +38,19 @@ void OpenGLVideoController::createGBuffer() {
     delete gBuffer;
   }
 
+  lighting.use();
+
   gBuffer = new FrameBuffer(screenSize.width, screenSize.height);
 
   gBuffer->addColorBuffer(GL_RGB32F, GL_RGB);
+  glUniform1i(lighting.getUniformLocation("colorTexture"), 0);
+
   gBuffer->addColorBuffer(GL_RGBA32F, GL_RGBA);
+  glUniform1i(lighting.getUniformLocation("normalDepthTexture"), 1);
+
+  gBuffer->addColorBuffer(GL_RGB32F, GL_RGB);
+  glUniform1i(lighting.getUniformLocation("positionTexture"), 2);
+
   gBuffer->addDepthBuffer();
   gBuffer->initializeColorBuffers();
 }
@@ -69,9 +78,6 @@ void OpenGLVideoController::createLightingProgram() {
   lighting.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/l-fragment.glsl"));
   lighting.link();
   lighting.use();
-
-  glUniform1i(lighting.getUniformLocation("colorTexture"), 0);
-  glUniform1i(lighting.getUniformLocation("normalDepthTexture"), 1);
 
   VertexShaderInput inputs[] = {
     { "vertexPosition", 2, GL_FLOAT },
@@ -127,7 +133,7 @@ Matrix4 OpenGLVideoController::createViewMatrix() {
 }
 
 SDL_Window* OpenGLVideoController::createWindow(const char* title, Region2d<int> region) {
-  return SDL_CreateWindow(title, region.x, region.y, region.width, region.height, SDL_WINDOW_OPENGL);
+  return SDL_CreateWindow(title, region.x, region.y, region.width, region.height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 }
 
 void OpenGLVideoController::onDestroy() {

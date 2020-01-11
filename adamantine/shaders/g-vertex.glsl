@@ -11,6 +11,7 @@ in vec2 vertexUv;
 
 out vec3 fragmentColor;
 out vec3 fragmentNormal;
+out vec3 fragmentPosition;
 
 vec4 position() {
   return projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
@@ -35,4 +36,5 @@ void main() {
 
   fragmentColor = color();
   fragmentNormal = normal();
+  fragmentPosition = vec4(modelMatrix * vec4(vertexPosition, 1.0)).xyz;
 }

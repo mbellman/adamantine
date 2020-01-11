@@ -1,10 +1,6 @@
 #include "SDL.h"
 #include "subsystem/InputSystem.h"
 
-bool InputSystem::didCloseWindow() const {
-  return didReceiveQuitEvent;
-}
-
 void InputSystem::handleKeyDown(const SDL_Keycode& code) {
   switch (code) {
     case SDLK_w:
@@ -55,28 +51,21 @@ void InputSystem::onMouseMotion(MouseMotionHandler handler) {
   mouseMotionHandlers.push_back(handler);
 }
 
-void InputSystem::poll() {
-  SDL_Event event;
-
-  while (SDL_PollEvent(&event)) {
-    switch (event.type) {
-      case SDL_QUIT:
-        didReceiveQuitEvent = true;
-        break;
-      case SDL_KEYDOWN:
-        handleKeyDown(event.key.keysym.sym);
-        fireInputHandlers(keyboardHandlers, event.key);
-        break;
-      case SDL_KEYUP:
-        handleKeyUp(event.key.keysym.sym);
-        break;
-      case SDL_MOUSEBUTTONDOWN:
-      case SDL_MOUSEBUTTONUP:
-        fireInputHandlers(mouseButtonHandlers, event.button);
-        break;
-      case SDL_MOUSEMOTION:
-        fireInputHandlers(mouseMotionHandlers, event.motion);
-        break;
-    }
+void InputSystem::handleEvent(const SDL_Event& event) {
+  switch (event.type) {
+    case SDL_KEYDOWN:
+      handleKeyDown(event.key.keysym.sym);
+      fireInputHandlers(keyboardHandlers, event.key);
+      break;
+    case SDL_KEYUP:
+      handleKeyUp(event.key.keysym.sym);
+      break;
+    case SDL_MOUSEBUTTONDOWN:
+    case SDL_MOUSEBUTTONUP:
+      fireInputHandlers(mouseButtonHandlers, event.button);
+      break;
+    case SDL_MOUSEMOTION:
+      fireInputHandlers(mouseMotionHandlers, event.motion);
+      break;
   }
 }

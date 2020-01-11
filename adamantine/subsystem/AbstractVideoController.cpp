@@ -1,3 +1,4 @@
+#include "SDL.h"
 #include "subsystem/AbstractVideoController.h"
 
 AbstractVideoController::~AbstractVideoController() {
@@ -17,15 +18,44 @@ void AbstractVideoController::initWindow(const char* title, Region2d<int> region
 }
 
 bool AbstractVideoController::isActive() const {
-  return scene->isActive();
+  return !didCloseWindow;
 }
 
 void AbstractVideoController::onDestroy() {}
 
 void AbstractVideoController::onScreenSizeChange(int width, int height) {}
 
+void AbstractVideoController::pollEvents() {
+  SDL_Event event;
+
+  while (SDL_PollEvent(&event)) {
+    switch (event.type) {
+      case SDL_QUIT:
+        didCloseWindow = true;
+        break;
+      case SDL_WINDOWEVENT:
+        if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+          onScreenSizeChange(event.window.data1, event.window.data2);
+        }
+
+        break;
+      case SDL_KEYDOWN:
+        if (event.key.keysym.sym == SDLK_f) {
+          toggleFullScreen();
+        }
+
+        break;
+      default:
+        break;
+    }
+
+    scene->getInputSystem().handleEvent(event);
+  }
+}
+
 void AbstractVideoController::update(float dt) {
-  scene->pollInput();
+  pollEvents();
+
   scene->onUpdate(dt);
   scene->updateRunningTime(dt);
 
@@ -49,8 +79,8 @@ void AbstractVideoController::toggleFullScreen() {
   SDL_GetDesktopDisplayMode(0, &display);
 
   int fullScreenFlags = isFullScreen ? 0 : SDL_WINDOW_FULLSCREEN;
-  int updatedWidth = isFullScreen ? 640 : display.w;
-  int updatedHeight = isFullScreen ? 480 : display.h;
+  int updatedWidth = isFullScreen ? 1200 : display.w;
+  int updatedHeight = isFullScreen ? 720 : display.h;
 
   SDL_SetWindowFullscreen(sdlWindow, isFullScreen ? 0 : SDL_WINDOW_FULLSCREEN);
   SDL_SetWindowSize(sdlWindow, updatedWidth, updatedHeight);

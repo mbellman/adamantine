@@ -21,7 +21,11 @@ public:
   virtual void update(float dt) final;
 
 protected:
+  bool didCloseWindow = false;
   SDL_Window* sdlWindow = nullptr;
   AbstractScene* scene = nullptr;
   Region2d<int> screenSize;
+
+private:
+  void pollEvents();
 };
