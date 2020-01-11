@@ -23,4 +23,5 @@ public:
 protected:
   SDL_Window* sdlWindow = nullptr;
   AbstractScene* scene = nullptr;
+  Region2d<int> screenSize;
 };

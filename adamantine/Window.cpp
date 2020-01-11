@@ -19,6 +19,7 @@ Window::~Window() {
 
 void Window::handleStats() {
   char title[100];
+
   sprintf_s(title, sizeof(title), "FPS: %d", stats.getFPS());
 
   SDL_SetWindowTitle(videoController->getWindow(), title);

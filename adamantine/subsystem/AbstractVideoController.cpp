@@ -11,6 +11,9 @@ SDL_Window* AbstractVideoController::getWindow() {
 
 void AbstractVideoController::initWindow(const char* title, Region2d<int> region) {
   sdlWindow = createWindow(title, region);
+
+  screenSize.width = region.width;
+  screenSize.height = region.height;
 }
 
 bool AbstractVideoController::isActive() const {

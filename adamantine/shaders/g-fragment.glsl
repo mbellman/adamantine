@@ -7,7 +7,7 @@ layout (location = 0) out vec3 color;
 layout (location = 1) out vec4 normalDepth;
 
 float depth() {
-  return (gl_FragCoord.z / gl_FragCoord.w) / 10000.0;
+  return gl_FragCoord.z / gl_FragCoord.w;
 }
 
 void main() {

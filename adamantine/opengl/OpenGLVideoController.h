@@ -6,7 +6,7 @@
 #include "subsystem/AbstractVideoController.h"
 #include "opengl/ShaderProgram.h"
 #include "opengl/OpenGLPipeline.h"
-#include "opengl/GBuffer.h"
+#include "opengl/FrameBuffer.h"
 #include "subsystem/Geometry.h"
 #include "subsystem/Entities.h"
 #include "glut.h"
@@ -26,15 +26,18 @@ private:
   SDL_GLContext glContext;
   ShaderProgram geometry;
   ShaderProgram lighting;
-  GBuffer gBuffer;
   OpenGLPipeline* lightingPipeline = nullptr;
+  FrameBuffer* gBuffer = nullptr;
   std::map<int, OpenGLPipeline*> pipelines;
 
-  void createLightingProgram();
+  void createGBuffer();
   void createGeometryProgram();
+  void createLightingProgram();
   OpenGLPipeline* createOpenGLPipeline(const Object* object);
-  Matrix4 createProjectionMatrix(float fov, float aspectRatio, float near, float far);
+  Matrix4 createProjectionMatrix(float fov, float near, float far);
   Matrix4 createViewMatrix();
   void onEntityAdded(Entity* entity);
   void onEntityRemoved(Entity* entity);
+  void renderGeometry();
+  void renderLighting();
 };

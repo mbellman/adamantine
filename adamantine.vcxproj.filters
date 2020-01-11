@@ -72,7 +72,7 @@
     <ClCompile Include="adamantine\subsystem\ObjLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="adamantine\opengl\GBuffer.cpp">
+    <ClCompile Include="adamantine\opengl\FrameBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -170,7 +170,7 @@
     <ClInclude Include="adamantine\subsystem\ObjLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="adamantine\opengl\GBuffer.h">
+    <ClInclude Include="adamantine\opengl\FrameBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

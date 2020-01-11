@@ -10,6 +10,7 @@
 #include "opengl/OpenGLPipeline.h"
 #include "opengl/ShaderProgram.h"
 #include "opengl/ShaderLoader.h"
+#include "opengl/FrameBuffer.h"
 #include "subsystem/Math.h"
 #include "subsystem/Entities.h"
 
@@ -29,6 +30,20 @@ OpenGLVideoController::~OpenGLVideoController() {
   pipelines.clear();
 
   delete lightingPipeline;
+  delete gBuffer;
+}
+
+void OpenGLVideoController::createGBuffer() {
+  if (gBuffer != nullptr) {
+    delete gBuffer;
+  }
+
+  gBuffer = new FrameBuffer(screenSize.width, screenSize.height);
+
+  gBuffer->addColorBuffer(GL_RGB32F, GL_RGB);
+  gBuffer->addColorBuffer(GL_RGBA32F, GL_RGBA);
+  gBuffer->addDepthBuffer();
+  gBuffer->initializeColorBuffers();
 }
 
 void OpenGLVideoController::createGeometryProgram() {
@@ -90,9 +105,10 @@ OpenGLPipeline* OpenGLVideoController::createOpenGLPipeline(const Object* object
   return pipeline;
 }
 
-Matrix4 OpenGLVideoController::createProjectionMatrix(float fov, float aspectRatio, float near, float far) {
+Matrix4 OpenGLVideoController::createProjectionMatrix(float fov, float near, float far) {
   constexpr float DEG_TO_RAD = M_PI / 180.0f;
   float f = 1.0f / tanf(fov / 2.0f * DEG_TO_RAD);
+  float aspectRatio = (float)screenSize.width / (float)screenSize.height;
 
   Matrix4 projection = {
     f / aspectRatio, 0.0f, 0.0f, 0.0f,
@@ -151,6 +167,7 @@ void OpenGLVideoController::onInit() {
 
   createLightingProgram();
   createGeometryProgram();
+  createGBuffer();
 
   scene->onEntityAdded([=](auto* entity) {
     onEntityAdded(entity);
@@ -161,22 +178,35 @@ void OpenGLVideoController::onInit() {
   });
 
   scene->onInit();
-
-  gBuffer.initialize(1200, 720);
 }
 
 void OpenGLVideoController::onRender() {
   const Vec3f& backgroundColor = scene->getSettings().backgroundColor;
 
-  // Geometry pass
-  gBuffer.startWriting();
+  renderGeometry();
+  renderLighting();
+
+  SDL_GL_SwapWindow(sdlWindow);
+  glFinish();
+}
+
+void OpenGLVideoController::onScreenSizeChange(int width, int height) {
+  screenSize.width = width;
+  screenSize.height = height;
+
+  glViewport(0, 0, width, height);
+  createGBuffer();
+}
+
+void OpenGLVideoController::renderGeometry() {
+  gBuffer->startWriting();
   geometry.use();
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glUniformMatrix4fv(geometry.getUniformLocation("projectionMatrix"), 1, GL_FALSE, createProjectionMatrix(45.0f, 1200.0f / 720.0f, 1.0f, 10000.0f).m);
+  glUniformMatrix4fv(geometry.getUniformLocation("projectionMatrix"), 1, GL_FALSE, createProjectionMatrix(45.0f, 1.0f, 10000.0f).m);
   glUniformMatrix4fv(geometry.getUniformLocation("viewMatrix"), 1, GL_FALSE, createViewMatrix().m);
 
   for (auto* object : scene->getStage().getObjects()) {
@@ -184,24 +214,16 @@ void OpenGLVideoController::onRender() {
 
     pipelines.at(object->id)->render();
   }
+}
 
-  // Lighting pass
-  gBuffer.useDefaultFrameBuffer();
+void OpenGLVideoController::renderLighting() {
+  gBuffer->useDefaultFramebuffer();
+  gBuffer->startReading();
 
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_CULL_FACE);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  gBuffer.startReading();
-  gBuffer.bindTextures();
-
   lighting.use();
   lightingPipeline->render();
-
-  SDL_GL_SwapWindow(sdlWindow);
-  glFinish();
-}
-
-void OpenGLVideoController::onScreenSizeChange(int width, int height) {
-  glViewport(0, 0, width, height);
 }
