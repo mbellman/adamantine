@@ -3,6 +3,7 @@
 uniform sampler2D colorTexture;
 uniform sampler2D normalDepthTexture;
 uniform sampler2D positionTexture;
+uniform vec3 cameraPosition;
 
 in vec2 fragmentUv;
 
@@ -22,7 +23,7 @@ float getBlurFactor(float depth) {
   return mix(MIN_BLUR, MAX_BLUR, pow(r, 3));
 }
 
-void main() {
+vec4 getDoF() {
   vec4 sum = vec4(0.0);
   float depth = texture(normalDepthTexture, fragmentUv).w;
   float blur = getBlurFactor(depth);
@@ -35,5 +36,13 @@ void main() {
     }
   }
 
-  color = sum.xyz;
+  return sum;
+}
+
+void main() {
+  vec3 position = texture(positionTexture, fragmentUv).xyz;
+  vec3 relativePosition = position - cameraPosition;
+  float mag = length(relativePosition);
+
+  color = getDoF().xyz * clamp(mix(0.0, 1.0, 1 - mag / 500.0), 0.0, 1.0);
 }

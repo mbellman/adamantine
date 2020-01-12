@@ -13,8 +13,14 @@ out vec3 fragmentColor;
 out vec3 fragmentNormal;
 out vec3 fragmentPosition;
 
-vec4 position() {
+vec4 clipPosition() {
   return projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
+}
+
+vec3 worldPosition() {
+  vec3 position = vec4(modelMatrix * vec4(vertexPosition, 1.0)).xyz;
+
+  return vec3(position.x, position.y, -position.z);
 }
 
 vec3 normal() {
@@ -32,9 +38,9 @@ vec2 uv() {
 }
 
 void main() {
-  gl_Position = position();
+  gl_Position = clipPosition();
 
   fragmentColor = color();
   fragmentNormal = normal();
-  fragmentPosition = vec4(modelMatrix * vec4(vertexPosition, 1.0)).xyz;
+  fragmentPosition = worldPosition();
 }

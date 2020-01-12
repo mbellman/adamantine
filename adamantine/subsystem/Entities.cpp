@@ -39,7 +39,7 @@ Vec3f Camera::getOrientationDirection(const Vec3f& orientation) const {
   float pitchFactor = std::abs(cosf(pitch));
 
   Vec3f direction = {
-    -sinf(yaw) * pitchFactor,
+    sinf(yaw) * pitchFactor,
     sinf(pitch),
     cosf(yaw) * pitchFactor
   };

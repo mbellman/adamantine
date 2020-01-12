@@ -105,7 +105,7 @@ void DefaultScene::onInit() {
 
   inputSystem.onMouseMotion([=](const SDL_MouseMotionEvent& event) {
     if (SDL_GetRelativeMouseMode()) {
-      camera.orientation.x += event.yrel / 1000.0f;
+      camera.orientation.x -= event.yrel / 1000.0f;
       camera.orientation.y += event.xrel / 1000.0f;
     }
   });

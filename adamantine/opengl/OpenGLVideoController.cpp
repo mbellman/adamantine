@@ -129,7 +129,22 @@ Matrix4 OpenGLVideoController::createProjectionMatrix(float fov, float near, flo
 Matrix4 OpenGLVideoController::createViewMatrix() {
   const Camera& camera = scene->getCamera();
 
-  return (Matrix4::rotate(camera.orientation) * Matrix4::translate(camera.position)).transpose();
+  Vec3f rotation = {
+    -camera.orientation.x,
+    camera.orientation.y,
+    camera.orientation.z
+  };
+
+  Vec3f translation = {
+    -camera.position.x,
+    -camera.position.y,
+    camera.position.z
+  };
+
+  return (
+    Matrix4::rotate(rotation) *
+    Matrix4::translate(translation)
+  ).transpose();
 }
 
 SDL_Window* OpenGLVideoController::createWindow(const char* title, Region2d<int> region) {
@@ -231,5 +246,16 @@ void OpenGLVideoController::renderLighting() {
   glClear(GL_COLOR_BUFFER_BIT);
 
   lighting.use();
+
+  const Vec3f cameraPosition = scene->getCamera().position;
+
+  float camera[3] = {
+    cameraPosition.x,
+    cameraPosition.y,
+    cameraPosition.z
+  };
+
+  glUniform3fv(lighting.getUniformLocation("cameraPosition"), 1, camera);
+
   lightingPipeline->render();
 }
