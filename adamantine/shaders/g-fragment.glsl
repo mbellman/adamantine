@@ -14,6 +14,6 @@ float getDepth() {
 
 void main() {
   color = fragmentColor;
-  normalDepth = vec4(fragmentNormal, getDepth());
+  normalDepth = vec4(normalize(fragmentNormal), getDepth());
   position = fragmentPosition;
 }

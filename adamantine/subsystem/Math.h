@@ -40,6 +40,7 @@ struct Vec2f {
  */
 struct Vec3f : Vec2f {
   Vec3f() {};
+  Vec3f(float f) : Vec2f(f, f), z(f) {};
   Vec3f(float x, float y, float z) : Vec2f(x, y), z(z) {};
 
   float z = 0.0f;

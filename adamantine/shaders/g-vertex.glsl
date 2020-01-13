@@ -25,7 +25,7 @@ vec3 getWorldPosition() {
 
 vec3 getNormal() {
   mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
-  vec3 normal = normalize(normalMatrix * vertexNormal);
+  vec3 normal = normalMatrix * vertexNormal;
 
   return vec3(normal.x, normal.y, -normal.z);
 }

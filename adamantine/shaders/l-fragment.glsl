@@ -12,40 +12,34 @@ layout (location = 0) out vec3 color;
 struct Light {
   vec3 position;
   vec3 color;
-  float power;
-  float intensity;
+  float radius;
 };
 
 const Light lights[5] = Light[5](
   Light(
     vec3(50.0, 15.0, 250.0),
     vec3(1.0, 0.0, 1.0),
-    750.0,
-    1.0
+    750.0
   ),
   Light(
-    vec3(-100.0, 10.0, 100.0),
+    vec3(-20.0, 10.0, 0.0),
     vec3(1.0, 0.0, 0.0),
-    300.0,
-    1.0
+    300.0
   ),
   Light(
     vec3(150.0, 50.0, 200.0),
     vec3(0.0, 1.0, 1.0),
-    1000.0,
-    1.0
+    1000.0
   ),
   Light(
     vec3(-200.0, 15.0, -150.0),
     vec3(1.0, 1.0, 0.0),
-    250.0,
-    1.0
+    400.0
   ),
   Light(
     vec3(-100.0, 10.0, 300.0),
     vec3(0.0, 1.0, 0.0),
-    500.0,
-    1.0
+    500.0
   )
 );
 
@@ -82,19 +76,19 @@ vec4 getDoF() {
 vec3 getLightFactor(Light light, vec3 surfacePosition, vec3 surfaceNormal) {
   vec3 surfaceToCamera = cameraPosition - surfacePosition;
   vec3 surfaceToLight = light.position - surfacePosition;
-  vec3 halfVector = normalize(surfaceToCamera + surfaceToLight);
 
   float lightDistance = length(surfaceToLight);
   float attenuation = pow(1.0 / lightDistance, 2);
-  vec3 adjustedLightColor = light.color * light.power * attenuation;
+  vec3 lighting = light.color * light.radius * attenuation;
 
   float normalDot = dot(surfaceToLight / lightDistance, surfaceNormal);
   float illuminance = max(normalDot, 0.0);
-  vec3 diffuse = adjustedLightColor * illuminance;
+  vec3 diffuse = lighting * illuminance;
 
+  vec3 halfVector = normalize(surfaceToCamera + surfaceToLight);
   float specularDot = dot(halfVector, surfaceNormal);
-  float specularity = pow(max(specularDot, 0.0), 20);
-  vec3 specular = adjustedLightColor * specularity * 10.0;
+  float specularity = pow(max(specularDot, 0.0), 50);
+  vec3 specular = lighting * specularity * 15.0 * illuminance;
   
   return diffuse + specular;
 }
@@ -103,7 +97,7 @@ void main() {
   vec3 albedo = texture(colorTexture, fragmentUv).xyz;
   vec3 position = texture(positionTexture, fragmentUv).xyz;
   vec3 normal = texture(normalDepthTexture, fragmentUv).xyz;
-  vec3 outColor = albedo * 0.01;
+  vec3 outColor = albedo * 0.0;
 
   for (int i = 0; i < lights.length(); i++) {
     outColor += albedo * getLightFactor(lights[i], position, normal);

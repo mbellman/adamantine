@@ -48,6 +48,7 @@ class ObjLoader : public AbstractLoader {
 public:
   std::vector<Vec3f> vertices;
   std::vector<Vec2f> textureCoordinates;
+  std::vector<Vec3f> normals;
   std::vector<Face> faces;
 
   ObjLoader(const char* path);
@@ -55,6 +56,7 @@ public:
 
 private:
   void handleFace();
+  void handleNormal();
   void handleVertex();
   void handleTextureCoordinate();
   VertexData parseVertexData(std::string data);

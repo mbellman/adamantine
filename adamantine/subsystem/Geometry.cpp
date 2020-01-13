@@ -6,13 +6,11 @@
  * --------
  */
 void Vertex3d::updateNormal() {
-  Vec3f normal;
+  normal = Vec3f(0.0f);
 
   for (auto* polygon : polygons) {
     normal += polygon->normal;
   }
-
-  this->normal = normal.unit();
 }
 
 /**

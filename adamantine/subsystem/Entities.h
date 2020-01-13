@@ -55,9 +55,10 @@ public:
   const Matrix4& getMatrix() const;
   const std::vector<Polygon*>& getPolygons() const;
   void rotate(const Vec3f& rotation);
-  void setScale(float scale);
+  void setColor(const Vec3f& color);
   void setOrientation(const Vec3f& orientation);
   void setPosition(const Vec3f& position);
+  void setScale(float scale);
 
 protected:
   std::vector<Vertex3d*> vertices;

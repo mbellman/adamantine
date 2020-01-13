@@ -94,6 +94,15 @@ void DefaultScene::onInit() {
 
   model2->setScale(15.0f);
   model2->setPosition({ 100.0f, 0.0f, 300.0f });
+  model2->setColor({ 1.0f, 0.5f, 0.3f });
+
+  ObjLoader ball("./demo/ball.obj");
+
+  auto* model3 = new Model(ball);
+
+  model3->setScale(10.0f);
+  model3->setPosition({ 80.0f, 10.0f, 200.0f });
+  model3->setColor({ 1.0f, 0.1f, 0.5f });
 
   stage.add(mesh);
   stage.add(cube1);
@@ -102,6 +111,7 @@ void DefaultScene::onInit() {
   stage.add(model);
   stage.add(tinyCube);
   stage.add(model2);
+  stage.add(model3);
 
   inputSystem.onMouseMotion([=](const SDL_MouseMotionEvent& event) {
     if (SDL_GetRelativeMouseMode()) {

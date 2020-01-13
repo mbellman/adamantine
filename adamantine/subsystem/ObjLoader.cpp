@@ -6,6 +6,7 @@
 
 static std::string VERTEX_LABEL = "v";
 static std::string TEXTURE_COORDINATE_LABEL = "vt";
+static std::string NORMAL_LABEL = "vn";
 static std::string FACE_LABEL = "f";
 
 ObjLoader::ObjLoader(const char* path) {
@@ -20,6 +21,8 @@ ObjLoader::ObjLoader(const char* path) {
       handleVertex();
     } else if (label == TEXTURE_COORDINATE_LABEL) {
       handleTextureCoordinate();
+    } else if (label == NORMAL_LABEL) {
+      handleNormal();
     } else if (label == FACE_LABEL) {
       handleFace();
     }
@@ -41,6 +44,14 @@ void ObjLoader::handleFace() {
   face.v3 = parseVertexData(readNextChunk());
 
   faces.push_back(face);
+}
+
+void ObjLoader::handleNormal() {
+  float x = stof(readNextChunk());
+  float y = stof(readNextChunk());
+  float z = stof(readNextChunk());
+
+  normals.push_back({ x, y, z });
 }
 
 void ObjLoader::handleVertex() {

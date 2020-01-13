@@ -128,10 +128,10 @@ void Object::rotate(const Vec3f& rotation) {
   recomputeMatrix();
 }
 
-void Object::setScale(float scale) {
-  this->scale = scale;
-
-  recomputeMatrix();
+void Object::setColor(const Vec3f& color) {
+  for (auto* vertex : vertices) {
+    vertex->color = color;
+  }
 }
 
 void Object::setOrientation(const Vec3f& orientation) {
@@ -142,6 +142,12 @@ void Object::setOrientation(const Vec3f& orientation) {
 
 void Object::setPosition(const Vec3f& position) {
   this->position = position;
+
+  recomputeMatrix();
+}
+
+void Object::setScale(float scale) {
+  this->scale = scale;
 
   recomputeMatrix();
 }
@@ -177,7 +183,7 @@ Mesh::Mesh(int w, int h, float tileSize) {
       float z = i * tileSize + offset.y;
 
       vertex->position = { x, 0.0f, z };
-      vertex->color = { RNG::random(), RNG::random(), RNG::random() };
+      vertex->color = Vec3f(1.0f);
 
       vertices.push_back(vertex);
     }
@@ -222,7 +228,7 @@ Cube::Cube() {
   for (int c = 0; c < 8; c++) {
     Vec3f position = Cube::corners[c];
 
-    addVertex(position, { RNG::random(), RNG::random(), RNG::random() });
+    addVertex(position, Vec3f(1.0f));
   }
 
   // Add polygons
@@ -337,7 +343,7 @@ void Model::buildUntexturedModel(const ObjLoader& loader) {
   for (int v = 0; v < loader.vertices.size(); v++) {
     Vec3f vector = loader.vertices.at(v);
 
-    addVertex(vector, { RNG::random(), RNG::random(), RNG::random() });
+    addVertex(vector, Vec3f(1.0));
   }
 
   for (int f = 0; f < loader.faces.size(); f++) {
