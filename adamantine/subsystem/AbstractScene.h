@@ -2,8 +2,9 @@
 
 #include <vector>
 
-#include "subsystem/Entities.h"
 #include "subsystem/Stage.h"
+#include "subsystem/AssetCache.h"
+#include "subsystem/Entities.h"
 #include "subsystem/InputSystem.h"
 
 struct SceneSettings {
@@ -27,8 +28,9 @@ public:
 
 protected:
   Stage stage;
-  Camera camera;
+  AssetCache assets;
   InputSystem inputSystem;
+  Camera camera;
   SceneSettings settings;
 
   float getRunningTime();

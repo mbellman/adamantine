@@ -6,6 +6,7 @@
 #include "subsystem/AbstractVideoController.h"
 #include "opengl/ShaderProgram.h"
 #include "opengl/OpenGLPipeline.h"
+#include "opengl/OpenGLTexture.h"
 #include "opengl/FrameBuffer.h"
 #include "subsystem/Geometry.h"
 #include "subsystem/Entities.h"
@@ -29,6 +30,7 @@ private:
   OpenGLPipeline* lightingPipeline = nullptr;
   FrameBuffer* gBuffer = nullptr;
   std::map<int, OpenGLPipeline*> pipelines;
+  std::map<int, OpenGLTexture*> textures;
 
   void createGBuffer();
   void createGeometryProgram();

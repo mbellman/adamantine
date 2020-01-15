@@ -12,6 +12,7 @@ in vec2 vertexUv;
 out vec3 fragmentColor;
 out vec3 fragmentNormal;
 out vec3 fragmentPosition;
+out vec2 fragmentUv;
 
 vec4 getClipPosition() {
   return projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
@@ -44,4 +45,5 @@ void main() {
   fragmentColor = getColor();
   fragmentNormal = getNormal();
   fragmentPosition = getWorldPosition();
+  fragmentUv = getUv();
 }

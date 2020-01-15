@@ -97,7 +97,7 @@ void main() {
   vec3 albedo = texture(colorTexture, fragmentUv).xyz;
   vec3 position = texture(positionTexture, fragmentUv).xyz;
   vec3 normal = texture(normalDepthTexture, fragmentUv).xyz;
-  vec3 outColor = albedo * 0.0;
+  vec3 outColor = albedo * 0.01;
 
   for (int i = 0; i < lights.length(); i++) {
     outColor += albedo * getLightFactor(lights[i], position, normal);

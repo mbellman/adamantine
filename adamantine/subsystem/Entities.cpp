@@ -172,8 +172,8 @@ Mesh::Mesh(int w, int h, float tileSize) {
 
   // Add vertices
   Vec2f offset = {
-    (w + 1) * tileSize * -0.5f,
-    (h + 1) * tileSize * -0.5f
+    w * tileSize * -0.5f,
+    h * tileSize * -0.5f
   };
 
   for (int i = 0; i < h + 1; i++) {
@@ -225,10 +225,19 @@ void Mesh::defineOffsets(std::function<void(Vec3f&, int, int)> offsetHandler) {
  */
 Cube::Cube() {
   // Add vertices
+  Vec2f uvs[4] = {
+    { 0.0f, 0.0f },
+    { 1.0f, 0.0f },
+    { 1.0f, 1.0f },
+    { 0.0f, 1.0f }
+  };
+
   for (int c = 0; c < 8; c++) {
     Vec3f position = Cube::corners[c];
+    Vec3f color = Vec3f(1.0f);
+    Vec2f uv = uvs[c % 4];
 
-    addVertex(position, Vec3f(1.0f));
+    addVertex(position, color, uv);
   }
 
   // Add polygons

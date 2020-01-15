@@ -27,7 +27,12 @@ OpenGLVideoController::~OpenGLVideoController() {
     delete pipeline;
   }
 
+  for (auto [ key, texture ] : textures) {
+    delete texture;
+  }
+
   pipelines.clear();
+  textures.clear();
 
   delete lightingPipeline;
   delete gBuffer;
@@ -157,20 +162,28 @@ void OpenGLVideoController::onDestroy() {
 
 void OpenGLVideoController::onEntityAdded(Entity* entity) {
   if (entity->isOfType<Object>()) {
-    auto* pipeline = createOpenGLPipeline((Object*)entity);
+    auto* object = (Object*)entity;
+    auto* pipeline = createOpenGLPipeline(object);
 
     pipeline->bind();
     geometry.bindVertexInputs();
+    pipelines.emplace(object->id, pipeline);
 
-    pipelines.emplace(entity->id, pipeline);
+    if (object->texture != nullptr && textures.find(object->texture->getId()) == textures.end()) {
+      auto* texture = new OpenGLTexture(object->texture);
+
+      textures.emplace(object->texture->getId(), texture);
+    }
   }
 }
 
 void OpenGLVideoController::onEntityRemoved(Entity* entity) {
   if (entity->isOfType<Object>()) {
-    delete pipelines.at(entity->id);
+    auto* object = (Object*)entity;
 
-    pipelines.erase(entity->id);
+    delete pipelines.at(object->id);
+
+    pipelines.erase(object->id);
   }
 }
 
@@ -232,6 +245,15 @@ void OpenGLVideoController::renderGeometry() {
 
   for (auto* object : scene->getStage().getObjects()) {
     glUniformMatrix4fv(geometry.getUniformLocation("modelMatrix"), 1, GL_FALSE, object->getMatrix().m);
+    
+    if (object->texture != nullptr) {
+      glUniform1i(geometry.getUniformLocation("hasTexture"), 1);
+      glUniform1i(geometry.getUniformLocation("modelTexture"), 3);
+      glActiveTexture(GL_TEXTURE0 + 3);
+      textures.at(object->texture->getId())->use();
+    } else {
+      glUniform1i(geometry.getUniformLocation("hasTexture"), 0);
+    }
 
     pipelines.at(object->id)->render();
   }

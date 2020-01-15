@@ -6,6 +6,7 @@
 #include "subsystem/Math.h"
 #include "subsystem/Geometry.h"
 #include "subsystem/ObjLoader.h"
+#include "subsystem/Texture.h"
 
 struct Entity {
   Entity();
@@ -48,6 +49,7 @@ class Object : public Entity {
 public:
   // TODO represent scale as a Vec3f
   float scale = 1.0f;
+  const Texture* texture = nullptr;
   std::function<void(float)> onUpdate = nullptr;
 
   virtual ~Object();

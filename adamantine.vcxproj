@@ -100,14 +100,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\demo;$(SolutionDir)\adamantine;$(SolutionDir)\external\GLEW\include;$(SolutionDir)\external\GLUT\include;$(SolutionDir)\external\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\external\SDL_image\include;$(SolutionDir)\demo;$(SolutionDir)\adamantine;$(SolutionDir)\external\GLEW\include;$(SolutionDir)\external\GLUT\include;$(SolutionDir)\external\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)\external\GLUT\lib;$(SolutionDir)\external\GLEW\lib;$(SolutionDir)\external\SDL2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glu32.lib;glut32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\external\SDL_image\lib;$(SolutionDir)\external\GLUT\lib;$(SolutionDir)\external\GLEW\lib;$(SolutionDir)\external\SDL2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;opengl32.lib;glu32.lib;glut32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -128,6 +128,7 @@
   <ItemGroup>
     <ClCompile Include="adamantine\opengl\FrameBuffer.cpp" />
     <ClCompile Include="adamantine\opengl\OpenGLPipeline.cpp" />
+    <ClCompile Include="adamantine\opengl\OpenGLTexture.cpp" />
     <ClCompile Include="adamantine\opengl\OpenGLVideoController.cpp" />
     <ClCompile Include="adamantine\opengl\ShaderLoader.cpp" />
     <ClCompile Include="adamantine\opengl\ShaderProgram.cpp" />
@@ -135,6 +136,7 @@
     <ClCompile Include="adamantine\subsystem\AbstractLoader.cpp" />
     <ClCompile Include="adamantine\subsystem\AbstractScene.cpp" />
     <ClCompile Include="adamantine\subsystem\AbstractVideoController.cpp" />
+    <ClCompile Include="adamantine\subsystem\AssetCache.cpp" />
     <ClCompile Include="adamantine\subsystem\Entities.cpp" />
     <ClCompile Include="adamantine\subsystem\FileLoader.cpp" />
     <ClCompile Include="adamantine\subsystem\Geometry.cpp" />
@@ -143,6 +145,7 @@
     <ClCompile Include="adamantine\subsystem\ObjLoader.cpp" />
     <ClCompile Include="adamantine\subsystem\RNG.cpp" />
     <ClCompile Include="adamantine\subsystem\Stage.cpp" />
+    <ClCompile Include="adamantine\subsystem\Texture.cpp" />
     <ClCompile Include="adamantine\Window.cpp" />
     <ClCompile Include="demo\DefaultScene.cpp" />
     <ClCompile Include="demo\main.cpp" />
@@ -150,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="adamantine\opengl\FrameBuffer.h" />
     <ClInclude Include="adamantine\opengl\OpenGLPipeline.h" />
+    <ClInclude Include="adamantine\opengl\OpenGLTexture.h" />
     <ClInclude Include="adamantine\opengl\OpenGLVideoController.h" />
     <ClInclude Include="adamantine\opengl\ShaderLoader.h" />
     <ClInclude Include="adamantine\opengl\ShaderProgram.h" />
@@ -157,6 +161,7 @@
     <ClInclude Include="adamantine\subsystem\AbstractLoader.h" />
     <ClInclude Include="adamantine\subsystem\AbstractScene.h" />
     <ClInclude Include="adamantine\subsystem\AbstractVideoController.h" />
+    <ClInclude Include="adamantine\subsystem\AssetCache.h" />
     <ClInclude Include="adamantine\subsystem\Entities.h" />
     <ClInclude Include="adamantine\subsystem\FileLoader.h" />
     <ClInclude Include="adamantine\subsystem\Geometry.h" />
@@ -165,6 +170,7 @@
     <ClInclude Include="adamantine\subsystem\ObjLoader.h" />
     <ClInclude Include="adamantine\subsystem\RNG.h" />
     <ClInclude Include="adamantine\subsystem\Stage.h" />
+    <ClInclude Include="adamantine\subsystem\Texture.h" />
     <ClInclude Include="adamantine\Window.h" />
     <ClInclude Include="demo\DefaultScene.h" />
     <ClInclude Include="subsystem\AbstractVideoController.h" />

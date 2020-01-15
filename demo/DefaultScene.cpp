@@ -4,6 +4,7 @@
 #include "subsystem/Entities.h"
 #include "subsystem/RNG.h"
 #include "subsystem/ObjLoader.h"
+#include "subsystem/Texture.h"
 
 void DefaultScene::onInit() {
   settings.backgroundColor = {
@@ -12,13 +13,10 @@ void DefaultScene::onInit() {
     0.3f
   };
 
-  auto* mesh = new Mesh(100, 100, 10.0f);
+  auto* mesh = new Mesh(2, 2, 500.0f);
 
   mesh->setPosition({ 0.0f, -20.0f, 0.0f });
-
-  mesh->defineOffsets([=](Vec3f& position, int x, int y) {
-    position.y = RNG::random() * 5.0f;
-  });
+  mesh->setColor({ 0.5f, 0.0f, 0.3f });
 
   auto* cube1 = new Cube();
 
@@ -49,9 +47,13 @@ void DefaultScene::onInit() {
   };
 
   auto* cube3 = new Cube();
+  auto* catTexture = new Texture("./demo/cat.png");
+
+  assets.addTexture(catTexture);
 
   cube3->setScale(2.0f);
   cube3->setPosition({ 15.0f, 4.0f, 50.0f });
+  cube3->texture = catTexture;
   cube3->setOrientation({ 0.9f, 2.5f, 3.1f });
 
   cube3->onUpdate = [=](float dt) {
