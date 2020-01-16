@@ -1,3 +1,4 @@
+#include "glew.h"
 #include "glut.h"
 #include "opengl/OpenGLTexture.h"
 
@@ -20,5 +21,6 @@ OpenGLTexture::~OpenGLTexture() {
 }
 
 void OpenGLTexture::use() {
+  glActiveTexture(GL_TEXTURE0 + 3);
   glBindTexture(GL_TEXTURE_2D, id);
 }

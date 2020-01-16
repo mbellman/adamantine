@@ -7,6 +7,7 @@
 #include "SDL_opengl.h"
 #include "glut.h"
 #include "opengl/OpenGLVideoController.h"
+#include "opengl/OpenGLObject.h"
 #include "opengl/OpenGLPipeline.h"
 #include "opengl/ShaderProgram.h"
 #include "opengl/ShaderLoader.h"
@@ -23,16 +24,13 @@ OpenGLVideoController::OpenGLVideoController() {
 }
 
 OpenGLVideoController::~OpenGLVideoController() {
-  for (auto [ key, pipeline ] : pipelines) {
-    delete pipeline;
+  for (auto* glObject : glObjects) {
+    delete glObject;
   }
 
-  for (auto [ key, texture ] : textures) {
-    delete texture;
-  }
+  glObjects.clear();
 
-  pipelines.clear();
-  textures.clear();
+  OpenGLObject::freeTextureCache();
 
   delete lightingPipeline;
   delete gBuffer;
@@ -108,14 +106,6 @@ void OpenGLVideoController::createLightingProgram() {
   lightingPipeline->setTotalVertices(6);
 }
 
-OpenGLPipeline* OpenGLVideoController::createOpenGLPipeline(const Object* object) {
-  OpenGLPipeline* pipeline = new OpenGLPipeline();
-
-  pipeline->createFromObject(object);
-
-  return pipeline;
-}
-
 Matrix4 OpenGLVideoController::createProjectionMatrix(float fov, float near, float far) {
   constexpr float DEG_TO_RAD = M_PI / 180.0f;
   float f = 1.0f / tanf(fov / 2.0f * DEG_TO_RAD);
@@ -162,28 +152,28 @@ void OpenGLVideoController::onDestroy() {
 
 void OpenGLVideoController::onEntityAdded(Entity* entity) {
   if (entity->isOfType<Object>()) {
-    auto* object = (Object*)entity;
-    auto* pipeline = createOpenGLPipeline(object);
+    auto* glObject = new OpenGLObject((Object*)entity);
 
-    pipeline->bind();
+    glObject->bind();
     geometry.bindVertexInputs();
-    pipelines.emplace(object->id, pipeline);
-
-    if (object->texture != nullptr && textures.find(object->texture->getId()) == textures.end()) {
-      auto* texture = new OpenGLTexture(object->texture);
-
-      textures.emplace(object->texture->getId(), texture);
-    }
+    glObjects.push_back(glObject);
   }
 }
 
 void OpenGLVideoController::onEntityRemoved(Entity* entity) {
   if (entity->isOfType<Object>()) {
-    auto* object = (Object*)entity;
+    const auto* object = (Object*)entity;
+    int index = 0;
 
-    delete pipelines.at(object->id);
+    for (auto* glObject : glObjects) {
+      if (glObject->getSourceObject() == object) {
+        glObjects.erase(glObjects.begin() + index);
 
-    pipelines.erase(object->id);
+        break;
+      }
+
+      index++;
+    }
   }
 }
 
@@ -242,20 +232,15 @@ void OpenGLVideoController::renderGeometry() {
 
   glUniformMatrix4fv(geometry.getUniformLocation("projectionMatrix"), 1, GL_FALSE, createProjectionMatrix(45.0f, 1.0f, 10000.0f).m);
   glUniformMatrix4fv(geometry.getUniformLocation("viewMatrix"), 1, GL_FALSE, createViewMatrix().m);
+  glUniform1i(geometry.getUniformLocation("modelTexture"), 3);
 
-  for (auto* object : scene->getStage().getObjects()) {
-    glUniformMatrix4fv(geometry.getUniformLocation("modelMatrix"), 1, GL_FALSE, object->getMatrix().m);
-    
-    if (object->texture != nullptr) {
-      glUniform1i(geometry.getUniformLocation("hasTexture"), 1);
-      glUniform1i(geometry.getUniformLocation("modelTexture"), 3);
-      glActiveTexture(GL_TEXTURE0 + 3);
-      textures.at(object->texture->getId())->use();
-    } else {
-      glUniform1i(geometry.getUniformLocation("hasTexture"), 0);
-    }
+  for (auto* glObject : glObjects) {
+    const float* modelMatrix = glObject->getSourceObject()->getMatrix().m;
 
-    pipelines.at(object->id)->render();
+    glUniformMatrix4fv(geometry.getUniformLocation("modelMatrix"), 1, GL_FALSE, modelMatrix);
+    glUniform1i(geometry.getUniformLocation("hasTexture"), glObject->hasTexture());
+
+    glObject->render();
   }
 }
 

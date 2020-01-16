@@ -127,6 +127,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="adamantine\opengl\FrameBuffer.cpp" />
+    <ClCompile Include="adamantine\opengl\OpenGLObject.cpp" />
     <ClCompile Include="adamantine\opengl\OpenGLPipeline.cpp" />
     <ClCompile Include="adamantine\opengl\OpenGLTexture.cpp" />
     <ClCompile Include="adamantine\opengl\OpenGLVideoController.cpp" />
@@ -152,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adamantine\opengl\FrameBuffer.h" />
+    <ClInclude Include="adamantine\opengl\OpenGLObject.h" />
     <ClInclude Include="adamantine\opengl\OpenGLPipeline.h" />
     <ClInclude Include="adamantine\opengl\OpenGLTexture.h" />
     <ClInclude Include="adamantine\opengl\OpenGLVideoController.h" />

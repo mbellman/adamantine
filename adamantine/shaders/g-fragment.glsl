@@ -1,6 +1,6 @@
 #version 330 core
 
-uniform int hasTexture = 0;
+uniform bool hasTexture = false;
 uniform sampler2D modelTexture;
 
 in vec3 fragmentColor;
@@ -17,11 +17,9 @@ float getDepth() {
 }
 
 void main() {
-  if (hasTexture == 1) {
-    color = texture(modelTexture, fragmentUv).xyz;
-  } else {
-    color = fragmentColor;
-  }
+  color = hasTexture
+    ? texture(modelTexture, fragmentUv).xyz
+    : fragmentColor;
 
   normalDepth = vec4(normalize(fragmentNormal), getDepth());
   position = fragmentPosition;

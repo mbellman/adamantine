@@ -16,7 +16,7 @@ void DefaultScene::onInit() {
   auto* mesh = new Mesh(2, 2, 500.0f);
 
   mesh->setPosition({ 0.0f, -20.0f, 0.0f });
-  mesh->setColor({ 0.5f, 0.0f, 0.3f });
+  mesh->setColor({ 0.5f, 0.3f, 0.8f });
 
   auto* cube1 = new Cube();
 
