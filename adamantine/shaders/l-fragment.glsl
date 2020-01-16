@@ -27,12 +27,12 @@ const Light lights[5] = Light[5](
     300.0
   ),
   Light(
-    vec3(150.0, 50.0, 200.0),
+    vec3(150.0, -10.0, 200.0),
     vec3(0.0, 1.0, 1.0),
     1000.0
   ),
   Light(
-    vec3(-200.0, 15.0, -150.0),
+    vec3(-200.0, -10.0, -150.0),
     vec3(1.0, 1.0, 0.0),
     400.0
   ),
@@ -81,14 +81,15 @@ vec3 getLightFactor(Light light, vec3 surfacePosition, vec3 surfaceNormal) {
   float attenuation = pow(1.0 / lightDistance, 2);
   vec3 lighting = light.color * light.radius * attenuation;
 
-  float normalDot = dot(surfaceToLight / lightDistance, surfaceNormal);
+  vec3 normalizedSurfaceToLight = surfaceToLight / lightDistance;
+  float normalDot = dot(normalizedSurfaceToLight, surfaceNormal);
   float illuminance = max(normalDot, 0.0);
   vec3 diffuse = lighting * illuminance;
 
-  vec3 halfVector = normalize(surfaceToCamera + surfaceToLight);
+  vec3 halfVector = normalize(normalize(surfaceToCamera) + normalizedSurfaceToLight);
   float specularDot = dot(halfVector, surfaceNormal);
   float specularity = pow(max(specularDot, 0.0), 50);
-  vec3 specular = lighting * specularity * 15.0 * illuminance;
+  vec3 specular = lighting * specularity * 5.0;
   
   return diffuse + specular;
 }
