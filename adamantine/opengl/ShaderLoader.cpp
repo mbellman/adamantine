@@ -21,8 +21,8 @@ GLuint ShaderLoader::load(GLenum shaderType, const char* path) {
     char error[512];
 
     glGetShaderInfoLog(shader, 512, 0, error);
-    printf("Failed to compile shader!");
-    printf(error);
+    printf("Failed to compile shader: %s\n", path);
+    printf("%s\n", error);
   }
 
   return shader;

@@ -32,8 +32,41 @@ OpenGLVideoController::~OpenGLVideoController() {
 
   OpenGLObject::freeTextureCache();
 
-  delete lightingPipeline;
+  delete lightingQuadPipeline;
+  delete dofQuadPipeline;
   delete gBuffer;
+  delete lBuffer;
+}
+
+void OpenGLVideoController::createDoFProgram() {
+  dof.create();
+  dof.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
+  dof.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/dof.fragment.glsl"));
+  dof.link();
+  dof.use();
+
+  VertexShaderInput inputs[] = {
+    { "vertexPosition", 2, GL_FLOAT },
+    { "vertexUv", 2, GL_FLOAT }
+  };
+
+  dof.setVertexInputs<float>(2, inputs);
+
+  float dofQuad[] = {
+    -1.0f, 1.0f, 0.0f, 1.0f,
+    1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f,
+    1.0f, -1.0f, 1.0f, 0.0f
+  };
+
+  dofQuadPipeline = new OpenGLPipeline();
+
+  dof.bindVertexInputs();
+
+  dofQuadPipeline->pipe(24, dofQuad);
+  dofQuadPipeline->setTotalVertices(6);
 }
 
 void OpenGLVideoController::createGBuffer() {
@@ -60,8 +93,8 @@ void OpenGLVideoController::createGBuffer() {
 
 void OpenGLVideoController::createGeometryProgram() {
   geometry.create();
-  geometry.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/g-vertex.glsl"));
-  geometry.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/g-fragment.glsl"));
+  geometry.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/geometry.vertex.glsl"));
+  geometry.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/geometry.fragment.glsl"));
   geometry.link();
   geometry.use();
 
@@ -75,10 +108,25 @@ void OpenGLVideoController::createGeometryProgram() {
   geometry.setVertexInputs<float>(4, vertexShaderInputs);
 }
 
+void OpenGLVideoController::createLBuffer() {
+  if (lBuffer != nullptr) {
+    delete lBuffer;
+  }
+
+  dof.use();
+
+  lBuffer = new FrameBuffer(screenSize.width, screenSize.height);
+
+  lBuffer->addColorBuffer(GL_RGBA32F, GL_RGBA);
+  glUniform1i(dof.getUniformLocation("screen"), 0);
+
+  lBuffer->initializeColorBuffers();
+}
+
 void OpenGLVideoController::createLightingProgram() {
   lighting.create();
-  lighting.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/l-vertex.glsl"));
-  lighting.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/l-fragment.glsl"));
+  lighting.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
+  lighting.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/light.fragment.glsl"));
   lighting.link();
   lighting.use();
 
@@ -98,12 +146,12 @@ void OpenGLVideoController::createLightingProgram() {
     1.0f, -1.0f, 1.0f, 0.0f
   };
 
-  lightingPipeline = new OpenGLPipeline();
+  lightingQuadPipeline = new OpenGLPipeline();
 
   lighting.bindVertexInputs();
 
-  lightingPipeline->pipe(24, lightingQuad);
-  lightingPipeline->setTotalVertices(6);
+  lightingQuadPipeline->pipe(24, lightingQuad);
+  lightingQuadPipeline->setTotalVertices(6);
 }
 
 Matrix4 OpenGLVideoController::createProjectionMatrix(float fov, float near, float far) {
@@ -189,9 +237,11 @@ void OpenGLVideoController::onInit() {
 
   SDL_GL_SetSwapInterval(0);
 
-  createLightingProgram();
   createGeometryProgram();
+  createLightingProgram();
+  createDoFProgram();
   createGBuffer();
+  createLBuffer();
 
   scene->onEntityAdded([=](auto* entity) {
     onEntityAdded(entity);
@@ -209,6 +259,7 @@ void OpenGLVideoController::onRender() {
 
   renderGeometry();
   renderLighting();
+  renderDoF();
 
   SDL_GL_SwapWindow(sdlWindow);
   glFinish();
@@ -219,7 +270,21 @@ void OpenGLVideoController::onScreenSizeChange(int width, int height) {
   screenSize.height = height;
 
   glViewport(0, 0, width, height);
+
   createGBuffer();
+  createLBuffer();
+}
+
+void OpenGLVideoController::renderDoF() {
+  lBuffer->useDefaultFramebuffer();
+  lBuffer->startReading();
+
+  dof.use();
+
+  glClear(GL_COLOR_BUFFER_BIT);
+  glUniform1i(dof.getUniformLocation("screen"), 0);
+
+  dofQuadPipeline->render();
 }
 
 void OpenGLVideoController::renderGeometry() {
@@ -245,7 +310,7 @@ void OpenGLVideoController::renderGeometry() {
 }
 
 void OpenGLVideoController::renderLighting() {
-  gBuffer->useDefaultFramebuffer();
+  lBuffer->startWriting();
   gBuffer->startReading();
 
   glDisable(GL_DEPTH_TEST);
@@ -264,5 +329,5 @@ void OpenGLVideoController::renderLighting() {
 
   glUniform3fv(lighting.getUniformLocation("cameraPosition"), 1, camera);
 
-  lightingPipeline->render();
+  lightingQuadPipeline->render();
 }

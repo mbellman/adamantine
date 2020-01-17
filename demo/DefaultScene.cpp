@@ -8,9 +8,9 @@
 
 void DefaultScene::onInit() {
   settings.backgroundColor = {
-    0.5f,
+    1.0f,
     0.0f,
-    0.3f
+    1.0f
   };
 
   auto* mesh = new Mesh(2, 2, 500.0f);

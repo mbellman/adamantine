@@ -26,17 +26,23 @@ private:
   SDL_GLContext glContext;
   ShaderProgram geometry;
   ShaderProgram lighting;
-  OpenGLPipeline* lightingPipeline = nullptr;
+  ShaderProgram dof;
+  OpenGLPipeline* lightingQuadPipeline = nullptr;
+  OpenGLPipeline* dofQuadPipeline = nullptr;
   FrameBuffer* gBuffer = nullptr;
+  FrameBuffer* lBuffer = nullptr;
   std::vector<OpenGLObject*> glObjects;
 
   void createGBuffer();
+  void createDoFProgram();
   void createGeometryProgram();
+  void createLBuffer();
   void createLightingProgram();
   Matrix4 createProjectionMatrix(float fov, float near, float far);
   Matrix4 createViewMatrix();
   void onEntityAdded(Entity* entity);
   void onEntityRemoved(Entity* entity);
+  void renderDoF();
   void renderGeometry();
   void renderLighting();
 };
