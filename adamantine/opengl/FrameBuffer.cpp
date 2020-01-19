@@ -24,6 +24,8 @@ void FrameBuffer::addColorBuffer(unsigned int internalFormat, unsigned int forma
   glTexImage2D(GL_TEXTURE_2D, 0, buffer.internalFormat, size.width, size.height, 0, buffer.format, GL_FLOAT, 0);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
   glFramebufferTexture2D(GL_FRAMEBUFFER, buffer.attachment, GL_TEXTURE_2D, buffer.texture, 0);
 
   colorBuffers.push_back(buffer);
