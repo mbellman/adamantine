@@ -346,6 +346,9 @@ void Model::buildTexturedModel(const ObjLoader& loader) {
   for (const auto& vertexIndices : polygonVertexIndices) {
     addPolygon(std::get<0>(vertexIndices), std::get<1>(vertexIndices), std::get<2>(vertexIndices));
   }
+
+  uniqueVertexIndexMap.clear();
+  polygonVertexIndices.clear();
 }
 
 void Model::buildUntexturedModel(const ObjLoader& loader) {
