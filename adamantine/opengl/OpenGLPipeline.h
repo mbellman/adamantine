@@ -10,9 +10,9 @@ public:
 
   void bind();
   void createFromObject(const Object* object);
+  void createScreenQuad();
   void pipe(int size, float* buffer);
   void render();
-  void setTotalVertices(int totalVertices);
 
 private:
   GLuint vao;

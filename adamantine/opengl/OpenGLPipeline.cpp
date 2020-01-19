@@ -2,8 +2,6 @@
 #include "glut.h"
 #include "opengl/OpenGLPipeline.h"
 
-#include <cstdio>
-
 OpenGLPipeline::OpenGLPipeline() {
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
@@ -17,7 +15,7 @@ void OpenGLPipeline::bind() {
 }
 
 void OpenGLPipeline::createFromObject(const Object* object) {
-  setTotalVertices(object->getPolygons().size() * 3);
+  totalVertices = object->getPolygons().size() * 3;
 
   int bufferSize = totalVertices * 11;
   float* buffer = new float[bufferSize];
@@ -49,6 +47,21 @@ void OpenGLPipeline::createFromObject(const Object* object) {
   delete[] buffer;
 }
 
+void OpenGLPipeline::createScreenQuad() {
+  float quad[] = {
+    -1.0f, 1.0f, 0.0f, 1.0f,
+    1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f,
+    1.0f, -1.0f, 1.0f, 0.0f
+  };
+
+  pipe(24, quad);
+
+  totalVertices = 6;
+}
+
 void OpenGLPipeline::pipe(int size, float* buffer) {
   glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), buffer, GL_STATIC_DRAW);
 }
@@ -57,8 +70,4 @@ void OpenGLPipeline::render() {
   bind();
 
   glDrawArrays(GL_TRIANGLES, 0, totalVertices);
-}
-
-void OpenGLPipeline::setTotalVertices(int totalVertices) {
-  this->totalVertices = totalVertices;
 }

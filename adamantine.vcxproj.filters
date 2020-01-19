@@ -87,6 +87,9 @@
     <ClCompile Include="adamantine\opengl\OpenGLObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="adamantine\opengl\ScreenShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="subsystem\FileLoader.h">
@@ -195,6 +198,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="adamantine\opengl\OpenGLObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="adamantine\opengl\ScreenShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

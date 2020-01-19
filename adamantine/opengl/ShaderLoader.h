@@ -2,8 +2,8 @@
 
 #include "glut.h"
 
-struct ShaderLoader {
-  static GLuint load(GLenum shaderType, const char* path);
-  static GLuint loadFragmentShader(const char* path);
-  static GLuint loadVertexShader(const char* path);
+namespace ShaderLoader {
+  GLuint load(GLenum shaderType, const char* path);
+  GLuint loadFragmentShader(const char* path);
+  GLuint loadVertexShader(const char* path);
 };

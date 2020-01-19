@@ -60,7 +60,3 @@ void FrameBuffer::startReading() {
 void FrameBuffer::startWriting() {
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 }
-
-void FrameBuffer::useDefaultFramebuffer() {
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}

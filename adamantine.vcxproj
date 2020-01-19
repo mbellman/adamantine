@@ -131,6 +131,7 @@
     <ClCompile Include="adamantine\opengl\OpenGLPipeline.cpp" />
     <ClCompile Include="adamantine\opengl\OpenGLTexture.cpp" />
     <ClCompile Include="adamantine\opengl\OpenGLVideoController.cpp" />
+    <ClCompile Include="adamantine\opengl\ScreenShader.cpp" />
     <ClCompile Include="adamantine\opengl\ShaderLoader.cpp" />
     <ClCompile Include="adamantine\opengl\ShaderProgram.cpp" />
     <ClCompile Include="adamantine\Stats.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="adamantine\opengl\OpenGLPipeline.h" />
     <ClInclude Include="adamantine\opengl\OpenGLTexture.h" />
     <ClInclude Include="adamantine\opengl\OpenGLVideoController.h" />
+    <ClInclude Include="adamantine\opengl\ScreenShader.h" />
     <ClInclude Include="adamantine\opengl\ShaderLoader.h" />
     <ClInclude Include="adamantine\opengl\ShaderProgram.h" />
     <ClInclude Include="adamantine\Stats.h" />

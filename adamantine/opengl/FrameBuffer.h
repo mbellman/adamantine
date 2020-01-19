@@ -23,7 +23,6 @@ public:
   void initializeColorBuffers();
   void startReading();
   void startWriting();
-  void useDefaultFramebuffer();
 
 private:
   GLuint fbo;

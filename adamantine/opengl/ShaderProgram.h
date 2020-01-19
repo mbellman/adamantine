@@ -26,7 +26,7 @@ public:
   void attachShader(GLuint shader);
   void bindVertexInputs();
   void create();
-  GLint getUniformLocation(const char* name);
+  GLint getUniformLocation(const char* name) const;
   void link();
 
   template<typename T>
@@ -54,7 +54,7 @@ public:
   }
 
   void setFragmentShaderOutput(const char* name);
-  void use();
+  void use() const;
 
 private:
   GLuint program = -1;

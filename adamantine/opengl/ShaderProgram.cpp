@@ -21,7 +21,7 @@ void ShaderProgram::create() {
   program = glCreateProgram();
 }
 
-GLint ShaderProgram::getUniformLocation(const char* name) {
+GLint ShaderProgram::getUniformLocation(const char* name) const {
   return glGetUniformLocation(program, name);
 }
 
@@ -40,6 +40,6 @@ void ShaderProgram::setVertexAttribute(const VertexAttribute& attribute) {
   glVertexAttribPointer(location, attribute.size, attribute.type, GL_FALSE, attribute.stride, (void*)attribute.offset);
 }
 
-void ShaderProgram::use() {
+void ShaderProgram::use() const {
   glUseProgram(program);
 }

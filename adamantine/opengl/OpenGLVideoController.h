@@ -7,6 +7,7 @@
 #include "opengl/ShaderProgram.h"
 #include "opengl/OpenGLObject.h"
 #include "opengl/FrameBuffer.h"
+#include "opengl/ScreenShader.h"
 #include "subsystem/Geometry.h"
 #include "subsystem/Entities.h"
 #include "glut.h"
@@ -25,24 +26,14 @@ public:
 private:
   SDL_GLContext glContext;
   ShaderProgram geometry;
-  ShaderProgram lighting;
-  ShaderProgram dof;
-  OpenGLPipeline* lightingQuadPipeline = nullptr;
-  OpenGLPipeline* dofQuadPipeline = nullptr;
-  FrameBuffer* gBuffer = nullptr;
-  FrameBuffer* lBuffer = nullptr;
+  std::vector<ScreenShader*> screenShaders;
   std::vector<OpenGLObject*> glObjects;
 
-  void createGBuffer();
-  void createDoFProgram();
   void createGeometryProgram();
-  void createLBuffer();
-  void createLightingProgram();
   Matrix4 createProjectionMatrix(float fov, float near, float far);
+  void createScreenShaders();
   Matrix4 createViewMatrix();
   void onEntityAdded(Entity* entity);
   void onEntityRemoved(Entity* entity);
-  void renderDoF();
   void renderGeometry();
-  void renderLighting();
 };
