@@ -2,7 +2,9 @@
 #include "glut.h"
 #include "opengl/OpenGLTexture.h"
 
-OpenGLTexture::OpenGLTexture(const Texture* texture) {
+OpenGLTexture::OpenGLTexture(const Texture* texture, GLenum unit) {
+  this->unit = unit;
+
   bool hasAlpha = texture->getData()->format->BytesPerPixel == 4;
   int format = hasAlpha ? GL_RGBA : GL_RGB;
   auto* surface = texture->getData();
@@ -21,6 +23,6 @@ OpenGLTexture::~OpenGLTexture() {
 }
 
 void OpenGLTexture::use() {
-  glActiveTexture(GL_TEXTURE0 + 3);
+  glActiveTexture(unit);
   glBindTexture(GL_TEXTURE_2D, id);
 }

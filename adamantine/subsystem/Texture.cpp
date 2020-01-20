@@ -1,9 +1,15 @@
+#include <cstdio>
+
 #include "SDL_image.h"
 #include "subsystem/Texture.h"
 
 Texture::Texture(const char* path) {
   id = Texture::total++;
   surface = IMG_Load(path);
+
+  if (!surface) {
+    printf("Failed to load texture: %s\n", path);
+  }
 }
 
 Texture::~Texture() {

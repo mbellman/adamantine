@@ -22,11 +22,13 @@ struct Vertex3d {
 
   Vec3f position;
   Vec3f normal;
+  Vec3f tangent;
   Vec3f color;
   Vec2f uv;
   std::vector<Polygon*> polygons;
 
   void updateNormal();
+  void updateTangent();
 };
 
 /**
@@ -40,6 +42,8 @@ struct Polygon {
 
   Vertex3d* vertices[3];
   Vec3f normal;
+  Vec3f tangent;
 
   void updateNormal();
+  void updateTangent();
 };

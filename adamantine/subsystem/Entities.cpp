@@ -155,10 +155,12 @@ void Object::setScale(float scale) {
 void Object::updateNormals() {
   for (auto* polygon : polygons) {
     polygon->updateNormal();
+    polygon->updateTangent();
   }
 
   for (auto* vertex : vertices) {
     vertex->updateNormal();
+    vertex->updateTangent();
   }
 }
 
@@ -182,10 +184,10 @@ Mesh::Mesh(int w, int h, float tileSize) {
       float x = j * tileSize + offset.x;
       float z = i * tileSize + offset.y;
 
-      vertex->position = { x, 0.0f, z };
-      vertex->color = Vec3f(1.0f);
+      float u = (float)j / (float)w;
+      float v = (float)i / (float)h;
 
-      vertices.push_back(vertex);
+      addVertex({ x, 0.0f, z}, Vec3f(1.0f), { u, v });
     }
   }
 

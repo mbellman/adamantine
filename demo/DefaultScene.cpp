@@ -14,9 +14,13 @@ void DefaultScene::onInit() {
   };
 
   auto* mesh = new Mesh(2, 2, 500.0f);
+  auto* sandNormalMap = new Texture("./demo/sand-normal-map.png");
+
+  assets.addTexture(sandNormalMap);
 
   mesh->setPosition({ 0.0f, -20.0f, 0.0f });
   mesh->setColor({ 0.5f, 0.3f, 0.8f });
+  mesh->normalMap = sandNormalMap;
 
   auto* cube1 = new Cube();
 
@@ -97,6 +101,7 @@ void DefaultScene::onInit() {
   model2->setScale(15.0f);
   model2->setPosition({ 100.0f, 0.0f, 300.0f });
   model2->setColor({ 1.0f, 0.5f, 0.3f });
+  model2->normalMap = sandNormalMap;
 
   ObjLoader ball("./demo/ball.obj");
 

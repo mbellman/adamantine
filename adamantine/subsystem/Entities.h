@@ -50,6 +50,7 @@ public:
   // TODO represent scale as a Vec3f
   float scale = 1.0f;
   const Texture* texture = nullptr;
+  const Texture* normalMap = nullptr;
   std::function<void(float)> onUpdate = nullptr;
 
   virtual ~Object();

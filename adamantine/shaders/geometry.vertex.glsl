@@ -6,11 +6,13 @@ uniform mat4 modelMatrix;
 
 in vec3 vertexPosition;
 in vec3 vertexNormal;
+in vec3 vertexTangent;
 in vec3 vertexColor;
 in vec2 vertexUv;
 
 out vec3 fragmentColor;
 out vec3 fragmentNormal;
+out vec3 fragmentTangent;
 out vec3 fragmentPosition;
 out vec2 fragmentUv;
 
@@ -31,6 +33,13 @@ vec3 getNormal() {
   return vec3(normal.x, normal.y, -normal.z);
 }
 
+vec3 getTangent() {
+  mat3 tangentMatrix = transpose(inverse(mat3(modelMatrix)));
+  vec3 tangent = tangentMatrix * vertexTangent;
+
+  return vec3(tangent.x, tangent.y, -tangent.z);
+}
+
 vec3 getColor() {
   return vertexColor;
 }
@@ -44,6 +53,7 @@ void main() {
 
   fragmentColor = getColor();
   fragmentNormal = getNormal();
+  fragmentTangent = getTangent();
   fragmentPosition = getWorldPosition();
   fragmentUv = getUv();
 }

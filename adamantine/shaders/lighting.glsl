@@ -18,7 +18,7 @@ struct Light {
 const Light lights[5] = Light[5](
   Light(
     vec3(50.0, 15.0, 250.0),
-    vec3(1.0, 0.0, 1.0),
+    vec3(1.0, 0.2, 1.0),
     750.0
   ),
   Light(
@@ -28,12 +28,12 @@ const Light lights[5] = Light[5](
   ),
   Light(
     vec3(150.0, -10.0, 200.0),
-    vec3(0.0, 1.0, 1.0),
+    vec3(0.2, 1.0, 1.0),
     1000.0
   ),
   Light(
     vec3(-200.0, -10.0, -150.0),
-    vec3(1.0, 1.0, 0.0),
+    vec3(1.0, 1.0, 0.2),
     400.0
   ),
   Light(

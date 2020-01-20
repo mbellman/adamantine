@@ -10,7 +10,11 @@ OpenGLObject::OpenGLObject(const Object* object) {
   glPipeline->createFromObject(object);
 
   if (object->texture != nullptr) {
-    glTexture = getOpenGLTexture(object->texture);
+    glTexture = OpenGLObject::getOpenGLTexture(object->texture, GL_TEXTURE0 + 3);
+  }
+
+  if (object->normalMap != nullptr) {
+    glNormalMap = OpenGLObject::getOpenGLTexture(object->normalMap, GL_TEXTURE0 + 4);
   }
 }
 
@@ -20,6 +24,10 @@ OpenGLObject::~OpenGLObject() {
 
 void OpenGLObject::bind() {
   glPipeline->bind();
+
+  if (glTexture != nullptr) {
+    glTexture->use();
+  }
 
   if (glTexture != nullptr) {
     glTexture->use();
@@ -34,15 +42,15 @@ void OpenGLObject::freeTextureCache() {
   textureMap.clear();
 }
 
-OpenGLTexture* OpenGLObject::getOpenGLTexture(const Texture* texture) {
+OpenGLTexture* OpenGLObject::getOpenGLTexture(const Texture* texture, GLenum unit) {
   int id = texture->getId();
 
-  if (textureMap.find(id) != textureMap.end()) {
-    return textureMap.at(id);
+  if (OpenGLObject::textureMap.find(id) != OpenGLObject::textureMap.end()) {
+    return OpenGLObject::textureMap.at(id);
   } else {
-    auto* openGLTexture = new OpenGLTexture(texture);
+    auto* openGLTexture = new OpenGLTexture(texture, unit);
 
-    textureMap.emplace(id, openGLTexture);
+    OpenGLObject::textureMap.emplace(id, openGLTexture);
 
     return openGLTexture;
   }
@@ -52,14 +60,16 @@ const Object* OpenGLObject::getSourceObject() const {
   return sourceObject;
 }
 
+bool OpenGLObject::hasNormalMap() const {
+  return glNormalMap != nullptr;
+}
+
 bool OpenGLObject::hasTexture() const {
   return glTexture != nullptr;
 }
 
 void OpenGLObject::render() {
-  if (glTexture != nullptr) {
-    glTexture->use();
-  }
+  bind();
 
   glPipeline->render();
 }

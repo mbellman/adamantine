@@ -49,11 +49,12 @@ void OpenGLVideoController::createGeometryProgram() {
   VertexShaderInput vertexShaderInputs[] = {
     { "vertexPosition", 3, GL_FLOAT },
     { "vertexNormal", 3, GL_FLOAT},
+    { "vertexTangent", 3, GL_FLOAT },
     { "vertexColor", 3, GL_FLOAT },
     { "vertexUv", 2, GL_FLOAT }
   };
 
-  geometry.setVertexInputs<float>(4, vertexShaderInputs);
+  geometry.setVertexInputs<float>(5, vertexShaderInputs);
 }
 
 Matrix4 OpenGLVideoController::createProjectionMatrix(float fov, float near, float far) {
@@ -254,12 +255,14 @@ void OpenGLVideoController::renderGeometry() {
   glUniformMatrix4fv(geometry.getUniformLocation("projectionMatrix"), 1, GL_FALSE, createProjectionMatrix(45.0f, 1.0f, 10000.0f).m);
   glUniformMatrix4fv(geometry.getUniformLocation("viewMatrix"), 1, GL_FALSE, createViewMatrix().m);
   glUniform1i(geometry.getUniformLocation("modelTexture"), 3);
+  glUniform1i(geometry.getUniformLocation("normalMap"), 4);
 
   for (auto* glObject : glObjects) {
     const float* modelMatrix = glObject->getSourceObject()->getMatrix().m;
 
     glUniformMatrix4fv(geometry.getUniformLocation("modelMatrix"), 1, GL_FALSE, modelMatrix);
     glUniform1i(geometry.getUniformLocation("hasTexture"), glObject->hasTexture());
+    glUniform1i(geometry.getUniformLocation("hasNormalMap"), glObject->hasNormalMap());
 
     glObject->render();
   }

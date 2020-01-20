@@ -5,11 +5,12 @@
 
 class OpenGLTexture {
 public:
-  OpenGLTexture(const Texture* texture);
+  OpenGLTexture(const Texture* texture, GLenum unit);
   ~OpenGLTexture();
 
   void use();
 
 private:
   GLuint id;
+  GLenum unit;
 };

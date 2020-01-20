@@ -15,6 +15,7 @@ public:
 
   void bind();
   const Object* getSourceObject() const;
+  bool hasNormalMap() const;
   bool hasTexture() const;
   void render();
 
@@ -24,6 +25,7 @@ private:
   const Object* sourceObject = nullptr;
   OpenGLPipeline* glPipeline = nullptr;
   OpenGLTexture* glTexture = nullptr;
+  OpenGLTexture* glNormalMap = nullptr;
 
-  OpenGLTexture* getOpenGLTexture(const Texture* texture);
+  static OpenGLTexture* getOpenGLTexture(const Texture* texture, GLenum unit);
 };
