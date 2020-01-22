@@ -33,7 +33,7 @@ void ScreenShader::createFrameBuffer(const Region2d<int>& screen) {
 
   program.use();
 
-  frameBuffer = frameBufferFactory(screen, program);
+  frameBuffer = frameBufferFactory(program, screen);
 }
 
 void ScreenShader::onCreateFrameBuffer(FrameBufferFactory factory) {
@@ -48,9 +48,7 @@ void ScreenShader::render() {
   frameBuffer->startReading();
   program.use();
 
-  renderHandler(program);
-
-  glScreenQuad->render();
+  renderHandler(program, glScreenQuad);
 }
 
 void ScreenShader::startWriting() {

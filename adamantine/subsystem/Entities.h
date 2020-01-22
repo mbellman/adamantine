@@ -16,6 +16,7 @@ struct Entity {
   int id;
   Vec3f position;
   Vec3f orientation;
+  std::function<void(float)> onUpdate = nullptr;
 
   template<typename T>
   bool isOfType() {
@@ -23,17 +24,19 @@ struct Entity {
   }
 };
 
-class Light : public Entity {
-public:
+struct Light : Entity {
   enum LightType {
     POINT = 0,
     DIRECTIONAL = 1
   };
 
+  Light() {};
+  Light(const Vec3f& position, const Vec3f& color, float radius);
+
+  LightType type;
   Vec3f color;
   Vec3f direction;
-
-  virtual ~Light() {};
+  float radius;
 };
 
 class Camera : public Entity {
@@ -51,7 +54,6 @@ public:
   float scale = 1.0f;
   const Texture* texture = nullptr;
   const Texture* normalMap = nullptr;
-  std::function<void(float)> onUpdate = nullptr;
 
   virtual ~Object();
 

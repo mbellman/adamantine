@@ -1,47 +1,20 @@
 #version 330 core
 
-uniform sampler2D colorTexture;
-uniform sampler2D normalDepthTexture;
-uniform sampler2D positionTexture;
-uniform vec3 cameraPosition;
-
-in vec2 fragmentUv;
-
-layout (location = 0) out vec4 color;
-
 struct Light {
   vec3 position;
   vec3 color;
   float radius;
 };
 
-const Light lights[5] = Light[5](
-  Light(
-    vec3(50.0, 15.0, 250.0),
-    vec3(1.0, 0.2, 1.0),
-    750.0
-  ),
-  Light(
-    vec3(-20.0, 10.0, 0.0),
-    vec3(1.0, 0.0, 0.0),
-    300.0
-  ),
-  Light(
-    vec3(150.0, -10.0, 200.0),
-    vec3(0.2, 1.0, 1.0),
-    1000.0
-  ),
-  Light(
-    vec3(-200.0, -10.0, -150.0),
-    vec3(1.0, 1.0, 0.2),
-    400.0
-  ),
-  Light(
-    vec3(-100.0, 10.0, 300.0),
-    vec3(0.0, 1.0, 0.0),
-    500.0
-  )
-);
+uniform sampler2D colorTexture;
+uniform sampler2D normalDepthTexture;
+uniform sampler2D positionTexture;
+uniform vec3 cameraPosition;
+uniform Light lights[256];
+
+in vec2 fragmentUv;
+
+layout (location = 0) out vec4 color;
 
 vec3 getLightFactor(Light light, vec3 surfacePosition, vec3 surfaceNormal) {
   vec3 surfaceToCamera = cameraPosition - surfacePosition;
@@ -72,7 +45,7 @@ void main() {
   float depth = normalDepth.w;
   vec3 outColor = albedo * 0.01;
 
-  for (int i = 0; i < lights.length(); i++) {
+  for (int i = 0; i < 256; i++) {
     outColor += albedo * getLightFactor(lights[i], position, normal);
   }
 

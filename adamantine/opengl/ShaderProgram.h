@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include "glew.h"
 #include "glut.h"
@@ -27,6 +28,7 @@ public:
   void bindVertexInputs();
   void create();
   GLint getUniformLocation(const char* name) const;
+  GLint getUniformLocation(std::string name) const;
   void link();
 
   template<typename T>

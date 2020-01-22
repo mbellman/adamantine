@@ -56,14 +56,7 @@ void AbstractVideoController::pollEvents() {
 void AbstractVideoController::update(float dt) {
   pollEvents();
 
-  scene->onUpdate(dt);
-  scene->updateRunningTime(dt);
-
-  for (auto* object : scene->getStage().getObjects()) {
-    if (object->onUpdate) {
-      object->onUpdate(dt);
-    }
-  }
+  scene->update(dt);
 }
 
 void AbstractVideoController::setScene(AbstractScene* scene) {

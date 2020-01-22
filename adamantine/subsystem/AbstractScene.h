@@ -24,7 +24,7 @@ public:
   void onEntityRemoved(EntityHandler handler);
   virtual void onInit();
   virtual void onUpdate(float dt);
-  virtual void updateRunningTime(float dt) final;
+  virtual void update(float dt) final;
 
 protected:
   Stage stage;

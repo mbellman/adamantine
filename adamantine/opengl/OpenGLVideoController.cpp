@@ -76,7 +76,7 @@ void OpenGLVideoController::createScreenShaders() {
   auto* lightingShader = new ScreenShader("./adamantine/shaders/lighting.glsl");
   auto* dofShader = new ScreenShader("./adamantine/shaders/dof.glsl");
 
-  lightingShader->onCreateFrameBuffer([=](auto screen, const ShaderProgram& program) {
+  lightingShader->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
     auto* buffer = new FrameBuffer(screen.width, screen.height);
 
     buffer->addColorBuffer(GL_RGB32F, GL_RGB);
@@ -94,7 +94,7 @@ void OpenGLVideoController::createScreenShaders() {
     return buffer;
   });
 
-  lightingShader->onRender([=](const ShaderProgram& program) {
+  lightingShader->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -108,9 +108,33 @@ void OpenGLVideoController::createScreenShaders() {
     };
 
     glUniform3fv(program.getUniformLocation("cameraPosition"), 1, camera);
+
+    for (int i = 0; i < scene->getStage().getLights().size(); i++) {
+      auto* light = scene->getStage().getLights()[i];
+
+      float position[3] = {
+        light->position.x,
+        light->position.y,
+        light->position.z
+      };
+
+      float color[3] = {
+        light->color.x,
+        light->color.y,
+        light->color.z
+      };
+
+      std::string idx = std::to_string(i);
+
+      glUniform3fv(program.getUniformLocation("lights[" + idx + "].position"), 1, position);
+      glUniform3fv(program.getUniformLocation("lights[" + idx + "].color"), 1, color);
+      glUniform1f(program.getUniformLocation("lights[" + idx + "].radius"), light->radius);
+    }
+
+    glScreenQuad->render();
   });
 
-  dofShader->onCreateFrameBuffer([=](auto screen, const ShaderProgram& program) {
+  dofShader->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
     auto* buffer = new FrameBuffer(screen.width, screen.height);
 
     buffer->addColorBuffer(GL_RGBA32F, GL_RGBA);
@@ -121,9 +145,11 @@ void OpenGLVideoController::createScreenShaders() {
     return buffer;
   });
 
-  dofShader->onRender([=](const ShaderProgram& program) {
+  dofShader->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
     glClear(GL_COLOR_BUFFER_BIT);
     glUniform1i(program.getUniformLocation("screen"), 0);
+
+    glScreenQuad->render();
   });
 
   lightingShader->createFrameBuffer(screenSize);

@@ -6,14 +6,41 @@
 #include "subsystem/ObjLoader.h"
 #include "subsystem/Texture.h"
 
-void DefaultScene::onInit() {
-  settings.backgroundColor = {
-    1.0f,
-    0.0f,
-    1.0f
-  };
+void DefaultScene::addLights() {
+  for (int i = 0; i < 256; i++) {
+    auto* light = new Light();
+    float r = i * 2.5f;
 
-  auto* mesh = new Mesh(2, 2, 500.0f);
+    Vec3f position = {
+      sinf((float)i) * r,
+      20.0f,
+      cosf((float)i) * r
+    };
+
+    light->position = position;
+
+    light->onUpdate = [=](float dt) {
+      light->position = {
+        position.x + sinf(getRunningTime()) * 100.0f,
+        position.y,
+        position.z + cosf(getRunningTime()) * 100.0f
+      };
+    };
+
+    light->color = {
+      RNG::random(),
+      RNG::random(),
+      RNG::random()
+    };
+
+    light->radius = RNG::random(100.0f, 500.0f);
+
+    stage.add(light);
+  }
+}
+
+void DefaultScene::addObjects() {
+  auto* mesh = new Mesh(4, 4, 500.0f);
   auto* sandNormalMap = new Texture("./demo/sand-normal-map.png");
 
   assets.addTexture(sandNormalMap);
@@ -119,6 +146,17 @@ void DefaultScene::onInit() {
   stage.add(tinyCube);
   stage.add(model2);
   stage.add(model3);
+}
+
+void DefaultScene::onInit() {
+  settings.backgroundColor = {
+    1.0f,
+    0.0f,
+    1.0f
+  };
+
+  addLights();
+  addObjects();
 
   inputSystem.onMouseMotion([=](const SDL_MouseMotionEvent& event) {
     if (SDL_GetRelativeMouseMode()) {

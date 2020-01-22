@@ -1,3 +1,5 @@
+#include <string>
+
 #include "glew.h"
 #include "glut.h"
 #include "opengl/ShaderProgram.h"
@@ -23,6 +25,10 @@ void ShaderProgram::create() {
 
 GLint ShaderProgram::getUniformLocation(const char* name) const {
   return glGetUniformLocation(program, name);
+}
+
+GLint ShaderProgram::getUniformLocation(std::string name) const {
+  return glGetUniformLocation(program, name.c_str());
 }
 
 void ShaderProgram::link() {
