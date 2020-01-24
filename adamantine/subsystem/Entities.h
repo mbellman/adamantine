@@ -96,6 +96,7 @@ public:
 
 private:
   static Vec3f corners[8];
+  static Vec2f uvs[4];
   static int faces[6][4];
 };
 

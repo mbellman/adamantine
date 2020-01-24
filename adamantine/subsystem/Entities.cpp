@@ -236,33 +236,27 @@ void Mesh::defineOffsets(std::function<void(Vec3f&, int, int)> offsetHandler) {
  * ----
  */
 Cube::Cube() {
-  // Add vertices
-  Vec2f uvs[4] = {
-    { 0.0f, 0.0f },
-    { 1.0f, 0.0f },
-    { 1.0f, 1.0f },
-    { 0.0f, 1.0f }
-  };
+  // Add faces
+  for (int f = 0; f < 6; f++) {
+    int (&face)[4] = Cube::faces[f];
 
-  for (int c = 0; c < 8; c++) {
-    Vec3f position = Cube::corners[c];
-    Vec3f color = Vec3f(1.0f);
-    Vec2f uv = uvs[c % 4];
+    // Add face corners
+    for (int c = 0; c < 4; c++) {
+      int cornerIndex = face[c];
+      Vec3f position = Cube::corners[cornerIndex];
+      Vec3f color = Vec3f(1.0f);
+      Vec2f uv = Cube::uvs[c];
 
-    addVertex(position, color, uv);
+      addVertex(position, color, uv);
+    }
   }
 
   // Add polygons
   for (int f = 0; f < 6; f++) {
-    int (&corners)[4] = Cube::faces[f];
-    int vIndexes[4];
+    int offset = f * 4;
 
-    for (int i = 0; i < 4; i++) {
-      vIndexes[i] = corners[i];
-    }
-
-    addPolygon(vIndexes[0], vIndexes[1], vIndexes[2]);
-    addPolygon(vIndexes[0], vIndexes[2], vIndexes[3]);
+    addPolygon(offset, offset + 1, offset + 2);
+    addPolygon(offset, offset + 2, offset + 3);
   }
 
   updateNormals();
@@ -280,10 +274,18 @@ Vec3f Cube::corners[8] = {
   { -1.0f, 1.0f, 1.0f }
 };
 
+// UV coordinates for each cube face.
+Vec2f Cube::uvs[4] = {
+  { 1.0f, 1.0f }, // Bottom right
+  { 0.0f, 1.0f }, // Bottom left
+  { 0.0f, 0.0f }, // Top left
+  { 1.0f, 0.0f }  // Top right
+};
+
 // The six cube faces, each defined by
 // four corner indices.
 int Cube::faces[6][4] = {
-  { 3, 2, 1, 0 }, // Back
+  { 1, 0, 3, 2 }, // Back
   { 7, 6, 2, 3 }, // Top
   { 4, 5, 6, 7 }, // Front
   { 0, 1, 5, 4 }, // Bottom

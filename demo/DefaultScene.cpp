@@ -9,7 +9,7 @@
 void DefaultScene::addLights() {
   for (int i = 0; i < 256; i++) {
     auto* light = new Light();
-    float r = i * 10.0f;
+    float r = i * 5.0f;
 
     Vec3f position = {
       sinf((float)i) * r,
@@ -19,13 +19,13 @@ void DefaultScene::addLights() {
 
     light->position = position;
 
-    light->onUpdate = [=](float dt) {
-      light->position = {
-        position.x + sinf(getRunningTime()) * 100.0f,
-        position.y,
-        position.z + cosf(getRunningTime()) * 100.0f
-      };
-    };
+     light->onUpdate = [=](float dt) {
+       light->position = {
+         position.x + sinf(getRunningTime()) * 100.0f,
+         position.y,
+         position.z + cosf(getRunningTime()) * 100.0f
+       };
+     };
 
     light->color = {
       RNG::random(),
@@ -42,7 +42,9 @@ void DefaultScene::addLights() {
 void DefaultScene::addObjects() {
   auto* mesh = new Mesh(4, 4, 500.0f);
   auto* sandNormalMap = new Texture("./demo/sand-normal-map.png");
+  auto* catTexture = new Texture("./demo/cat.png");
 
+  assets.addTexture(catTexture);
   assets.addTexture(sandNormalMap);
 
   mesh->setPosition({ 0.0f, -20.0f, 0.0f });
@@ -54,6 +56,7 @@ void DefaultScene::addObjects() {
   cube1->setScale(8.0f);
   cube1->setPosition({ -25.0f, 10.0f, 50.0f });
   cube1->setOrientation({ 1.5f, 0.7f, 2.1f });
+  cube1->texture = catTexture;
 
   cube1->onUpdate = [=](float dt) {
     cube1->rotate({
@@ -68,6 +71,7 @@ void DefaultScene::addObjects() {
   cube2->setScale(4.0f);
   cube2->setPosition({ 0.0f, 7.0f, 50.0f });
   cube2->setOrientation({ 0.3f, 1.1f, 0.8f });
+  cube2->texture = catTexture;
 
   cube2->onUpdate = [=](float dt) {
     cube2->rotate({
@@ -78,14 +82,11 @@ void DefaultScene::addObjects() {
   };
 
   auto* cube3 = new Cube();
-  auto* catTexture = new Texture("./demo/cat.png");
-
-  assets.addTexture(catTexture);
 
   cube3->setScale(2.0f);
   cube3->setPosition({ 15.0f, 4.0f, 50.0f });
-  cube3->texture = catTexture;
   cube3->setOrientation({ 0.9f, 2.5f, 3.1f });
+  cube3->texture = catTexture;
 
   cube3->onUpdate = [=](float dt) {
     cube3->rotate({
