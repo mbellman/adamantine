@@ -9,7 +9,7 @@
 void DefaultScene::addLights() {
   for (int i = 0; i < 256; i++) {
     auto* light = new Light();
-    float r = i * 2.5f;
+    float r = i * 10.0f;
 
     Vec3f position = {
       sinf((float)i) * r,

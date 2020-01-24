@@ -99,35 +99,18 @@ void OpenGLVideoController::createScreenShaders() {
     glDisable(GL_CULL_FACE);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    const Vec3f& cameraPosition = scene->getCamera().position;
+    auto& lights = scene->getStage().getLights();
+    int totalLights = lights.size();
 
-    float camera[3] = {
-      cameraPosition.x,
-      cameraPosition.y,
-      cameraPosition.z
-    };
+    glUniform3fv(program.getUniformLocation("cameraPosition"), 1, scene->getCamera().position.float3());
+    glUniform1i(program.getUniformLocation("totalLights"), totalLights);
 
-    glUniform3fv(program.getUniformLocation("cameraPosition"), 1, camera);
-
-    for (int i = 0; i < scene->getStage().getLights().size(); i++) {
-      auto* light = scene->getStage().getLights()[i];
-
-      float position[3] = {
-        light->position.x,
-        light->position.y,
-        light->position.z
-      };
-
-      float color[3] = {
-        light->color.x,
-        light->color.y,
-        light->color.z
-      };
-
+    for (int i = 0; i < totalLights; i++) {
+      auto* light = lights[i];
       std::string idx = std::to_string(i);
 
-      glUniform3fv(program.getUniformLocation("lights[" + idx + "].position"), 1, position);
-      glUniform3fv(program.getUniformLocation("lights[" + idx + "].color"), 1, color);
+      glUniform3fv(program.getUniformLocation("lights[" + idx + "].position"), 1, light->position.float3());
+      glUniform3fv(program.getUniformLocation("lights[" + idx + "].color"), 1, light->color.float3());
       glUniform1f(program.getUniformLocation("lights[" + idx + "].radius"), light->radius);
     }
 

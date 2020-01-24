@@ -29,8 +29,8 @@ void OpenGLObject::bind() {
     glTexture->use();
   }
 
-  if (glTexture != nullptr) {
-    glTexture->use();
+  if (glNormalMap != nullptr) {
+    glNormalMap->use();
   }
 }
 

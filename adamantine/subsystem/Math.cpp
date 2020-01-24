@@ -61,6 +61,10 @@ void Vec3f::debug() const {
   printf("[ %f ] [ %f ] [ %f ]\n", x, y, z);
 }
 
+const float* Vec3f::float3() const {
+  return &x;
+}
+
 float Vec3f::magnitude() const {
   return sqrtf(x*x + y*y + z*z);
 }

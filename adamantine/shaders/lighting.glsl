@@ -1,5 +1,7 @@
 #version 330 core
 
+#define MAX_LIGHTS 256
+
 struct Light {
   vec3 position;
   vec3 color;
@@ -10,7 +12,8 @@ uniform sampler2D colorTexture;
 uniform sampler2D normalDepthTexture;
 uniform sampler2D positionTexture;
 uniform vec3 cameraPosition;
-uniform Light lights[256];
+uniform int totalLights;
+uniform Light lights[MAX_LIGHTS];
 
 in vec2 fragmentUv;
 
@@ -45,7 +48,7 @@ void main() {
   float depth = normalDepth.w;
   vec3 outColor = albedo * 0.01;
 
-  for (int i = 0; i < 256; i++) {
+  for (int i = 0; i < totalLights; i++) {
     outColor += albedo * getLightFactor(lights[i], position, normal);
   }
 
