@@ -19,13 +19,13 @@ void DefaultScene::addLights() {
 
     light->position = position;
 
-     light->onUpdate = [=](float dt) {
-       light->position = {
-         position.x + sinf(getRunningTime()) * 100.0f,
-         position.y,
-         position.z + cosf(getRunningTime()) * 100.0f
-       };
-     };
+    light->onUpdate = [=](float dt) {
+      light->position = {
+        position.x + sinf(getRunningTime()) * 100.0f,
+        position.y,
+        position.z + cosf(getRunningTime()) * 100.0f
+      };
+    };
 
     light->color = {
       RNG::random(),
