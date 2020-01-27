@@ -26,14 +26,13 @@ struct Entity {
 
 struct Light : Entity {
   enum LightType {
-    POINT = 0,
-    DIRECTIONAL = 1
+    POINT = 0
   };
 
   Light() {};
   Light(const Vec3f& position, const Vec3f& color, float radius);
 
-  LightType type;
+  LightType type = LightType::POINT;
   Vec3f color;
   Vec3f direction;
   float radius;

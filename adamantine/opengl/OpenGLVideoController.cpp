@@ -103,6 +103,8 @@ void OpenGLVideoController::createScreenShaders() {
     int totalLights = lights.size();
 
     glUniform3fv(program.getUniformLocation("cameraPosition"), 1, scene->getCamera().position.float3());
+    glUniform3fv(program.getUniformLocation("ambientLightColor"), 1, scene->getSettings().ambientLightColor.float3());
+    glUniform3fv(program.getUniformLocation("ambientLightDirection"), 1, scene->getSettings().ambientLightDirection.float3());
     glUniform1i(program.getUniformLocation("totalLights"), totalLights);
 
     for (int i = 0; i < totalLights; i++) {

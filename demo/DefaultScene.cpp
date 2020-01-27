@@ -7,6 +7,9 @@
 #include "subsystem/Texture.h"
 
 void DefaultScene::addLights() {
+  settings.ambientLightColor = { 1.0f, 1.0f, 1.0f };
+  settings.ambientLightDirection = { -1.0f, -0.1f, 0.4f };
+
   for (int i = 0; i < 256; i++) {
     auto* light = new Light();
     float r = i * 5.0f;
@@ -150,12 +153,6 @@ void DefaultScene::addObjects() {
 }
 
 void DefaultScene::onInit() {
-  settings.backgroundColor = {
-    1.0f,
-    0.0f,
-    1.0f
-  };
-
   addLights();
   addObjects();
 

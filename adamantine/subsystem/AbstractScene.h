@@ -8,7 +8,8 @@
 #include "subsystem/InputSystem.h"
 
 struct SceneSettings {
-  Vec3f backgroundColor;
+  Vec3f ambientLightColor;
+  Vec3f ambientLightDirection;
 };
 
 class AbstractScene {

@@ -12,12 +12,29 @@ uniform sampler2D colorTexture;
 uniform sampler2D normalDepthTexture;
 uniform sampler2D positionTexture;
 uniform vec3 cameraPosition;
+uniform vec3 ambientLightColor;
+uniform vec3 ambientLightDirection;
 uniform int totalLights;
 uniform Light lights[MAX_LIGHTS];
 
 in vec2 fragmentUv;
 
 layout (location = 0) out vec4 color;
+
+vec3 getAmbientLightFactor(vec3 surfacePosition, vec3 surfaceNormal) {
+  vec3 surfaceToLight = -1.0 * normalize(ambientLightDirection);
+  vec3 surfaceToCamera = cameraPosition - surfacePosition;
+
+  float normalDot = dot(surfaceToLight, surfaceNormal);
+  vec3 diffuse = ambientLightColor * max(normalDot, 0.0);
+
+  vec3 halfVector = normalize(normalize(surfaceToCamera) + normalize(surfaceToLight));
+  float specularDot = dot(halfVector, surfaceNormal);
+  float specularity = pow(max(specularDot, 0.0), 30);
+  vec3 specular = ambientLightColor * specularity;
+
+  return diffuse + specular;
+}
 
 vec3 getLightFactor(Light light, vec3 surfacePosition, vec3 surfaceNormal) {
   vec3 surfaceToCamera = cameraPosition - surfacePosition;
@@ -46,7 +63,7 @@ void main() {
   vec4 normalDepth = texture(normalDepthTexture, fragmentUv);
   vec3 normal = normalDepth.xyz;
   float depth = normalDepth.w;
-  vec3 outColor = albedo * 0.01;
+  vec3 outColor = albedo * getAmbientLightFactor(position, normal);
 
   for (int i = 0; i < totalLights; i++) {
     outColor += albedo * getLightFactor(lights[i], position, normal);
