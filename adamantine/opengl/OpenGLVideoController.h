@@ -6,6 +6,7 @@
 #include "subsystem/AbstractVideoController.h"
 #include "opengl/ShaderProgram.h"
 #include "opengl/OpenGLObject.h"
+#include "opengl/OpenGLShadowCaster.h"
 #include "opengl/FrameBuffer.h"
 #include "opengl/ScreenShader.h"
 #include "subsystem/Geometry.h"
@@ -26,14 +27,18 @@ public:
 private:
   SDL_GLContext glContext;
   ShaderProgram geometry;
+  ShaderProgram depth;
   std::vector<ScreenShader*> screenShaders;
   std::vector<OpenGLObject*> glObjects;
+  std::vector<OpenGLShadowCaster*> glShadowCasters;
 
+  void createDepthProgram();
   void createGeometryProgram();
-  Matrix4 createProjectionMatrix(float fov, float near, float far);
   void createScreenShaders();
   Matrix4 createViewMatrix();
   void onEntityAdded(Entity* entity);
   void onEntityRemoved(Entity* entity);
+  void renderShadowCasters();
   void renderGeometry();
+  void renderScreenShaders();
 };

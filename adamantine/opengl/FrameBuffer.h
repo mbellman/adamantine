@@ -19,6 +19,7 @@ public:
   ~FrameBuffer();
 
   void addColorBuffer(unsigned int internalFormat, unsigned int format);
+  void addColorDepthBuffer();
   void addDepthBuffer();
   void initializeColorBuffers();
   void startReading();

@@ -19,10 +19,6 @@ float AbstractScene::getRunningTime() {
   return runningTime;
 }
 
-const SceneSettings& AbstractScene::getSettings() const {
-  return settings;
-}
-
 const Stage& AbstractScene::getStage() const {
   return stage;
 }

@@ -43,6 +43,14 @@ Vec3f Vec3f::operator*(float scalar) const {
   };
 }
 
+Vec3f Vec3f::operator*(const Vec3f& vector) const {
+  return {
+    x * vector.x,
+    y * vector.y,
+    z * vector.z
+  };
+}
+
 void Vec3f::operator*=(float scalar) {
   x *= scalar;
   y *= scalar;
@@ -83,6 +91,16 @@ Vec3f Vec3f::unit() const {
  * Matrix4
  * -------
  */
+void Matrix4::debug() const {
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      printf("[ %f ] ", m[i * 4 + j]);
+    }
+
+    printf("\n");
+  }
+}
+
 Matrix4 Matrix4::fromMatrix3(const Matrix3& matrix) {
   return {
     matrix.m11, matrix.m12, matrix.m13, 0.0f,
@@ -98,6 +116,45 @@ Matrix4 Matrix4::identity() {
     0.0f, 1.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 1.0f, 0.0f,
     0.0f, 0.0f, 0.0f, 1.0f
+  };
+}
+
+Matrix4 Matrix4::lookAt(const Vec3f& eye, const Vec3f& direction) {
+  Vec3f forward = direction.unit();
+  Vec3f right = Vec3f::crossProduct(Vec3f(0.0f, 1.0f, 0.0f), forward);
+  Vec3f up = Vec3f::crossProduct(forward, right);
+  Matrix4 translation = Matrix4::translate(eye);
+
+  Matrix4 rotation = {
+    right.x, right.y, right.z, 0.0f,
+    up.x, up.y, up.z, 0.0f,
+    forward.x, forward.y, forward.z, 0.0f,
+    0.0f, 0.0f, 0.0f, 1.0f
+  };
+
+  return rotation * translation;
+}
+
+Matrix4 Matrix4::orthographic(float top, float bottom, float left, float right, float near, float far) {
+  return {
+    2.0f / (right - left), 0.0f, 0.0f, -(right + left) / (right - left),
+    0.0f, 2.0f / (top - bottom), 0.0f, -(top + bottom) / (top - bottom),
+    0.0f, 0.0f, -2.0f / (far - near), -(far + near) / (far - near),
+    0.0f, 0.0f, 0.0f, 1.0f
+  };
+}
+
+Matrix4 Matrix4::projection(const Region2d<int>& area, float fov, float near, float far) {
+  constexpr float PI = 3.14159265359;
+  constexpr float DEG_TO_RAD = PI / 180.0f;
+  float f = 1.0f / tanf(fov / 2.0f * DEG_TO_RAD);
+  float aspectRatio = (float)area.width / (float)area.height;
+
+  return {
+    f / aspectRatio, 0.0f, 0.0f, 0.0f,
+    0.0f, f, 0.0f, 0.0f,
+    0.0f, 0.0f, (far + near) / (near - far), (2 * far * near) / (near - far),
+    0.0f, 0.0f, -1.0f, 0.0f
   };
 }
 
@@ -141,16 +198,6 @@ Matrix4 Matrix4::operator*(const Matrix4& matrix) const {
   }
 
   return product;
-}
-
-void Matrix4::debug() const {
-  for (int i = 0; i < 4; i++) {
-    for (int j = 0; j < 4; j++) {
-      printf("[ %f ] ", m[i * 4 + j]);
-    }
-
-    printf("\n");
-  }
 }
 
 Matrix4 Matrix4::transpose() const {

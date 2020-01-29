@@ -52,6 +52,7 @@ struct Vec3f : Vec2f {
   Vec3f operator-(const Vec3f& vector) const;
   void operator-=(const Vec3f& vector);
   Vec3f operator*(float scalar) const;
+  Vec3f operator*(const Vec3f& vector) const;
   void operator*=(float scalar);
 
   void debug() const;
@@ -75,6 +76,9 @@ struct Matrix4 {
 
   static Matrix4 fromMatrix3(const Matrix3& matrix);
   static Matrix4 identity();
+  static Matrix4 lookAt(const Vec3f& eye, const Vec3f& direction);
+  static Matrix4 orthographic(float top, float bottom, float left, float right, float near, float far);
+  static Matrix4 projection(const Region2d<int>& area, float fov, float near, float far);
   static Matrix4 rotate(const Vec3f& rotation);
   static Matrix4 scale(const Vec3f& scale);
   static Matrix4 translate(const Vec3f& translation);

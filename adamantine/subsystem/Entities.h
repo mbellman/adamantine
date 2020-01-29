@@ -26,7 +26,8 @@ struct Entity {
 
 struct Light : Entity {
   enum LightType {
-    POINT = 0
+    POINT = 0,
+    DIRECTIONAL = 1
   };
 
   Light() {};

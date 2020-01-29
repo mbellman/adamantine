@@ -1,5 +1,7 @@
 #include "opengl/FrameBuffer.h"
 
+#include <cstdio>
+
 FrameBuffer::FrameBuffer(int width, int height) {
   glGenFramebuffers(1, &fbo);
   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -9,7 +11,7 @@ FrameBuffer::FrameBuffer(int width, int height) {
 }
 
 FrameBuffer::~FrameBuffer() {
-  
+
 }
 
 void FrameBuffer::addColorBuffer(unsigned int internalFormat, unsigned int format) {
@@ -29,6 +31,23 @@ void FrameBuffer::addColorBuffer(unsigned int internalFormat, unsigned int forma
   glFramebufferTexture2D(GL_FRAMEBUFFER, buffer.attachment, GL_TEXTURE_2D, buffer.texture, 0);
 
   colorBuffers.push_back(buffer);
+}
+
+void FrameBuffer::addColorDepthBuffer() {
+  unsigned int buffer;
+
+  glGenTextures(1, &buffer);
+  glBindTexture(GL_TEXTURE_2D, buffer);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width, size.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, buffer, 0);
+  glDrawBuffer(GL_NONE);
+  glReadBuffer(GL_NONE);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void FrameBuffer::addDepthBuffer() {

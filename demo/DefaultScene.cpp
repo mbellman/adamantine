@@ -7,12 +7,17 @@
 #include "subsystem/Texture.h"
 
 void DefaultScene::addLights() {
-  settings.ambientLightColor = { 1.0f, 1.0f, 1.0f };
-  settings.ambientLightDirection = { -1.0f, -0.1f, 0.4f };
+  auto* directionalLight = new Light();
 
-  for (int i = 0; i < 256; i++) {
+  directionalLight->type = Light::LightType::DIRECTIONAL;
+  directionalLight->color = Vec3f(1.0f, 1.0f, 1.0f);
+  directionalLight->direction = Vec3f(-1.0f, -0.4f, 1.0f);
+
+  stage.add(directionalLight);
+
+  for (int i = 0; i < 100; i++) {
     auto* light = new Light();
-    float r = i * 5.0f;
+    float r = i * 10.0f;
 
     Vec3f position = {
       sinf((float)i) * r,

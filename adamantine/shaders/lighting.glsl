@@ -1,19 +1,22 @@
 #version 330 core
 
-#define MAX_LIGHTS 256
+#define MAX_LIGHTS 128
 
 struct Light {
   vec3 position;
+  vec3 direction;
   vec3 color;
   float radius;
+  int type;
 };
+
+const int POINT_LIGHT = 0;
+const int DIRECTIONAL_LIGHT = 1;
 
 uniform sampler2D colorTexture;
 uniform sampler2D normalDepthTexture;
 uniform sampler2D positionTexture;
 uniform vec3 cameraPosition;
-uniform vec3 ambientLightColor;
-uniform vec3 ambientLightDirection;
 uniform int totalLights;
 uniform Light lights[MAX_LIGHTS];
 
@@ -21,23 +24,23 @@ in vec2 fragmentUv;
 
 layout (location = 0) out vec4 color;
 
-vec3 getAmbientLightFactor(vec3 surfacePosition, vec3 surfaceNormal, vec3 surfaceToCamera) {
-  vec3 surfaceToLight = -1.0 * normalize(ambientLightDirection);
+vec3 getDirectionalLightFactor(Light light, vec3 surfaceNormal, vec3 surfaceToCamera) {
+  vec3 surfaceToLight = -1.0 * normalize(light.direction);
 
   // Diffuse term
   float normalDot = dot(surfaceToLight, surfaceNormal);
-  vec3 diffuse = ambientLightColor * max(normalDot, 0.0);
+  vec3 diffuse = light.color * max(normalDot, 0.0);
 
   // Specular term
-  vec3 halfVector = normalize(surfaceToCamera + normalize(surfaceToLight));
+  vec3 halfVector = normalize(surfaceToCamera + surfaceToLight);
   float specularDot = dot(halfVector, surfaceNormal);
   float specularity = pow(max(specularDot, 0.0), 30);
-  vec3 specular = ambientLightColor * specularity;
+  vec3 specular = light.color * specularity;
 
   return diffuse + specular;
 }
 
-vec3 getLightFactor(Light light, vec3 surfacePosition, vec3 surfaceNormal, vec3 surfaceToCamera) {
+vec3 getPointLightFactor(Light light, vec3 surfacePosition, vec3 surfaceNormal, vec3 surfaceToCamera) {
   vec3 surfaceToLight = light.position - surfacePosition;
 
   float lightDistance = length(surfaceToLight);
@@ -65,10 +68,19 @@ void main() {
   vec4 normalDepth = texture(normalDepthTexture, fragmentUv);
   vec3 surfaceToCamera = normalize(cameraPosition - position);
   vec3 normal = normalDepth.xyz;
-  vec3 combinedLighting = albedo * getAmbientLightFactor(position, normal, surfaceToCamera);
+  vec3 combinedLighting = vec3(0.0);
 
   for (int i = 0; i < totalLights; i++) {
-    combinedLighting += albedo * getLightFactor(lights[i], position, normal, surfaceToCamera);
+    Light light = lights[i];
+
+    switch (light.type) {
+      case POINT_LIGHT:
+        combinedLighting += albedo * getPointLightFactor(lights[i], position, normal, surfaceToCamera);
+        break;
+      case DIRECTIONAL_LIGHT:
+        combinedLighting += albedo * getDirectionalLightFactor(lights[i], normal, surfaceToCamera);
+        break;
+    }
   }
 
   color = vec4(combinedLighting, normalDepth.w);
