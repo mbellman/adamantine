@@ -6,10 +6,10 @@
 #include "glut.h"
 #include "subsystem/Math.h"
 
-struct ColorBuffer {
+struct ColorTexture {
   unsigned int internalFormat;
   unsigned int format;
-  GLuint texture;
+  GLuint id;
   GLuint attachment;
 };
 
@@ -18,16 +18,17 @@ public:
   FrameBuffer(int width, int height);
   ~FrameBuffer();
 
-  void addColorBuffer(unsigned int internalFormat, unsigned int format);
-  void addColorDepthBuffer();
+  void addColorTexture(unsigned int internalFormat, unsigned int format);
   void addDepthBuffer();
-  void initializeColorBuffers();
+  void addDepthTexture();
+  void initializeColorTextures();
   void startReading();
   void startWriting();
 
 private:
   GLuint fbo;
-  std::vector<ColorBuffer> colorBuffers;
   GLuint depthBuffer;
+  GLuint depthTexture;
+  std::vector<ColorTexture> colorTextures;
   Region2d<int> size;
 };

@@ -7,5 +7,5 @@ in vec2 fragmentUv;
 layout (location = 0) out vec3 color;
 
 void main() {
-  color = texture(depthTexture, fragmentUv).xyz;
+  color = vec3(texture(depthTexture, fragmentUv).r);
 }

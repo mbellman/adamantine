@@ -81,28 +81,32 @@ void OpenGLVideoController::createGeometryProgram() {
 }
 
 void OpenGLVideoController::createScreenShaders() {
-  auto* depthShader = new ScreenShader("./adamantine/shaders/z.fragment.glsl");
+  auto* depth = new ScreenShader("./adamantine/shaders/z.fragment.glsl");
 
-  depthShader->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
+  depth->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
     auto* buffer = new FrameBuffer(screen.width, screen.height);
 
-    buffer->addColorBuffer(GL_RGB32F, GL_RGB);
+    buffer->addColorTexture(GL_RGB32F, GL_RGB);
     glUniform1i(program.getUniformLocation("depthTexture"), 0);
 
-    buffer->initializeColorBuffers();
+    buffer->initializeColorTextures();
 
     return buffer;
   });
 
-  depthShader->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
-    glClear(GL_COLOR_BUFFER_BIT);
+  depth->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glShadowCasters[0]->startReading();
 
     glScreenQuad->render();
   });
 
-  depthShader->createFrameBuffer(screenSize);
+  depth->createFrameBuffer(screenSize);
 
-  screenShaders.push_back(depthShader);
+  screenShaders.push_back(depth);
 
   // auto* lightingShader = new ScreenShader("./adamantine/shaders/lighting.glsl");
   // auto* dofShader = new ScreenShader("./adamantine/shaders/dof.glsl");
@@ -241,7 +245,7 @@ void OpenGLVideoController::onInit() {
   SDL_GL_SetSwapInterval(0);
 
   createDepthProgram();
-  createGeometryProgram();
+  // createGeometryProgram();
   createScreenShaders();
 
   scene->onEntityAdded([=](auto* entity) {
@@ -256,12 +260,12 @@ void OpenGLVideoController::onInit() {
 }
 
 void OpenGLVideoController::onRender() {
-  // screenShaders[0]->startWriting();
+  // glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  renderShadowCasters();
+  // screenShaders[0]->startWriting();
   // renderGeometry();
-  // renderScreenShaders();
+  renderShadowCasters();
+  renderScreenShaders();
 
   SDL_GL_SwapWindow(sdlWindow);
   glFinish();
@@ -281,16 +285,16 @@ void OpenGLVideoController::onScreenSizeChange(int width, int height) {
 void OpenGLVideoController::renderShadowCasters() {
   depth.use();
 
-  // glViewport(0, 0, 1024, 1024);
+  glViewport(0, 0, 1024, 1024);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
 
   for (auto* glShadowCaster : glShadowCasters) {
-    // glShadowCaster->startCasting();
+    glShadowCaster->startCasting();
 
     Matrix4 lightMatrix = glShadowCaster->getLightMatrix().transpose();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
     glUniformMatrix4fv(depth.getUniformLocation("lightMatrix"), 1, GL_FALSE, lightMatrix.m);
 
     for (auto* glObject : glObjects) {
@@ -302,7 +306,7 @@ void OpenGLVideoController::renderShadowCasters() {
     }
   }
 
-  // glViewport(0, 0, screenSize.width, screenSize.height);
+  glViewport(0, 0, screenSize.width, screenSize.height);
 }
 
 void OpenGLVideoController::renderGeometry() {
