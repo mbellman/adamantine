@@ -10,11 +10,11 @@ OpenGLObject::OpenGLObject(const Object* object) {
   glPipeline->createFromObject(object);
 
   if (object->texture != nullptr) {
-    glTexture = OpenGLObject::getOpenGLTexture(object->texture, GL_TEXTURE0 + 3);
+    glTexture = OpenGLObject::getOpenGLTexture(object->texture, GL_TEXTURE0 + 4);
   }
 
   if (object->normalMap != nullptr) {
-    glNormalMap = OpenGLObject::getOpenGLTexture(object->normalMap, GL_TEXTURE0 + 4);
+    glNormalMap = OpenGLObject::getOpenGLTexture(object->normalMap, GL_TEXTURE0 + 5);
   }
 }
 

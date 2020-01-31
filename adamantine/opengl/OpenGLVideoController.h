@@ -9,6 +9,7 @@
 #include "opengl/OpenGLShadowCaster.h"
 #include "opengl/FrameBuffer.h"
 #include "opengl/ScreenShader.h"
+#include "opengl/GBuffer.h"
 #include "subsystem/Geometry.h"
 #include "subsystem/Entities.h"
 #include "glut.h"
@@ -26,19 +27,17 @@ public:
 
 private:
   SDL_GLContext glContext;
-  ShaderProgram geometry;
-  ShaderProgram depth;
+  GBuffer* gBuffer = nullptr;
   std::vector<ScreenShader*> screenShaders;
   std::vector<OpenGLObject*> glObjects;
   std::vector<OpenGLShadowCaster*> glShadowCasters;
 
-  void createDepthProgram();
-  void createGeometryProgram();
   void createScreenShaders();
   Matrix4 createViewMatrix();
   void onEntityAdded(Entity* entity);
   void onEntityRemoved(Entity* entity);
   void renderShadowCasters();
   void renderGeometry();
+  void renderLighting();
   void renderScreenShaders();
 };

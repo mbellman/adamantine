@@ -11,7 +11,7 @@ void DefaultScene::addLights() {
 
   directionalLight->type = Light::LightType::DIRECTIONAL;
   directionalLight->color = Vec3f(1.0f, 1.0f, 1.0f);
-  directionalLight->direction = Vec3f(-1.0f, -0.4f, 1.0f);
+  directionalLight->direction = Vec3f(-1.0f, -0.4f, 2.0f);
 
   stage.add(directionalLight);
 

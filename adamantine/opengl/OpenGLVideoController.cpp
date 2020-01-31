@@ -44,139 +44,29 @@ OpenGLVideoController::~OpenGLVideoController() {
   OpenGLObject::freeTextureCache();
 }
 
-void OpenGLVideoController::createDepthProgram() {
-  depth.create();
-  depth.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/depth.vertex.glsl"));
-  depth.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/depth.fragment.glsl"));
-  depth.link();
-  depth.use();
-
-  VertexShaderInput vertexInputs[] = {
-    { "vertexPosition", 3, GL_FLOAT },
-    { "vertexNormal", 3, GL_FLOAT},
-    { "vertexTangent", 3, GL_FLOAT },
-    { "vertexColor", 3, GL_FLOAT },
-    { "vertexUv", 2, GL_FLOAT }
-  };
-
-  depth.setVertexInputs<float>(5, vertexInputs);
-}
-
-void OpenGLVideoController::createGeometryProgram() {
-  geometry.create();
-  geometry.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/geometry.vertex.glsl"));
-  geometry.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/geometry.fragment.glsl"));
-  geometry.link();
-  geometry.use();
-
-  VertexShaderInput vertexInputs[] = {
-    { "vertexPosition", 3, GL_FLOAT },
-    { "vertexNormal", 3, GL_FLOAT},
-    { "vertexTangent", 3, GL_FLOAT },
-    { "vertexColor", 3, GL_FLOAT },
-    { "vertexUv", 2, GL_FLOAT }
-  };
-
-  geometry.setVertexInputs<float>(5, vertexInputs);
-}
-
 void OpenGLVideoController::createScreenShaders() {
-  auto* depth = new ScreenShader("./adamantine/shaders/z.fragment.glsl");
+  auto* dofShader = new ScreenShader("./adamantine/shaders/dof.glsl");
 
-  depth->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
+  dofShader->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
     auto* buffer = new FrameBuffer(screen.width, screen.height);
 
-    buffer->addColorTexture(GL_RGB32F, GL_RGB);
-    glUniform1i(program.getUniformLocation("depthTexture"), 0);
+    buffer->addColorTexture(GL_RGBA32F, GL_RGBA);
+    glUniform1i(program.getUniformLocation("screen"), 0);
 
     buffer->initializeColorTextures();
 
     return buffer;
   });
 
-  depth->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glShadowCasters[0]->startReading();
+  dofShader->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glUniform1i(program.getUniformLocation("screen"), 0);
 
     glScreenQuad->render();
   });
 
-  depth->createFrameBuffer(screenSize);
-
-  screenShaders.push_back(depth);
-
-  // auto* lightingShader = new ScreenShader("./adamantine/shaders/lighting.glsl");
-  // auto* dofShader = new ScreenShader("./adamantine/shaders/dof.glsl");
-
-  // lightingShader->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
-  //   auto* buffer = new FrameBuffer(screen.width, screen.height);
-
-  //   buffer->addColorBuffer(GL_RGB32F, GL_RGB);
-  //   glUniform1i(program.getUniformLocation("colorTexture"), 0);
-
-  //   buffer->addColorBuffer(GL_RGBA32F, GL_RGBA);
-  //   glUniform1i(program.getUniformLocation("normalDepthTexture"), 1);
-
-  //   buffer->addColorBuffer(GL_RGB32F, GL_RGB);
-  //   glUniform1i(program.getUniformLocation("positionTexture"), 2);
-
-  //   buffer->addDepthBuffer();
-  //   buffer->initializeColorBuffers();
-
-  //   return buffer;
-  // });
-
-  // lightingShader->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
-  //   glDisable(GL_DEPTH_TEST);
-  //   glDisable(GL_CULL_FACE);
-  //   glClear(GL_COLOR_BUFFER_BIT);
-
-  //   auto& lights = scene->getStage().getLights();
-  //   int totalLights = lights.size();
-
-  //   glUniform3fv(program.getUniformLocation("cameraPosition"), 1, scene->getCamera().position.float3());
-  //   glUniform1i(program.getUniformLocation("totalLights"), totalLights);
-
-  //   for (int i = 0; i < totalLights; i++) {
-  //     auto* light = lights[i];
-  //     std::string idx = std::to_string(i);
-
-  //     glUniform3fv(program.getUniformLocation("lights[" + idx + "].position"), 1, light->position.float3());
-  //     glUniform3fv(program.getUniformLocation("lights[" + idx + "].direction"), 1, light->direction.float3());
-  //     glUniform3fv(program.getUniformLocation("lights[" + idx + "].color"), 1, light->color.float3());
-  //     glUniform1f(program.getUniformLocation("lights[" + idx + "].radius"), light->radius);
-  //     glUniform1i(program.getUniformLocation("lights[" + idx + "].type"), light->type);
-  //   }
-
-  //   glScreenQuad->render();
-  // });
-
-  // dofShader->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
-  //   auto* buffer = new FrameBuffer(screen.width, screen.height);
-
-  //   buffer->addColorBuffer(GL_RGBA32F, GL_RGBA);
-  //   glUniform1i(program.getUniformLocation("screen"), 0);
-
-  //   buffer->initializeColorBuffers();
-
-  //   return buffer;
-  // });
-
-  // dofShader->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
-  //   glClear(GL_COLOR_BUFFER_BIT);
-  //   glUniform1i(program.getUniformLocation("screen"), 0);
-
-  //   glScreenQuad->render();
-  // });
-
-  // lightingShader->createFrameBuffer(screenSize);
-  // dofShader->createFrameBuffer(screenSize);
-
-  // screenShaders.push_back(lightingShader);
-  // screenShaders.push_back(dofShader);
+  dofShader->createFrameBuffer(screenSize);
+  screenShaders.push_back(dofShader);
 }
 
 Matrix4 OpenGLVideoController::createViewMatrix() {
@@ -203,9 +93,8 @@ void OpenGLVideoController::onEntityAdded(Entity* entity) {
     auto* glObject = new OpenGLObject((Object*)entity);
 
     glObject->bind();
-
-    geometry.bindVertexInputs();
-    depth.bindVertexInputs();
+    gBuffer->getGeometryProgram().bindVertexInputs();
+    gBuffer->getDepthProgram().bindVertexInputs();
 
     glObjects.push_back(glObject);
   } else if (entity->isOfType<Light>() && ((Light*)entity)->type == Light::LightType::DIRECTIONAL) {
@@ -244,8 +133,10 @@ void OpenGLVideoController::onInit() {
 
   SDL_GL_SetSwapInterval(0);
 
-  createDepthProgram();
-  // createGeometryProgram();
+  gBuffer = new GBuffer();
+
+  gBuffer->createFrameBuffer(screenSize.width, screenSize.height);
+
   createScreenShaders();
 
   scene->onEntityAdded([=](auto* entity) {
@@ -260,11 +151,16 @@ void OpenGLVideoController::onInit() {
 }
 
 void OpenGLVideoController::onRender() {
-  // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  gBuffer->startWriting();
 
-  // screenShaders[0]->startWriting();
-  // renderGeometry();
-  renderShadowCasters();
+  renderGeometry();
+
+  screenShaders[0]->startWriting();
+  gBuffer->startReading();
+  // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+  renderLighting();
+  // renderShadowCasters();
   renderScreenShaders();
 
   SDL_GL_SwapWindow(sdlWindow);
@@ -277,13 +173,17 @@ void OpenGLVideoController::onScreenSizeChange(int width, int height) {
 
   glViewport(0, 0, width, height);
 
+  gBuffer->createFrameBuffer(width, height);
+
   for (auto* shader : screenShaders) {
     shader->createFrameBuffer({ 0, 0, width, height });
   }
 }
 
 void OpenGLVideoController::renderShadowCasters() {
-  depth.use();
+  auto& depthProgram = gBuffer->getDepthProgram();
+
+  depthProgram.use();
 
   glViewport(0, 0, 1024, 1024);
   glEnable(GL_DEPTH_TEST);
@@ -295,12 +195,12 @@ void OpenGLVideoController::renderShadowCasters() {
     Matrix4 lightMatrix = glShadowCaster->getLightMatrix().transpose();
 
     glClear(GL_DEPTH_BUFFER_BIT);
-    glUniformMatrix4fv(depth.getUniformLocation("lightMatrix"), 1, GL_FALSE, lightMatrix.m);
+    glUniformMatrix4fv(depthProgram.getUniformLocation("lightMatrix"), 1, GL_FALSE, lightMatrix.m);
 
     for (auto* glObject : glObjects) {
       const float* modelMatrix = glObject->getSourceObject()->getMatrix().m;
 
-      glUniformMatrix4fv(depth.getUniformLocation("modelMatrix"), 1, GL_FALSE, modelMatrix);
+      glUniformMatrix4fv(depthProgram.getUniformLocation("modelMatrix"), 1, GL_FALSE, modelMatrix);
 
       glObject->render();
     }
@@ -310,7 +210,9 @@ void OpenGLVideoController::renderShadowCasters() {
 }
 
 void OpenGLVideoController::renderGeometry() {
-  geometry.use();
+  auto& geometryProgram = gBuffer->getGeometryProgram();
+
+  geometryProgram.use();
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
@@ -319,20 +221,52 @@ void OpenGLVideoController::renderGeometry() {
   Matrix4 projectionMatrix = Matrix4::projection(screenSize, 45.0f, 1.0f, 10000.0f).transpose();
   Matrix4 viewMatrix = createViewMatrix();
 
-  glUniformMatrix4fv(geometry.getUniformLocation("projectionMatrix"), 1, GL_FALSE, projectionMatrix.m);
-  glUniformMatrix4fv(geometry.getUniformLocation("viewMatrix"), 1, GL_FALSE, viewMatrix.m);
-  glUniform1i(geometry.getUniformLocation("modelTexture"), 3);
-  glUniform1i(geometry.getUniformLocation("normalMap"), 4);
+  glUniformMatrix4fv(geometryProgram.getUniformLocation("projectionMatrix"), 1, GL_FALSE, projectionMatrix.m);
+  glUniformMatrix4fv(geometryProgram.getUniformLocation("viewMatrix"), 1, GL_FALSE, viewMatrix.m);
+  glUniform1i(geometryProgram.getUniformLocation("modelTexture"), 4);
+  glUniform1i(geometryProgram.getUniformLocation("normalMap"), 5);
 
   for (auto* glObject : glObjects) {
     const float* modelMatrix = glObject->getSourceObject()->getMatrix().m;
 
-    glUniformMatrix4fv(geometry.getUniformLocation("modelMatrix"), 1, GL_FALSE, modelMatrix);
-    glUniform1i(geometry.getUniformLocation("hasTexture"), glObject->hasTexture());
-    glUniform1i(geometry.getUniformLocation("hasNormalMap"), glObject->hasNormalMap());
+    glUniformMatrix4fv(geometryProgram.getUniformLocation("modelMatrix"), 1, GL_FALSE, modelMatrix);
+    glUniform1i(geometryProgram.getUniformLocation("hasTexture"), glObject->hasTexture());
+    glUniform1i(geometryProgram.getUniformLocation("hasNormalMap"), glObject->hasNormalMap());
 
     glObject->render();
   }
+}
+
+void OpenGLVideoController::renderLighting() {
+  auto& lightingProgram = gBuffer->getLightingProgram();
+
+  lightingProgram.use();
+
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  auto& lights = scene->getStage().getLights();
+  int totalLights = lights.size();
+
+  glUniform1i(lightingProgram.getUniformLocation("colorTexture"), 0);
+  glUniform1i(lightingProgram.getUniformLocation("normalDepthTexture"), 1);
+  glUniform1i(lightingProgram.getUniformLocation("positionTexture"), 2);
+  glUniform3fv(lightingProgram.getUniformLocation("cameraPosition"), 1, scene->getCamera().position.float3());
+  glUniform1i(lightingProgram.getUniformLocation("totalLights"), totalLights);
+
+  for (int i = 0; i < totalLights; i++) {
+    auto* light = lights[i];
+    std::string idx = std::to_string(i);
+
+    glUniform3fv(lightingProgram.getUniformLocation("lights[" + idx + "].position"), 1, light->position.float3());
+    glUniform3fv(lightingProgram.getUniformLocation("lights[" + idx + "].direction"), 1, light->direction.float3());
+    glUniform3fv(lightingProgram.getUniformLocation("lights[" + idx + "].color"), 1, light->color.float3());
+    glUniform1f(lightingProgram.getUniformLocation("lights[" + idx + "].radius"), light->radius);
+    glUniform1i(lightingProgram.getUniformLocation("lights[" + idx + "].type"), light->type);
+  }
+
+  gBuffer->renderScreenQuad();
 }
 
 void OpenGLVideoController::renderScreenShaders() {

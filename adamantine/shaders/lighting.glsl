@@ -22,7 +22,7 @@ uniform Light lights[MAX_LIGHTS];
 
 in vec2 fragmentUv;
 
-layout (location = 0) out vec4 color;
+layout (location = 0) out vec4 colorDepth;
 
 vec3 getDirectionalLightFactor(Light light, vec3 surfaceNormal, vec3 surfaceToCamera) {
   vec3 surfaceToLight = -1.0 * normalize(light.direction);
@@ -83,5 +83,5 @@ void main() {
     }
   }
 
-  color = vec4(combinedLighting, normalDepth.w);
+  colorDepth = vec4(combinedLighting, normalDepth.w);
 }
