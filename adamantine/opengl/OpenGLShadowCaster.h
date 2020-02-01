@@ -11,6 +11,7 @@ class OpenGLShadowCaster {
 public:
   OpenGLShadowCaster(const Light* light);
 
+  const Light* getLight() const;
   Matrix4 getLightMatrix() const;
   void startCasting();
   void startReading();

@@ -43,19 +43,30 @@ void FrameBuffer::addDepthBuffer() {
 }
 
 void FrameBuffer::addDepthTexture() {
+  float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
   glGenTextures(1, &depthTexture);
   glBindTexture(GL_TEXTURE_2D, depthTexture);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width, size.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void FrameBuffer::clearColorTexture(int attachment) {
+  startWriting();
+
+  float black[] = { 0.0f };
+
+  glClearBufferfv(GL_COLOR, attachment, black);
 }
 
 void FrameBuffer::initializeColorTextures() {
@@ -71,14 +82,14 @@ void FrameBuffer::initializeColorTextures() {
 }
 
 void FrameBuffer::startReading() {
+  for (int i = 0; i < colorTextures.size(); i++) {
+    glActiveTexture(GL_TEXTURE0 + i);
+    glBindTexture(GL_TEXTURE_2D, colorTextures[i].id);
+  }
+
   if (depthTexture > 0) {
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0 + colorTextures.size());
     glBindTexture(GL_TEXTURE_2D, depthTexture);
-  } else {
-    for (int i = 0; i < colorTextures.size(); i++) {
-      glActiveTexture(GL_TEXTURE0 + i);
-      glBindTexture(GL_TEXTURE_2D, colorTextures[i].id);
-    }
   }
 
   glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);

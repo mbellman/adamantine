@@ -3,30 +3,24 @@
 
 GBuffer::GBuffer() {
   createGeometryProgram();
-  createDepthProgram();
   createLightingProgram();
+  createLightViewProgram();
+  createShadowCasterProgram();
+
+  glScreenQuad = new OpenGLPipeline();
+
+  lightingProgram.bindVertexInputs();
+  shadowCasterProgram.bindVertexInputs();
+
+  glScreenQuad->createScreenQuad();
 }
 
 GBuffer::~GBuffer() {
 
 }
 
-void GBuffer::createDepthProgram() {
-  depthProgram.create();
-  depthProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/depth.vertex.glsl"));
-  depthProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/depth.fragment.glsl"));
-  depthProgram.link();
-  depthProgram.use();
-
-  VertexShaderInput vertexInputs[] = {
-    { "vertexPosition", 3, GL_FLOAT },
-    { "vertexNormal", 3, GL_FLOAT},
-    { "vertexTangent", 3, GL_FLOAT },
-    { "vertexColor", 3, GL_FLOAT },
-    { "vertexUv", 2, GL_FLOAT }
-  };
-
-  depthProgram.setVertexInputs<float>(5, vertexInputs);
+void GBuffer::clearLightViewBuffer() {
+  frameBuffer->clearColorTexture(3);
 }
 
 void GBuffer::createFrameBuffer(int width, int height) {
@@ -36,10 +30,10 @@ void GBuffer::createFrameBuffer(int width, int height) {
 
   frameBuffer = new FrameBuffer(width, height);
 
-  frameBuffer->addColorTexture(GL_RGB32F, GL_RGB);     // Color
-  frameBuffer->addColorTexture(GL_RGBA32F, GL_RGBA);   // Normal/depth
-  frameBuffer->addColorTexture(GL_RGB32F, GL_RGB);     // Position
-  frameBuffer->addColorTexture(GL_RED, GL_RED);        // Shadowcaster light depth buffer
+  frameBuffer->addColorTexture(GL_RGB32F, GL_RGB);     // (0) Color
+  frameBuffer->addColorTexture(GL_RGBA32F, GL_RGBA);   // (1) Normal/depth
+  frameBuffer->addColorTexture(GL_RGB32F, GL_RGB);     // (2) Position
+  frameBuffer->addColorTexture(GL_R32F, GL_RED);       // (3) Shadowcaster light view buffer
   frameBuffer->addDepthBuffer();
   frameBuffer->initializeColorTextures();
 }
@@ -65,7 +59,7 @@ void GBuffer::createGeometryProgram() {
 void GBuffer::createLightingProgram() {
   lightingProgram.create();
   lightingProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
-  lightingProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/lighting.glsl"));
+  lightingProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/light.fragment.glsl"));
   lightingProgram.link();
   lightingProgram.use();
 
@@ -75,15 +69,39 @@ void GBuffer::createLightingProgram() {
   };
 
   lightingProgram.setVertexInputs<float>(2, inputs);
-
-  glScreenQuad = new OpenGLPipeline();
-
-  lightingProgram.bindVertexInputs();
-  glScreenQuad->createScreenQuad();
 }
 
-ShaderProgram& GBuffer::getDepthProgram() {
-  return depthProgram;
+void GBuffer::createLightViewProgram() {
+  lightViewProgram.create();
+  lightViewProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/lightview.vertex.glsl"));
+  lightViewProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/lightview.fragment.glsl"));
+  lightViewProgram.link();
+  lightViewProgram.use();
+
+  VertexShaderInput vertexInputs[] = {
+    { "vertexPosition", 3, GL_FLOAT },
+    { "vertexNormal", 3, GL_FLOAT},
+    { "vertexTangent", 3, GL_FLOAT },
+    { "vertexColor", 3, GL_FLOAT },
+    { "vertexUv", 2, GL_FLOAT }
+  };
+
+  lightViewProgram.setVertexInputs<float>(5, vertexInputs);
+}
+
+void GBuffer::createShadowCasterProgram() {
+  shadowCasterProgram.create();
+  shadowCasterProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
+  shadowCasterProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/shadowcaster.fragment.glsl"));
+  shadowCasterProgram.link();
+  shadowCasterProgram.use();
+
+  VertexShaderInput inputs[] = {
+    { "vertexPosition", 2, GL_FLOAT },
+    { "vertexUv", 2, GL_FLOAT }
+  };
+
+  shadowCasterProgram.setVertexInputs<float>(2, inputs);
 }
 
 ShaderProgram& GBuffer::getGeometryProgram() {
@@ -92,6 +110,14 @@ ShaderProgram& GBuffer::getGeometryProgram() {
 
 ShaderProgram& GBuffer::getLightingProgram() {
   return lightingProgram;
+}
+
+ShaderProgram& GBuffer::getLightViewProgram() {
+  return lightViewProgram;
+}
+
+ShaderProgram& GBuffer::getShadowCasterProgram() {
+  return shadowCasterProgram;
 }
 
 void GBuffer::renderScreenQuad() {

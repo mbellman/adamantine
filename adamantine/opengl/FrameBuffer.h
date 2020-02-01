@@ -21,6 +21,7 @@ public:
   void addColorTexture(unsigned int internalFormat, unsigned int format);
   void addDepthBuffer();
   void addDepthTexture();
+  void clearColorTexture(int attachment);
   void initializeColorTextures();
   void startReading();
   void startWriting();

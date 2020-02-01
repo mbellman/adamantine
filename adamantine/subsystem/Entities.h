@@ -37,6 +37,7 @@ struct Light : Entity {
   Vec3f color;
   Vec3f direction;
   float radius;
+  bool canCastShadows = false;
 };
 
 class Camera : public Entity {

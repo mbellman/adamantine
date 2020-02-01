@@ -10,22 +10,26 @@ public:
   GBuffer();
   ~GBuffer();
 
+  void clearLightViewBuffer();
   void createFrameBuffer(int width, int height);
-  ShaderProgram& getDepthProgram();
   ShaderProgram& getGeometryProgram();
   ShaderProgram& getLightingProgram();
+  ShaderProgram& getLightViewProgram();
+  ShaderProgram& getShadowCasterProgram();
   void renderScreenQuad();
   void startReading();
   void startWriting();
 
 private:
   ShaderProgram geometryProgram;
-  ShaderProgram depthProgram;
   ShaderProgram lightingProgram;
+  ShaderProgram lightViewProgram;
+  ShaderProgram shadowCasterProgram;
   FrameBuffer* frameBuffer = nullptr;
   OpenGLPipeline* glScreenQuad = nullptr;
 
-  void createDepthProgram();
   void createGeometryProgram();
   void createLightingProgram();
+  void createLightViewProgram();
+  void createShadowCasterProgram();
 };

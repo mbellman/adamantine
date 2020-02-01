@@ -9,6 +9,10 @@ OpenGLShadowCaster::OpenGLShadowCaster(const Light* light) {
   frameBuffer->addDepthTexture();
 }
 
+const Light* OpenGLShadowCaster::getLight() const {
+  return light;
+}
+
 Matrix4 OpenGLShadowCaster::getLightMatrix() const {
   // Matrix4 projection = Matrix4::projection({ 0, 0, 1200, 720}, 45.0f, 1.0f, 1000.0f);
   Matrix4 projection = Matrix4::orthographic(200.0f, -200.0f, -200.0f, 200.0f, -1000.0f, 1000.0f);
