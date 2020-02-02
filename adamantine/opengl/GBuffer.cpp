@@ -33,9 +33,11 @@ void GBuffer::createFrameBuffer(int width, int height) {
   frameBuffer->addColorTexture(GL_RGB32F, GL_RGB);     // (0) Color
   frameBuffer->addColorTexture(GL_RGBA32F, GL_RGBA);   // (1) Normal/depth
   frameBuffer->addColorTexture(GL_RGB32F, GL_RGB);     // (2) Position
-  frameBuffer->addColorTexture(GL_R32F, GL_RED);       // (3) Shadowcaster light view buffer
+  frameBuffer->addColorTexture(GL_R32F, GL_RED);       // (3) Shadowcaster light view buffer, cascade 0
+  frameBuffer->addColorTexture(GL_R32F, GL_RED);       // (4) Shadowcaster light view buffer, cascade 1
+  frameBuffer->addColorTexture(GL_R32F, GL_RED);       // (5) Shadowcaster light view buffer, cascade 2
   frameBuffer->addDepthBuffer();
-  frameBuffer->initializeColorTextures();
+  frameBuffer->bindColorTextures();
 }
 
 void GBuffer::createGeometryProgram() {
@@ -130,4 +132,12 @@ void GBuffer::startReading() {
 
 void GBuffer::startWriting() {
   frameBuffer->startWriting();
+}
+
+void GBuffer::writeToAllBuffers() {
+  frameBuffer->bindColorTextures();
+}
+
+void GBuffer::writeToShadowCascade(int cascadeIndex) {
+  frameBuffer->bindColorTexture(GL_COLOR_ATTACHMENT0 + 3 + cascadeIndex);
 }

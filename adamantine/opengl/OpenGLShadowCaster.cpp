@@ -21,6 +21,18 @@ Matrix4 OpenGLShadowCaster::getLightMatrix() const {
   return projection * view;
 }
 
+Matrix4 OpenGLShadowCaster::getLightMatrixCascade(int cascadeIndex, const Camera& camera) const {
+  const float* sizes = OpenGLShadowCaster::cascadeSizes[cascadeIndex];
+  const float range = sizes[0];
+  const float depth = sizes[1];
+
+  Vec3f lightPosition = (camera.position + camera.getDirection().unit() * range);
+  Matrix4 projection = Matrix4::orthographic(range, -range, -range, range, -depth, depth);
+  Matrix4 view = Matrix4::lookAt(lightPosition * Vec3f(-1.0f, -1.0f, 1.0f), light->direction * Vec3f(-1.0f, -1.0f, 1.0f));
+
+  return (projection * view).transpose();
+}
+
 void OpenGLShadowCaster::startCasting() {
   frameBuffer->startWriting();
 }
@@ -28,3 +40,9 @@ void OpenGLShadowCaster::startCasting() {
 void OpenGLShadowCaster::startReading() {
   frameBuffer->startReading();
 }
+
+const float OpenGLShadowCaster::cascadeSizes[3][2] = {
+  { 100.0f, 1000.0f },
+  { 300.0f, 3000.0f },
+  { 1500.0f, 5000.0f }
+};

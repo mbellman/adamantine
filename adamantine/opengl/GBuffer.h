@@ -19,6 +19,8 @@ public:
   void renderScreenQuad();
   void startReading();
   void startWriting();
+  void writeToAllBuffers();
+  void writeToShadowCascade(int cascadeIndex);
 
 private:
   ShaderProgram geometryProgram;

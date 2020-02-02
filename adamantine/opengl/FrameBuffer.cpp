@@ -64,13 +64,11 @@ void FrameBuffer::addDepthTexture() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBuffer::clearColorTexture(int attachment) {
-  float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-  glClearBufferfv(GL_COLOR, attachment, black);
+void FrameBuffer::bindColorTexture(GLuint attachment) {
+  glDrawBuffer(attachment);
 }
 
-void FrameBuffer::initializeColorTextures() {
+void FrameBuffer::bindColorTextures() {
   GLuint* attachments = new GLuint[colorTextures.size()];
 
   for (int i = 0; i < colorTextures.size(); i++) {
@@ -80,6 +78,12 @@ void FrameBuffer::initializeColorTextures() {
   glDrawBuffers(colorTextures.size(), attachments);
 
   delete[] attachments;
+}
+
+void FrameBuffer::clearColorTexture(GLint attachment) {
+  float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+  glClearBufferfv(GL_COLOR, attachment, black);
 }
 
 void FrameBuffer::startReading() {

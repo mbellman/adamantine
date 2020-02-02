@@ -21,8 +21,9 @@ public:
   void addColorTexture(unsigned int internalFormat, unsigned int format);
   void addDepthBuffer();
   void addDepthTexture();
-  void clearColorTexture(int attachment);
-  void initializeColorTextures();
+  void bindColorTexture(GLuint attachment);
+  void bindColorTextures();
+  void clearColorTexture(GLint attachment);
   void startReading();
   void startWriting();
 

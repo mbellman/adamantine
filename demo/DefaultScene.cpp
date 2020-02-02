@@ -12,8 +12,8 @@ void DefaultScene::addLights() {
   auto* directionalLight3 = new Light();
 
   directionalLight->type = Light::LightType::DIRECTIONAL;
-  directionalLight->color = Vec3f(1.0f);
-  directionalLight->direction = Vec3f(-1.0f, -0.4f, 2.0f);
+  directionalLight->color = Vec3f(1.0f, 0.0f, 0.0f);
+  directionalLight->direction = Vec3f(-1.0f, -0.4f, 1.5f);
   directionalLight->canCastShadows = true;
 
   directionalLight2->type = Light::LightType::DIRECTIONAL;

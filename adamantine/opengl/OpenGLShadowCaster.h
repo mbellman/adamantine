@@ -13,10 +13,13 @@ public:
 
   const Light* getLight() const;
   Matrix4 getLightMatrix() const;
+  Matrix4 getLightMatrixCascade(int cascadeIndex, const Camera& camera) const;
   void startCasting();
   void startReading();
 
 private:
+  static const float cascadeSizes[3][2];
+
   const Light* light = nullptr;
   FrameBuffer* frameBuffer = nullptr;
 };

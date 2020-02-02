@@ -53,7 +53,7 @@ void OpenGLVideoController::createScreenShaders() {
     buffer->addColorTexture(GL_RGBA32F, GL_RGBA);
     glUniform1i(program.getUniformLocation("screen"), 0);
 
-    buffer->initializeColorTextures();
+    buffer->bindColorTextures();
 
     return buffer;
   });
@@ -154,6 +154,7 @@ void OpenGLVideoController::onInit() {
 
 void OpenGLVideoController::onRender() {
   gBuffer->startWriting();
+  gBuffer->writeToAllBuffers();
 
   renderGeometry();
 
@@ -192,25 +193,29 @@ void OpenGLVideoController::renderShadowCasters() {
     gBuffer->startWriting();
     gBuffer->clearLightViewBuffer();
 
-    auto* light = glShadowCaster->getLight();
-    const Vec3f& cameraPosition = scene->getCamera().position;
-    Vec3f lightPosition = (cameraPosition - light->direction.unit() * 100.0f);
+    const Camera& camera = scene->getCamera();
 
-    Matrix4 projection = Matrix4::orthographic(200.0f, -200.0f, -200.0f, 200.0f, -1000.0f, 1000.0f);
-    Matrix4 view = Matrix4::lookAt(lightPosition * Vec3f(-1.0f, -1.0f, 1.0f), light->direction * Vec3f(-1.0f, -1.0f, 1.0f));
-    Matrix4 lightMatrix = (projection * view).transpose();
+    Matrix4 lightMatrixCascades[] = {
+      glShadowCaster->getLightMatrixCascade(0, camera),
+      glShadowCaster->getLightMatrixCascade(1, camera),
+      glShadowCaster->getLightMatrixCascade(2, camera)
+    };
 
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glClear(GL_DEPTH_BUFFER_BIT);
 
-    lightViewProgram.setMatrix4("lightMatrix", lightMatrix);
+    for (int i = 0; i < 3; i++) {
+      glClear(GL_DEPTH_BUFFER_BIT);
 
-    for (auto* glObject : glObjects) {
-      lightViewProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
+      gBuffer->writeToShadowCascade(i);
+      lightViewProgram.setMatrix4("lightMatrix", lightMatrixCascades[i]);
 
-      glObject->render();
+      for (auto* glObject : glObjects) {
+        lightViewProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
+
+        glObject->render();
+      }
     }
 
     // Shadowcaster camera space lighting pass
@@ -222,13 +227,19 @@ void OpenGLVideoController::renderShadowCasters() {
     glEnable(GL_BLEND);
     glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ZERO);
 
+    auto* light = glShadowCaster->getLight();
+
     shadowCasterProgram.use();
     shadowCasterProgram.setInt("colorTexture", 0);
     shadowCasterProgram.setInt("normalDepthTexture", 1);
     shadowCasterProgram.setInt("positionTexture", 2);
-    shadowCasterProgram.setInt("lightMap", 3);
-    shadowCasterProgram.setMatrix4("lightMatrix", lightMatrix);
-    shadowCasterProgram.setVec3f("cameraPosition", scene->getCamera().position);
+    shadowCasterProgram.setInt("lightMaps[0]", 3);
+    shadowCasterProgram.setInt("lightMaps[1]", 4);
+    shadowCasterProgram.setInt("lightMaps[2]", 5);
+    shadowCasterProgram.setMatrix4("lightMatrixCascades[0]", lightMatrixCascades[0]);
+    shadowCasterProgram.setMatrix4("lightMatrixCascades[1]", lightMatrixCascades[1]);
+    shadowCasterProgram.setMatrix4("lightMatrixCascades[2]", lightMatrixCascades[2]);
+    shadowCasterProgram.setVec3f("cameraPosition", camera.position);
     shadowCasterProgram.setVec3f("light.position", light->position);
     shadowCasterProgram.setVec3f("light.direction", light->direction);
     shadowCasterProgram.setVec3f("light.color", light->color);
@@ -255,8 +266,8 @@ void OpenGLVideoController::renderGeometry() {
 
   geometryProgram.setMatrix4("projectionMatrix", projectionMatrix);
   geometryProgram.setMatrix4("viewMatrix", viewMatrix);
-  geometryProgram.setInt("modelTexture", 4);
-  geometryProgram.setInt("normalMap", 5);
+  geometryProgram.setInt("modelTexture", 6);
+  geometryProgram.setInt("normalMap", 7);
 
   for (auto* glObject : glObjects) {
     geometryProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
