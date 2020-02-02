@@ -21,6 +21,8 @@ void FrameBuffer::addColorTexture(unsigned int internalFormat, unsigned int form
   texture.format = format;
   texture.attachment = GL_COLOR_ATTACHMENT0 + colorTextures.size();
 
+  float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
   glGenTextures(1, &texture.id);
   glBindTexture(GL_TEXTURE_2D, texture.id);
   glTexImage2D(GL_TEXTURE_2D, 0, texture.internalFormat, size.width, size.height, 0, texture.format, GL_FLOAT, 0);
@@ -28,6 +30,7 @@ void FrameBuffer::addColorTexture(unsigned int internalFormat, unsigned int form
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
   glFramebufferTexture2D(GL_FRAMEBUFFER, texture.attachment, GL_TEXTURE_2D, texture.id, 0);
@@ -62,9 +65,7 @@ void FrameBuffer::addDepthTexture() {
 }
 
 void FrameBuffer::clearColorTexture(int attachment) {
-  startWriting();
-
-  float black[] = { 0.0f };
+  float black[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
   glClearBufferfv(GL_COLOR, attachment, black);
 }

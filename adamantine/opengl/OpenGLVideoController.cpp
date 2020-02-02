@@ -158,14 +158,10 @@ void OpenGLVideoController::onRender() {
 
   screenShaders[0]->startWriting();
   gBuffer->startReading();
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-  // renderLighting();
-  
-  glClear(GL_COLOR_BUFFER_BIT);
-
+  renderLighting();
   renderShadowCasters();
-  // renderScreenShaders();
+  renderScreenShaders();
 
   SDL_GL_SwapWindow(sdlWindow);
   glFinish();
@@ -189,17 +185,24 @@ void OpenGLVideoController::renderShadowCasters() {
   auto& shadowCasterProgram = gBuffer->getShadowCasterProgram();
 
   for (auto* glShadowCaster : glShadowCasters) {
-    // Shadowcaster light view pass
+    // Shadowcaster light space pass
     lightViewProgram.use();
 
     gBuffer->startWriting();
     gBuffer->clearLightViewBuffer();
 
-    Matrix4 lightMatrix = glShadowCaster->getLightMatrix().transpose();
+    auto* light = glShadowCaster->getLight();
+    const Vec3f& cameraPosition = scene->getCamera().position;
+    Vec3f lightPosition = (cameraPosition - light->direction.unit() * 100.0f);
+
+    Matrix4 projection = Matrix4::orthographic(200.0f, -200.0f, -200.0f, 200.0f, -1000.0f, 1000.0f);
+    Matrix4 view = Matrix4::lookAt(lightPosition * Vec3f(-1.0f, -1.0f, 1.0f), light->direction * Vec3f(-1.0f, -1.0f, 1.0f));
+    Matrix4 lightMatrix = (projection * view).transpose();
 
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+    glClear(GL_DEPTH_BUFFER_BIT);
     glUniformMatrix4fv(lightViewProgram.getUniformLocation("lightMatrix"), 1, GL_FALSE, lightMatrix.m);
 
     for (auto* glObject : glObjects) {
@@ -210,8 +213,8 @@ void OpenGLVideoController::renderShadowCasters() {
       glObject->render();
     }
 
-    // Shadowcaster camera view lighting pass
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // Shadowcaster camera space lighting pass
+    screenShaders[0]->startWriting();
     gBuffer->startReading();
 
     glDisable(GL_DEPTH_TEST);
@@ -221,12 +224,10 @@ void OpenGLVideoController::renderShadowCasters() {
 
     shadowCasterProgram.use();
 
-    const Light* light = glShadowCaster->getLight();
-
     glUniform1i(shadowCasterProgram.getUniformLocation("colorTexture"), 0);
     glUniform1i(shadowCasterProgram.getUniformLocation("normalDepthTexture"), 1);
     glUniform1i(shadowCasterProgram.getUniformLocation("positionTexture"), 2);
-    glUniform1i(shadowCasterProgram.getUniformLocation("lightViewTexture"), 3);
+    glUniform1i(shadowCasterProgram.getUniformLocation("lightMap"), 3);
     glUniformMatrix4fv(shadowCasterProgram.getUniformLocation("lightMatrix"), 1, GL_FALSE, lightMatrix.m);
     glUniform3fv(shadowCasterProgram.getUniformLocation("cameraPosition"), 1, scene->getCamera().position.float3());
 
@@ -280,7 +281,7 @@ void OpenGLVideoController::renderLighting() {
   glClear(GL_COLOR_BUFFER_BIT);
 
   auto& lights = scene->getStage().getLights();
-  int totalLights = lights.size();
+  int totalLights = lights.size() - scene->getStage().getTotalShadowCasters();
 
   glUniform1i(lightingProgram.getUniformLocation("colorTexture"), 0);
   glUniform1i(lightingProgram.getUniformLocation("normalDepthTexture"), 1);
@@ -288,15 +289,18 @@ void OpenGLVideoController::renderLighting() {
   glUniform3fv(lightingProgram.getUniformLocation("cameraPosition"), 1, scene->getCamera().position.float3());
   glUniform1i(lightingProgram.getUniformLocation("totalLights"), totalLights);
 
-  for (int i = 0; i < totalLights; i++) {
-    auto* light = lights[i];
-    std::string idx = std::to_string(i);
+  int index = 0;
 
-    glUniform3fv(lightingProgram.getUniformLocation("lights[" + idx + "].position"), 1, light->position.float3());
-    glUniform3fv(lightingProgram.getUniformLocation("lights[" + idx + "].direction"), 1, light->direction.float3());
-    glUniform3fv(lightingProgram.getUniformLocation("lights[" + idx + "].color"), 1, light->color.float3());
-    glUniform1f(lightingProgram.getUniformLocation("lights[" + idx + "].radius"), light->radius);
-    glUniform1i(lightingProgram.getUniformLocation("lights[" + idx + "].type"), light->type);
+  for (auto* light : lights) {
+    if (!light->canCastShadows) {
+      std::string idx = std::to_string(index++);
+
+      glUniform3fv(lightingProgram.getUniformLocation("lights[" + idx + "].position"), 1, light->position.float3());
+      glUniform3fv(lightingProgram.getUniformLocation("lights[" + idx + "].direction"), 1, light->direction.float3());
+      glUniform3fv(lightingProgram.getUniformLocation("lights[" + idx + "].color"), 1, light->color.float3());
+      glUniform1f(lightingProgram.getUniformLocation("lights[" + idx + "].radius"), light->radius);
+      glUniform1i(lightingProgram.getUniformLocation("lights[" + idx + "].type"), light->type);
+    }
   }
 
   gBuffer->renderScreenQuad();

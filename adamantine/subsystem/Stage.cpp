@@ -30,6 +30,18 @@ const std::vector<Object*>& Stage::getObjects() const {
   return objects;
 }
 
+int Stage::getTotalShadowCasters() const {
+  int total = 0;
+
+  for (auto* light : lights) {
+    if (light->canCastShadows) {
+      total++;
+    }
+  }
+
+  return total;
+}
+
 void Stage::onEntityAdded(EntityHandler handler) {
   entityAddedHandler = handler;
 }

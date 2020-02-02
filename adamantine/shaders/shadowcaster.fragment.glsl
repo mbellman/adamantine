@@ -14,7 +14,7 @@ const int DIRECTIONAL_LIGHT = 1;
 uniform sampler2D colorTexture;
 uniform sampler2D normalDepthTexture;
 uniform sampler2D positionTexture;
-uniform sampler2D lightViewTexture;
+uniform sampler2D lightMap;
 uniform mat4 lightMatrix;
 uniform vec3 cameraPosition;
 uniform Light light;
@@ -24,26 +24,25 @@ in vec2 fragmentUv;
 layout (location = 0) out vec4 colorDepth;
 
 float getShadowFactor(vec3 position) {
-  vec3 pos = position * vec3(1.0, 1.0, -1.0);
-  vec4 lightSpacePosition = lightMatrix * vec4(pos, 1.0);
+  vec4 lightSpacePosition = lightMatrix * vec4(position * vec3(1.0, 1.0, -1.0), 1.0);
   vec3 projection = (lightSpacePosition.xyz / lightSpacePosition.w) * 0.5 + 0.5;
 
-  if (texture(lightViewTexture, projection.xy).r == 0.0) {
+  if (projection.z >= 1.0) {
     return 1.0;
   }
 
   float shadowFactor = 0.0;
-  vec2 texelSize = 1.0 / textureSize(lightViewTexture, 0);
+  vec2 texelSize = 0.15 * 1.0 / textureSize(lightMap, 0);
 
-  for (int x = -1; x <= 1; x++) {
-    for (int y = -1; y <= 1; y++) {
-      float closestDepth = texture(lightViewTexture, projection.xy + vec2(x, y) * texelSize).r;
+  for (int x = -2; x <= 2; x++) {
+    for (int y = -2; y <= 2; y++) {
+      float closestDepth = texture(lightMap, projection.xy + vec2(x, y) * texelSize).r;
 
       shadowFactor += (closestDepth < projection.z - 0.002) ? 0.0 : 1.0;
     }
   }
 
-  return shadowFactor / 9.0;
+  return shadowFactor / 25.0;
 }
 
 vec3 getDirectionalLightFactor(vec3 surfaceNormal, vec3 surfaceToCamera) {

@@ -27,13 +27,11 @@ vec4 getDoF() {
 
   for (int x = -2; x <= 2; x++) {
     for (int y = -2; y <= 2; y++) {
-      vec2 sampleUv = vec2(fragmentUv.x + x * blur, fragmentUv.y + y * blur);
-
-      sum += texture(screen, sampleUv) / 25.0;
+      sum += texture(screen, fragmentUv + vec2(x * blur, y * blur));
     }
   }
 
-  return sum;
+  return sum / 25.0;
 }
 
 void main() {

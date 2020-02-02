@@ -14,6 +14,7 @@ public:
   void add(Entity* entity);
   const std::vector<Light*>& getLights() const;
   const std::vector<Object*>& getObjects() const;
+  int getTotalShadowCasters() const;
   void onEntityAdded(EntityHandler handler);
   void onEntityRemoved(EntityHandler handler);
   void remove(Entity* entity);
