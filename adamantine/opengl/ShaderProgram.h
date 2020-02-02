@@ -5,6 +5,7 @@
 
 #include "glew.h"
 #include "glut.h"
+#include "subsystem/Math.h"
 
 struct VertexAttribute {
   const char* name;
@@ -30,6 +31,11 @@ public:
   GLint getUniformLocation(const char* name) const;
   GLint getUniformLocation(std::string name) const;
   void link();
+  void setBool(std::string name, bool value);
+  void setFloat(std::string name, float value);
+  void setInt(std::string name, int value);
+  void setMatrix4(std::string name, const Matrix4& value);
+  void setVec3f(std::string name, const Vec3f& value);
 
   template<typename T>
   void setVertexInputs(int number, const VertexShaderInput* inputs) {
@@ -55,7 +61,6 @@ public:
     }
   }
 
-  void setFragmentShaderOutput(const char* name);
   void use() const;
 
 private:

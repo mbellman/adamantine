@@ -35,8 +35,24 @@ void ShaderProgram::link() {
   glLinkProgram(program);
 }
 
-void ShaderProgram::setFragmentShaderOutput(const char* name) {
-  glBindFragDataLocation(program, 0, name);
+void ShaderProgram::setBool(std::string name, bool value) {
+  setInt(name, value);
+}
+
+void ShaderProgram::setFloat(std::string name, float value) {
+  glUniform1f(getUniformLocation(name), value);
+}
+
+void ShaderProgram::setInt(std::string name, int value) {
+  glUniform1i(getUniformLocation(name), value);
+}
+
+void ShaderProgram::setMatrix4(std::string name, const Matrix4& value) {
+  glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, value.m);
+}
+
+void ShaderProgram::setVec3f(std::string name, const Vec3f& value) {
+  glUniform3fv(getUniformLocation(name), 1, value.float3());
 }
 
 void ShaderProgram::setVertexAttribute(const VertexAttribute& attribute) {

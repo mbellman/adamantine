@@ -60,6 +60,7 @@ void OpenGLVideoController::createScreenShaders() {
 
   dofShader->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
     glClear(GL_COLOR_BUFFER_BIT);
+
     glUniform1i(program.getUniformLocation("screen"), 0);
 
     glScreenQuad->render();
@@ -203,12 +204,11 @@ void OpenGLVideoController::renderShadowCasters() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glClear(GL_DEPTH_BUFFER_BIT);
-    glUniformMatrix4fv(lightViewProgram.getUniformLocation("lightMatrix"), 1, GL_FALSE, lightMatrix.m);
+
+    lightViewProgram.setMatrix4("lightMatrix", lightMatrix);
 
     for (auto* glObject : glObjects) {
-      const float* modelMatrix = glObject->getSourceObject()->getMatrix().m;
-
-      glUniformMatrix4fv(lightViewProgram.getUniformLocation("modelMatrix"), 1, GL_FALSE, modelMatrix);
+      lightViewProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
 
       glObject->render();
     }
@@ -223,19 +223,17 @@ void OpenGLVideoController::renderShadowCasters() {
     glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ZERO);
 
     shadowCasterProgram.use();
-
-    glUniform1i(shadowCasterProgram.getUniformLocation("colorTexture"), 0);
-    glUniform1i(shadowCasterProgram.getUniformLocation("normalDepthTexture"), 1);
-    glUniform1i(shadowCasterProgram.getUniformLocation("positionTexture"), 2);
-    glUniform1i(shadowCasterProgram.getUniformLocation("lightMap"), 3);
-    glUniformMatrix4fv(shadowCasterProgram.getUniformLocation("lightMatrix"), 1, GL_FALSE, lightMatrix.m);
-    glUniform3fv(shadowCasterProgram.getUniformLocation("cameraPosition"), 1, scene->getCamera().position.float3());
-
-    glUniform3fv(shadowCasterProgram.getUniformLocation("light.position"), 1, light->position.float3());
-    glUniform3fv(shadowCasterProgram.getUniformLocation("light.direction"), 1, light->direction.float3());
-    glUniform3fv(shadowCasterProgram.getUniformLocation("light.color"), 1, light->color.float3());
-    glUniform1f(shadowCasterProgram.getUniformLocation("light.radius"), light->radius);
-    glUniform1i(shadowCasterProgram.getUniformLocation("light.type"), light->type);
+    shadowCasterProgram.setInt("colorTexture", 0);
+    shadowCasterProgram.setInt("normalDepthTexture", 1);
+    shadowCasterProgram.setInt("positionTexture", 2);
+    shadowCasterProgram.setInt("lightMap", 3);
+    shadowCasterProgram.setMatrix4("lightMatrix", lightMatrix);
+    shadowCasterProgram.setVec3f("cameraPosition", scene->getCamera().position);
+    shadowCasterProgram.setVec3f("light.position", light->position);
+    shadowCasterProgram.setVec3f("light.direction", light->direction);
+    shadowCasterProgram.setVec3f("light.color", light->color);
+    shadowCasterProgram.setFloat("light.radius", light->radius);
+    shadowCasterProgram.setInt("light.type", light->type);
 
     gBuffer->renderScreenQuad();
   }
@@ -255,17 +253,15 @@ void OpenGLVideoController::renderGeometry() {
   Matrix4 projectionMatrix = Matrix4::projection(screenSize, 45.0f, 1.0f, 10000.0f).transpose();
   Matrix4 viewMatrix = createViewMatrix();
 
-  glUniformMatrix4fv(geometryProgram.getUniformLocation("projectionMatrix"), 1, GL_FALSE, projectionMatrix.m);
-  glUniformMatrix4fv(geometryProgram.getUniformLocation("viewMatrix"), 1, GL_FALSE, viewMatrix.m);
-  glUniform1i(geometryProgram.getUniformLocation("modelTexture"), 4);
-  glUniform1i(geometryProgram.getUniformLocation("normalMap"), 5);
+  geometryProgram.setMatrix4("projectionMatrix", projectionMatrix);
+  geometryProgram.setMatrix4("viewMatrix", viewMatrix);
+  geometryProgram.setInt("modelTexture", 4);
+  geometryProgram.setInt("normalMap", 5);
 
   for (auto* glObject : glObjects) {
-    const float* modelMatrix = glObject->getSourceObject()->getMatrix().m;
-
-    glUniformMatrix4fv(geometryProgram.getUniformLocation("modelMatrix"), 1, GL_FALSE, modelMatrix);
-    glUniform1i(geometryProgram.getUniformLocation("hasTexture"), glObject->hasTexture());
-    glUniform1i(geometryProgram.getUniformLocation("hasNormalMap"), glObject->hasNormalMap());
+    geometryProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
+    geometryProgram.setBool("hasTexture", glObject->hasTexture());
+    geometryProgram.setBool("hasNormalMap", glObject->hasNormalMap());
 
     glObject->render();
   }
@@ -283,11 +279,11 @@ void OpenGLVideoController::renderLighting() {
   auto& lights = scene->getStage().getLights();
   int totalLights = lights.size() - scene->getStage().getTotalShadowCasters();
 
-  glUniform1i(lightingProgram.getUniformLocation("colorTexture"), 0);
-  glUniform1i(lightingProgram.getUniformLocation("normalDepthTexture"), 1);
-  glUniform1i(lightingProgram.getUniformLocation("positionTexture"), 2);
-  glUniform3fv(lightingProgram.getUniformLocation("cameraPosition"), 1, scene->getCamera().position.float3());
-  glUniform1i(lightingProgram.getUniformLocation("totalLights"), totalLights);
+  lightingProgram.setInt("colorTexture", 0);
+  lightingProgram.setInt("normalDepthTexture", 1);
+  lightingProgram.setInt("positionTexture", 2);
+  lightingProgram.setVec3f("cameraPosition", scene->getCamera().position);
+  lightingProgram.setInt("totalLights", totalLights);
 
   int index = 0;
 
@@ -295,11 +291,11 @@ void OpenGLVideoController::renderLighting() {
     if (!light->canCastShadows) {
       std::string idx = std::to_string(index++);
 
-      glUniform3fv(lightingProgram.getUniformLocation("lights[" + idx + "].position"), 1, light->position.float3());
-      glUniform3fv(lightingProgram.getUniformLocation("lights[" + idx + "].direction"), 1, light->direction.float3());
-      glUniform3fv(lightingProgram.getUniformLocation("lights[" + idx + "].color"), 1, light->color.float3());
-      glUniform1f(lightingProgram.getUniformLocation("lights[" + idx + "].radius"), light->radius);
-      glUniform1i(lightingProgram.getUniformLocation("lights[" + idx + "].type"), light->type);
+      lightingProgram.setVec3f("lights[" + idx + "].position", light->position);
+      lightingProgram.setVec3f("lights[" + idx + "].direction", light->direction);
+      lightingProgram.setVec3f("lights[" + idx + "].color", light->color);
+      lightingProgram.setFloat("lights[" + idx + "].radius", light->radius);
+      lightingProgram.setInt("lights[" + idx + "].type", light->type);
     }
   }
 
