@@ -12,6 +12,7 @@ struct Light {
 
 const int POINT_LIGHT = 0;
 const int DIRECTIONAL_LIGHT = 1;
+const int SPOT_LIGHT = 2;
 
 uniform sampler2D colorTexture;
 uniform sampler2D normalDepthTexture;
@@ -62,6 +63,14 @@ vec3 getPointLightFactor(Light light, vec3 surfacePosition, vec3 surfaceNormal, 
   return diffuse + specular;
 }
 
+vec3 getSpotLightFactor(Light light, vec3 surfacePosition, vec3 surfaceNormal, vec3 surfaceToCamera) {
+  vec3 surfaceToLight = light.position - surfacePosition;
+  float directionDot = max(dot(normalize(surfaceToLight), normalize(light.direction) * -1.0), 0.0);
+  float shine = directionDot >= 0.8 ? 1.0 : pow(directionDot + 0.2, 30);
+
+  return getPointLightFactor(light, surfacePosition, surfaceNormal, surfaceToCamera) * shine;
+}
+
 void main() {
   vec3 albedo = texture(colorTexture, fragmentUv).xyz;
   vec3 position = texture(positionTexture, fragmentUv).xyz;
@@ -79,6 +88,9 @@ void main() {
         break;
       case DIRECTIONAL_LIGHT:
         combinedLighting += albedo * getDirectionalLightFactor(lights[i], normal, surfaceToCamera);
+        break;
+      case SPOT_LIGHT:
+        combinedLighting += albedo * getSpotLightFactor(lights[i], position, normal, surfaceToCamera);
         break;
     }
   }

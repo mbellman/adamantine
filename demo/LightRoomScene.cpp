@@ -2,6 +2,7 @@
 
 #include "LightRoomScene.h"
 #include "subsystem/Entities.h"
+#include "subsystem/Texture.h"
 #include "subsystem/RNG.h"
 
 void LightRoomScene::addLights() {
@@ -20,6 +21,19 @@ void LightRoomScene::addLights() {
 
     stage.add(light);
   }
+
+  auto* light = new Light();
+
+  light->type = Light::LightType::SPOTLIGHT;
+  light->color = Vec3f(1.0f);
+  light->direction = Vec3f(0.2f, 0.0f, 1.0f);
+  light->position = Vec3f(-20.0f, 20.0f, 0.0f);
+  light->radius = 1000.0f;
+  light->canCastShadows = true;
+
+  cameraLight = light;
+
+  stage.add(light);
 }
 
 void LightRoomScene::addObjects() {
@@ -107,6 +121,9 @@ void LightRoomScene::onInit() {
 }
 
 void LightRoomScene::onUpdate(float dt) {
+  cameraLight->position = camera.position + camera.getDirection() * 25.0f;
+  cameraLight->direction = camera.getDirection();
+
   if (inputSystem.isKeyHeld(Key::W)) {
     camera.position += camera.getDirection() * 100.0f * dt;
   }
