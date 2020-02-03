@@ -153,6 +153,14 @@ void DefaultScene::addObjects() {
   model2->setPosition({ 100.0f, 0.0f, 300.0f });
   model2->setColor({ 1.0f, 0.5f, 0.3f });
 
+  model2->onUpdate = [=](float dt) {
+    model2->rotate({
+      0.0f,
+      0.5f * dt,
+      0.0f
+    });
+  };
+
   ObjLoader ball("./demo/ball.obj");
 
   auto* model3 = new Model(ball);

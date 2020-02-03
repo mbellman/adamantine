@@ -152,6 +152,7 @@
     <ClCompile Include="adamantine\subsystem\Texture.cpp" />
     <ClCompile Include="adamantine\Window.cpp" />
     <ClCompile Include="demo\DefaultScene.cpp" />
+    <ClCompile Include="demo\LightRoomScene.cpp" />
     <ClCompile Include="demo\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +182,7 @@
     <ClInclude Include="adamantine\subsystem\Texture.h" />
     <ClInclude Include="adamantine\Window.h" />
     <ClInclude Include="demo\DefaultScene.h" />
+    <ClInclude Include="demo\LightRoomScene.h" />
     <ClInclude Include="subsystem\AbstractVideoController.h" />
     <ClInclude Include="opengl\OpenGLScene.h" />
     <ClInclude Include="opengl\OpenGLVideoController.h" />

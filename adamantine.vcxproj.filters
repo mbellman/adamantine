@@ -96,6 +96,9 @@
     <ClCompile Include="adamantine\opengl\GBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="demo\LightRoomScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="subsystem\FileLoader.h">
@@ -213,6 +216,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="adamantine\opengl\GBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="demo\LightRoomScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

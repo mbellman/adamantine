@@ -159,11 +159,11 @@ Matrix4 Matrix4::projection(const Region2d<int>& area, float fov, float near, fl
 }
 
 Matrix4 Matrix4::rotate(const Vec3f& rotation) {
-  Quaternion q1 = Quaternion::fromAxisAngle(rotation.x, 1.0f, 0.0f, 0.0f);
-  Quaternion q2 = Quaternion::fromAxisAngle(rotation.y, 0.0f, 1.0f, 0.0f);
-  Quaternion q3 = Quaternion::fromAxisAngle(rotation.z, 0.0f, 0.0f, 1.0f);
+  Quaternion pitch = Quaternion::fromAxisAngle(rotation.x, 1.0f, 0.0f, 0.0f);
+  Quaternion yaw = Quaternion::fromAxisAngle(rotation.y, 0.0f, 1.0f, 0.0f);
+  Quaternion roll = Quaternion::fromAxisAngle(rotation.z, 0.0f, 0.0f, 1.0f);
 
-  return Matrix4::fromMatrix3((q1 * q2 * q3).toMatrix3());
+  return Matrix4::fromMatrix3((pitch * yaw * roll).toMatrix3());
 }
 
 Matrix4 Matrix4::scale(const Vec3f& scale) {

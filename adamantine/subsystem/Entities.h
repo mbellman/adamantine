@@ -34,9 +34,9 @@ struct Light : Entity {
   Light(const Vec3f& position, const Vec3f& color, float radius);
 
   LightType type = LightType::POINT;
-  Vec3f color;
+  Vec3f color = Vec3f(1.0f);
   Vec3f direction;
-  float radius;
+  float radius = 100.0f;
   bool canCastShadows = false;
 };
 
