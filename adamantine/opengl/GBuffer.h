@@ -10,7 +10,7 @@ public:
   GBuffer();
   ~GBuffer();
 
-  void clearLightViewBuffer();
+  void clearLightViewBuffers();
   void createFrameBuffer(int width, int height);
   ShaderProgram& getGeometryProgram();
   ShaderProgram& getLightingProgram();
@@ -19,6 +19,7 @@ public:
   void renderScreenQuad();
   void startReading();
   void startWriting();
+  void useFirstShadowCascade();
   void writeToAllBuffers();
   void writeToShadowCascade(int cascadeIndex);
 

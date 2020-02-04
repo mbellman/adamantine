@@ -47,12 +47,13 @@ float getShadowFactor(vec3 position) {
 
   float shadowFactor = 0.0;
   vec2 texelSize = 0.5 * 1.0 / textureSize(lightMaps[cascadeIndex], 0);
+  float bias = light.type == DIRECTIONAL_LIGHT ? 0.001 : 0.0001;
 
   for (int x = -2; x <= 2; x++) {
     for (int y = -2; y <= 2; y++) {
       float closestDepth = texture(lightMaps[cascadeIndex], projection.xy + vec2(x, y) * texelSize).r;
 
-      shadowFactor += (closestDepth < projection.z - 0.001) ? 0.0 : 1.0;
+      shadowFactor += (closestDepth < projection.z - bias) ? 0.0 : 1.0;
     }
   }
 

@@ -191,9 +191,15 @@ void OpenGLVideoController::renderShadowCasters() {
     lightViewProgram.use();
 
     gBuffer->startWriting();
-    gBuffer->clearLightViewBuffer();
+    gBuffer->clearLightViewBuffers();
 
     const Camera& camera = scene->getCamera();
+    auto* light = glShadowCaster->getLight();
+    bool isDirectionalLight = light->type == Light::LightType::DIRECTIONAL;
+
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
     Matrix4 lightMatrixCascades[] = {
       glShadowCaster->getLightMatrixCascade(0, camera),
@@ -201,11 +207,9 @@ void OpenGLVideoController::renderShadowCasters() {
       glShadowCaster->getLightMatrixCascade(2, camera)
     };
 
-    glDisable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    int totalCascades = isDirectionalLight ? 3 : 1;
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < totalCascades; i++) {
       glClear(GL_DEPTH_BUFFER_BIT);
 
       gBuffer->writeToShadowCascade(i);
@@ -213,9 +217,12 @@ void OpenGLVideoController::renderShadowCasters() {
 
       for (auto* glObject : glObjects) {
         lightViewProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
-
         glObject->render();
       }
+    }
+
+    if (!isDirectionalLight) {
+      gBuffer->useFirstShadowCascade();
     }
 
     // Shadowcaster camera space lighting pass
@@ -226,8 +233,6 @@ void OpenGLVideoController::renderShadowCasters() {
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ZERO);
-
-    auto* light = glShadowCaster->getLight();
 
     shadowCasterProgram.use();
     shadowCasterProgram.setInt("colorTexture", 0);

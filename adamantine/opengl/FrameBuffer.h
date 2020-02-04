@@ -21,11 +21,12 @@ public:
   void addColorTexture(unsigned int internalFormat, unsigned int format);
   void addDepthBuffer();
   void addDepthTexture();
-  void bindColorTexture(GLuint attachment);
+  void bindColorTexture(GLenum attachment);
   void bindColorTextures();
   void clearColorTexture(GLint attachment);
   void startReading();
   void startWriting();
+  void transferColorTexture(GLenum source, const GLenum* targets, int size);
 
 private:
   GLuint fbo;

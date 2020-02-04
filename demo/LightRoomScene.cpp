@@ -6,34 +6,61 @@
 #include "subsystem/RNG.h"
 
 void LightRoomScene::addLights() {
+  // for (int i = 0; i < 10; i++) {
+  //   auto* light = new Light();
+
+  //   Vec3f position = Vec3f(
+  //     RNG::random() - 0.5f,
+  //     RNG::random(),
+  //     RNG::random() - 0.5f
+  //   ).unit() * 150.0f;
+
+  //   light->color = Vec3f(RNG::random(), 0.0f, RNG::random());
+  //   light->position = position;
+  //   light->radius = 1000.0f;
+
+  //   stage.add(light);
+  // }
+
+  auto* cameraLight = new Light();
+
+  cameraLight->type = Light::LightType::SPOTLIGHT;
+  cameraLight->color = Vec3f(1.0f);
+  cameraLight->direction = Vec3f(0.2f, 0.0f, 1.0f);
+  cameraLight->position = Vec3f(-20.0f, 20.0f, 0.0f);
+  cameraLight->radius = 1000.0f;
+  cameraLight->canCastShadows = true;
+
+  cameraLight->onUpdate = [=](float dt) {
+    cameraLight->position = camera.position + camera.getDirection() * 25.0f;
+    cameraLight->direction = camera.getDirection();
+  };
+
+  stage.add(cameraLight);
+
   for (int i = 0; i < 10; i++) {
     auto* light = new Light();
 
-    Vec3f position = Vec3f(
-      RNG::random() - 0.5f,
-      RNG::random(),
-      RNG::random() - 0.5f
-    ).unit() * 150.0f;
+    Vec3f basePosition = {
+      RNG::random() * 400.0f - 200.0f,
+      100.0f,
+      RNG::random() * 400.0f - 200.0f
+    };
 
-    light->color = Vec3f(RNG::random(), 0.0f, RNG::random());
-    light->position = position;
-    light->radius = 1000.0f;
+    light->type = Light::LightType::SPOTLIGHT;
+    light->color = Vec3f(1.0f, RNG::random(), 0.0f);
+    light->radius = 1500.0f;
+    light->canCastShadows = true;
+
+    light->onUpdate = [=](float dt) {
+      Vec3f direction = Vec3f(sinf(getRunningTime()), -1.0f, cosf(getRunningTime()));
+
+      light->direction = direction;
+      light->position = basePosition + direction.unit() * 25.0f;
+    };
 
     stage.add(light);
   }
-
-  auto* light = new Light();
-
-  light->type = Light::LightType::SPOTLIGHT;
-  light->color = Vec3f(1.0f);
-  light->direction = Vec3f(0.2f, 0.0f, 1.0f);
-  light->position = Vec3f(-20.0f, 20.0f, 0.0f);
-  light->radius = 1000.0f;
-  light->canCastShadows = true;
-
-  cameraLight = light;
-
-  stage.add(light);
 }
 
 void LightRoomScene::addObjects() {
@@ -72,6 +99,12 @@ void LightRoomScene::addObjects() {
 
   ObjLoader lanternObj("./demo/lantern.obj");
 
+  auto* lanternTexture = new Texture("./demo/lantern-texture.png");
+  auto* lanternNormalMap = new Texture("./demo/lantern-normal-map.png");
+
+  assets.addTexture(lanternTexture);
+  assets.addTexture(lanternNormalMap);
+
   for (int i = 0; i < 6; i++) {
     float x = sinf((float)i * PI / 3.0f);
     float z = cosf((float)i * PI / 3.0f);
@@ -79,18 +112,24 @@ void LightRoomScene::addObjects() {
     Vec3f position = Vec3f(x, 0.0f, z) * 100.0f;
 
     auto* lantern = new Model(lanternObj);
-    auto* light = new Light();
 
     lantern->setPosition(position);
     lantern->setScale(50.0f);
     lantern->setColor(Vec3f(0.5f));
-
-    light->color = Vec3f(1.0f, 0.75f, 0.1f);
-    light->position = position + Vec3f(0.0f, 35.0f, 0.0f);
-    light->radius = 500.0f;
+    lantern->texture = lanternTexture;
+    lantern->normalMap = lanternNormalMap;
 
     stage.add(lantern);
-    stage.add(light);
+
+    if (i % 2 == 0) {
+      auto* light = new Light();
+
+      light->color = Vec3f(1.0f, 0.75f, 0.1f);
+      light->position = position + Vec3f(0.0f, 35.0f, 0.0f);
+      light->radius = 500.0f;
+
+      stage.add(light);
+    }
   }
 }
 
@@ -121,9 +160,6 @@ void LightRoomScene::onInit() {
 }
 
 void LightRoomScene::onUpdate(float dt) {
-  cameraLight->position = camera.position + camera.getDirection() * 25.0f;
-  cameraLight->direction = camera.getDirection();
-
   if (inputSystem.isKeyHeld(Key::W)) {
     camera.position += camera.getDirection() * 100.0f * dt;
   }

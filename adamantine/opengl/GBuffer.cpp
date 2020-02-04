@@ -19,8 +19,10 @@ GBuffer::~GBuffer() {
 
 }
 
-void GBuffer::clearLightViewBuffer() {
+void GBuffer::clearLightViewBuffers() {
   frameBuffer->clearColorTexture(3);
+  frameBuffer->clearColorTexture(4);
+  frameBuffer->clearColorTexture(5);
 }
 
 void GBuffer::createFrameBuffer(int width, int height) {
@@ -132,6 +134,15 @@ void GBuffer::startReading() {
 
 void GBuffer::startWriting() {
   frameBuffer->startWriting();
+}
+
+void GBuffer::useFirstShadowCascade() {
+  GLenum targets[] = {
+    GL_COLOR_ATTACHMENT0 + 4,
+    GL_COLOR_ATTACHMENT0 + 5
+  };
+
+  frameBuffer->transferColorTexture(GL_COLOR_ATTACHMENT0 + 3, targets, 2);
 }
 
 void GBuffer::writeToAllBuffers() {

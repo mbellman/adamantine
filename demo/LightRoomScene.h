@@ -11,6 +11,4 @@ public:
 private:
   void addLights();
   void addObjects();
-
-  Light* cameraLight = nullptr;
 };
