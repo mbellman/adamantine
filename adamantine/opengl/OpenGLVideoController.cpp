@@ -50,7 +50,7 @@ void OpenGLVideoController::createScreenShaders() {
   dofShader->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
     auto* buffer = new FrameBuffer(screen.width, screen.height);
 
-    buffer->addColorTexture(GL_RGBA32F, GL_RGBA);
+    buffer->addColorTexture(GL_RGBA32F, GL_RGBA, GL_CLAMP_TO_EDGE);
     glUniform1i(program.getUniformLocation("screen"), 0);
 
     buffer->bindColorTextures();

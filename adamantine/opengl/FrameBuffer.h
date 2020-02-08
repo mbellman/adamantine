@@ -18,7 +18,8 @@ public:
   FrameBuffer(int width, int height);
   ~FrameBuffer();
 
-  void addColorTexture(unsigned int internalFormat, unsigned int format);
+  void addColorTexture(GLint internalFormat, GLenum format);
+  void addColorTexture(GLint internalFormat, GLenum format, GLint clamp);
   void addDepthBuffer();
   void addDepthTexture();
   void bindColorTexture(GLenum attachment);

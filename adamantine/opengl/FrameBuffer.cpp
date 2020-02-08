@@ -14,7 +14,11 @@ FrameBuffer::~FrameBuffer() {
 
 }
 
-void FrameBuffer::addColorTexture(unsigned int internalFormat, unsigned int format) {
+void FrameBuffer::addColorTexture(GLint internalFormat, GLenum format) {
+  addColorTexture(internalFormat, format, GL_CLAMP_TO_BORDER);
+}
+
+void FrameBuffer::addColorTexture(GLint internalFormat, GLenum format, GLint clamp) {
   ColorTexture texture;
 
   texture.internalFormat = internalFormat;
@@ -28,8 +32,8 @@ void FrameBuffer::addColorTexture(unsigned int internalFormat, unsigned int form
   glTexImage2D(GL_TEXTURE_2D, 0, texture.internalFormat, size.width, size.height, 0, texture.format, GL_FLOAT, 0);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clamp);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clamp);
   glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
