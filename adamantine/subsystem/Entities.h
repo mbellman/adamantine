@@ -102,6 +102,15 @@ private:
   static int faces[6][4];
 };
 
+class Skybox : public Object {
+public:
+  Skybox(const Texture* texture, float size);
+
+private:
+  static Vec3f vertexPositions[14];
+  static Vec2f uvs[14];
+};
+
 class Model : public Object {
 public:
   Model(const ObjLoader& loader);

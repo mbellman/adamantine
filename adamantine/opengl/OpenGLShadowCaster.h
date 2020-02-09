@@ -20,5 +20,4 @@ private:
   static const float cascadeSizes[3][2];
 
   const Light* light = nullptr;
-  FrameBuffer* frameBuffer = nullptr;
 };

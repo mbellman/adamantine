@@ -1,5 +1,6 @@
 #version 330 core
 
+uniform float lightingFlag;
 uniform bool hasTexture = false;
 uniform bool hasNormalMap = false;
 uniform sampler2D modelTexture;
@@ -11,7 +12,7 @@ in vec3 fragmentTangent;
 in vec3 fragmentPosition;
 in vec2 fragmentUv;
 
-layout (location = 0) out vec3 color;
+layout (location = 0) out vec4 colorLFlag;
 layout (location = 1) out vec4 normalDepth;
 layout (location = 2) out vec3 position;
 
@@ -48,7 +49,7 @@ float getDepth() {
 }
 
 void main() {
-  color = getColor();
+  colorLFlag = vec4(getColor(), lightingFlag);
   normalDepth = vec4(getNormal(), getDepth());
   position = fragmentPosition;
 }

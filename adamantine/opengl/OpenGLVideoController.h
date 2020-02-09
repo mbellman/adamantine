@@ -31,7 +31,9 @@ private:
   std::vector<ScreenShader*> screenShaders;
   std::vector<OpenGLObject*> glObjects;
   std::vector<OpenGLShadowCaster*> glShadowCasters;
+  OpenGLObject* glSkybox = nullptr;
 
+  OpenGLObject* createOpenGLObject(Object* object);
   void createScreenShaders();
   Matrix4 createViewMatrix();
   void onEntityAdded(Entity* entity);

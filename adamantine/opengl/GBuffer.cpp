@@ -32,7 +32,7 @@ void GBuffer::createFrameBuffer(int width, int height) {
 
   frameBuffer = new FrameBuffer(width, height);
 
-  frameBuffer->addColorTexture(GL_RGB32F, GL_RGB);     // (0) Color
+  frameBuffer->addColorTexture(GL_RGBA32F, GL_RGBA);   // (0) Color/lighting flag
   frameBuffer->addColorTexture(GL_RGBA32F, GL_RGBA);   // (1) Normal/depth
   frameBuffer->addColorTexture(GL_RGB32F, GL_RGB);     // (2) Position
   frameBuffer->addColorTexture(GL_R32F, GL_RED);       // (3) Shadowcaster light view buffer, cascade 0

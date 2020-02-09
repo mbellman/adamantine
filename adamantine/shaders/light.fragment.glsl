@@ -72,28 +72,37 @@ vec3 getSpotLightFactor(Light light, vec3 surfacePosition, vec3 surfaceNormal, v
 }
 
 void main() {
-  vec3 albedo = texture(colorTexture, fragmentUv).xyz;
+  vec4 colorLFlag = texture(colorTexture, fragmentUv);
+  vec3 albedo = colorLFlag.xyz;
   vec3 position = texture(positionTexture, fragmentUv).xyz;
   vec4 normalDepth = texture(normalDepthTexture, fragmentUv);
-  vec3 surfaceToCamera = normalize(cameraPosition - position);
-  vec3 normal = normalDepth.xyz;
-  vec3 combinedLighting = vec3(0.0);
+  vec3 outColor;
 
-  for (int i = 0; i < totalLights; i++) {
-    Light light = lights[i];
+  if (colorLFlag.w < 1.0) {
+    outColor = albedo;
+  } else {
+    vec3 surfaceToCamera = normalize(cameraPosition - position);
+    vec3 normal = normalDepth.xyz;
+    vec3 combinedLighting = vec3(0.0);
 
-    switch (light.type) {
-      case POINT_LIGHT:
-        combinedLighting += albedo * getPointLightFactor(lights[i], position, normal, surfaceToCamera);
-        break;
-      case DIRECTIONAL_LIGHT:
-        combinedLighting += albedo * getDirectionalLightFactor(lights[i], normal, surfaceToCamera);
-        break;
-      case SPOT_LIGHT:
-        combinedLighting += albedo * getSpotLightFactor(lights[i], position, normal, surfaceToCamera);
-        break;
+    for (int i = 0; i < totalLights; i++) {
+      Light light = lights[i];
+
+      switch (light.type) {
+        case POINT_LIGHT:
+          combinedLighting += albedo * getPointLightFactor(lights[i], position, normal, surfaceToCamera);
+          break;
+        case DIRECTIONAL_LIGHT:
+          combinedLighting += albedo * getDirectionalLightFactor(lights[i], normal, surfaceToCamera);
+          break;
+        case SPOT_LIGHT:
+          combinedLighting += albedo * getSpotLightFactor(lights[i], position, normal, surfaceToCamera);
+          break;
+      }
     }
+
+    outColor = combinedLighting;
   }
 
-  colorDepth = vec4(combinedLighting, normalDepth.w);
+  colorDepth = vec4(outColor, normalDepth.w);
 }

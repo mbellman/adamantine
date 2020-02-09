@@ -25,6 +25,10 @@ OpenGLVideoController::OpenGLVideoController() {
 }
 
 OpenGLVideoController::~OpenGLVideoController() {
+  if (glSkybox != nullptr) {
+    delete glSkybox;
+  }
+
   for (auto* glObject : glObjects) {
     delete glObject;
   }
@@ -42,6 +46,16 @@ OpenGLVideoController::~OpenGLVideoController() {
   glShadowCasters.clear();
 
   OpenGLObject::freeTextureCache();
+}
+
+OpenGLObject* OpenGLVideoController::createOpenGLObject(Object* object) {
+  auto* glObject = new OpenGLObject(object);
+
+  glObject->bind();
+  gBuffer->getGeometryProgram().bindVertexInputs();
+  gBuffer->getLightViewProgram().bindVertexInputs();
+
+  return glObject;
 }
 
 void OpenGLVideoController::createScreenShaders() {
@@ -90,13 +104,14 @@ void OpenGLVideoController::onDestroy() {
 }
 
 void OpenGLVideoController::onEntityAdded(Entity* entity) {
-  if (entity->isOfType<Object>()) {
-    auto* glObject = new OpenGLObject((Object*)entity);
+  if (entity->isOfType<Skybox>()) {
+    if (glSkybox != nullptr) {
+      delete glSkybox;
+    }
 
-    glObject->bind();
-
-    gBuffer->getGeometryProgram().bindVertexInputs();
-    gBuffer->getLightViewProgram().bindVertexInputs();
+    glSkybox = createOpenGLObject((Skybox*)entity);
+  } else if (entity->isOfType<Object>()) {
+    auto* glObject = createOpenGLObject((Object*)entity);
 
     glObjects.push_back(glObject);
   } else if (entity->isOfType<Light>() && ((Light*)entity)->canCastShadows) {
@@ -264,6 +279,7 @@ void OpenGLVideoController::renderGeometry() {
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
+  glEnable(GL_STENCIL_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   Matrix4 projectionMatrix = Matrix4::projection(screenSize, 45.0f, 1.0f, 10000.0f).transpose();
@@ -278,8 +294,18 @@ void OpenGLVideoController::renderGeometry() {
     geometryProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
     geometryProgram.setBool("hasTexture", glObject->hasTexture());
     geometryProgram.setBool("hasNormalMap", glObject->hasNormalMap());
+    geometryProgram.setFloat("lightingFlag", 1.0f);
 
     glObject->render();
+  }
+
+  if (glSkybox != nullptr) {
+    geometryProgram.setMatrix4("modelMatrix", glSkybox->getSourceObject()->getMatrix());
+    geometryProgram.setBool("hasTexture", true);
+    geometryProgram.setBool("hasNormalMap", false);
+    geometryProgram.setFloat("lightingFlag", 0.0f);
+
+    glSkybox->render();
   }
 }
 

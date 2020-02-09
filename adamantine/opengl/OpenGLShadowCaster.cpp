@@ -3,10 +3,6 @@
 
 OpenGLShadowCaster::OpenGLShadowCaster(const Light* light) {
   this->light = light;
-
-  frameBuffer = new FrameBuffer(1024, 1024);
-
-  frameBuffer->addDepthTexture();
 }
 
 const Light* OpenGLShadowCaster::getLight() const {
@@ -32,14 +28,6 @@ Matrix4 OpenGLShadowCaster::getLightMatrixCascade(int cascadeIndex, const Camera
   }
 
   return (projection * view).transpose();
-}
-
-void OpenGLShadowCaster::startCasting() {
-  frameBuffer->startWriting();
-}
-
-void OpenGLShadowCaster::startReading() {
-  frameBuffer->startReading();
 }
 
 const float OpenGLShadowCaster::cascadeSizes[3][2] = {

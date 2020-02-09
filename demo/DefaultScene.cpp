@@ -183,6 +183,14 @@ void DefaultScene::onInit() {
   addLights();
   addObjects();
 
+  auto* skyboxTexture = new Texture("./demo/sea-skybox.png");
+  auto* skybox = new Skybox(skyboxTexture, 5000.0f);
+
+  skybox->setColor(Vec3f(1.0f));
+
+  stage.add(skybox);
+  assets.addTexture(skyboxTexture);
+
   inputSystem.onMouseMotion([=](const SDL_MouseMotionEvent& event) {
     if (SDL_GetRelativeMouseMode()) {
       camera.orientation.x -= event.yrel / 1000.0f;

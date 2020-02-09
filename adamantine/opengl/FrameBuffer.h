@@ -21,7 +21,7 @@ public:
   void addColorTexture(GLint internalFormat, GLenum format);
   void addColorTexture(GLint internalFormat, GLenum format, GLint clamp);
   void addDepthBuffer();
-  void addDepthTexture();
+  void addStencilBuffer();
   void bindColorTexture(GLenum attachment);
   void bindColorTextures();
   void clearColorTexture(GLint attachment);
