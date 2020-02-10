@@ -22,6 +22,7 @@ OpenGLVideoController::OpenGLVideoController() {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+  SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
 }
 
 OpenGLVideoController::~OpenGLVideoController() {
@@ -52,8 +53,9 @@ OpenGLObject* OpenGLVideoController::createOpenGLObject(Object* object) {
   auto* glObject = new OpenGLObject(object);
 
   glObject->bind();
-  gBuffer->getGeometryProgram().bindVertexInputs();
-  gBuffer->getLightViewProgram().bindVertexInputs();
+
+  gBuffer->getShaderProgram(GBuffer::Shader::GEOMETRY).bindVertexInputs();
+  gBuffer->getShaderProgram(GBuffer::Shader::LIGHT_VIEW).bindVertexInputs();
 
   return glObject;
 }
@@ -64,9 +66,7 @@ void OpenGLVideoController::createScreenShaders() {
   dofShader->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
     auto* buffer = new FrameBuffer(screen.width, screen.height);
 
-    buffer->addColorTexture(GL_RGBA32F, GL_RGBA, GL_CLAMP_TO_EDGE);
-    glUniform1i(program.getUniformLocation("screen"), 0);
-
+    buffer->addColorTexture(GL_RGBA32F, GL_RGBA, GL_CLAMP_TO_EDGE);   // (0) Color/depth
     buffer->bindColorTextures();
 
     return buffer;
@@ -74,7 +74,6 @@ void OpenGLVideoController::createScreenShaders() {
 
   dofShader->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
     glClear(GL_COLOR_BUFFER_BIT);
-
     glUniform1i(program.getUniformLocation("screen"), 0);
 
     glScreenQuad->render();
@@ -144,9 +143,10 @@ void OpenGLVideoController::onInit() {
 
   glewInit();
 
-  glEnable(GL_DEPTH_TEST);
-  glCullFace(GL_BACK);
   glEnable(GL_CULL_FACE);
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_STENCIL_TEST);
+  glCullFace(GL_BACK);
 
   SDL_GL_SetSwapInterval(0);
 
@@ -155,6 +155,8 @@ void OpenGLVideoController::onInit() {
   gBuffer->createFrameBuffer(screenSize.width, screenSize.height);
 
   createScreenShaders();
+
+  gBuffer->getFrameBuffer()->shareDepthStencilBuffer(screenShaders[0]->getFrameBuffer());
 
   scene->onEntityAdded([=](auto* entity) {
     onEntityAdded(entity);
@@ -171,14 +173,19 @@ void OpenGLVideoController::onRender() {
   gBuffer->startWriting();
   gBuffer->writeToAllBuffers();
 
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
   renderGeometry();
 
   screenShaders[0]->startWriting();
   gBuffer->startReading();
 
-  renderLighting();
+  renderNonIlluminatedSurfaces();
+  renderIlluminatedSurfaces();
   renderShadowCasters();
   renderScreenShaders();
+
+  glStencilMask(0xFF);
 
   SDL_GL_SwapWindow(sdlWindow);
   glFinish();
@@ -195,14 +202,121 @@ void OpenGLVideoController::onScreenSizeChange(int width, int height) {
   for (auto* shader : screenShaders) {
     shader->createFrameBuffer({ 0, 0, width, height });
   }
+
+  gBuffer->getFrameBuffer()->shareDepthStencilBuffer(screenShaders[0]->getFrameBuffer());
+}
+
+void OpenGLVideoController::renderGeometry() {
+  auto& geometryProgram = gBuffer->getShaderProgram(GBuffer::Shader::GEOMETRY);
+
+  geometryProgram.use();
+
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_STENCIL_TEST);
+
+  Matrix4 projectionMatrix = Matrix4::projection(screenSize, 45.0f, 1.0f, 10000.0f).transpose();
+  Matrix4 viewMatrix = createViewMatrix();
+
+  geometryProgram.setMatrix4("projectionMatrix", projectionMatrix);
+  geometryProgram.setMatrix4("viewMatrix", viewMatrix);
+  geometryProgram.setInt("modelTexture", 6);
+  geometryProgram.setInt("normalMap", 7);
+
+  glStencilFunc(GL_ALWAYS, 1, 0xFF);
+  glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+
+  for (auto* glObject : glObjects) {
+    geometryProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
+    geometryProgram.setBool("hasTexture", glObject->hasTexture());
+    geometryProgram.setBool("hasNormalMap", glObject->hasNormalMap());
+
+    glObject->render();
+  }
+
+  glDisable(GL_STENCIL_TEST);
+  glStencilMask(0x00);
+
+  if (glSkybox != nullptr) {
+    geometryProgram.setMatrix4("modelMatrix", glSkybox->getSourceObject()->getMatrix());
+    geometryProgram.setBool("hasTexture", true);
+    geometryProgram.setBool("hasNormalMap", false);
+
+    glSkybox->render();
+  }
+}
+
+void OpenGLVideoController::renderIlluminatedSurfaces() {
+  auto& illuminationProgram = gBuffer->getShaderProgram(GBuffer::Shader::ILLUMINATION);
+
+  illuminationProgram.use();
+
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_STENCIL_TEST);
+  glStencilFunc(GL_EQUAL, 1, 0xFF);
+
+  auto& lights = scene->getStage().getLights();
+  int totalLights = lights.size() - scene->getStage().getTotalShadowCasters();
+
+  illuminationProgram.setInt("colorTexture", 0);
+  illuminationProgram.setInt("normalDepthTexture", 1);
+  illuminationProgram.setInt("positionTexture", 2);
+  illuminationProgram.setVec3f("cameraPosition", scene->getCamera().position);
+  illuminationProgram.setInt("totalLights", totalLights);
+
+  int index = 0;
+
+  for (auto* light : lights) {
+    if (!light->canCastShadows) {
+      std::string idx = std::to_string(index++);
+
+      illuminationProgram.setVec3f("lights[" + idx + "].position", light->position);
+      illuminationProgram.setVec3f("lights[" + idx + "].direction", light->direction);
+      illuminationProgram.setVec3f("lights[" + idx + "].color", light->color);
+      illuminationProgram.setFloat("lights[" + idx + "].radius", light->radius);
+      illuminationProgram.setInt("lights[" + idx + "].type", light->type);
+    }
+  }
+
+  gBuffer->renderScreenQuad();
+}
+
+void OpenGLVideoController::renderNonIlluminatedSurfaces() {
+  auto& albedoProgram = gBuffer->getShaderProgram(GBuffer::Shader::ALBEDO);
+
+  albedoProgram.use();
+
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_STENCIL_TEST);
+  glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+
+  gBuffer->renderScreenQuad();
+}
+
+void OpenGLVideoController::renderScreenShaders() {
+  glDisable(GL_STENCIL_TEST);
+
+  for (int i = 0; i < screenShaders.size(); i++) {
+    bool isFinalShader = i == screenShaders.size() - 1;
+
+    if (isFinalShader) {
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    } else {
+      screenShaders[i + 1]->startWriting();
+    }
+
+    screenShaders[i]->render();
+  }
 }
 
 void OpenGLVideoController::renderShadowCasters() {
-  auto& lightViewProgram = gBuffer->getLightViewProgram();
-  auto& shadowCasterProgram = gBuffer->getShadowCasterProgram();
+  auto& lightViewProgram = gBuffer->getShaderProgram(GBuffer::Shader::LIGHT_VIEW);
+  auto& shadowCasterProgram = gBuffer->getShaderProgram(GBuffer::Shader::SHADOW_CASTER);
 
   for (auto* glShadowCaster : glShadowCasters) {
-    // Shadowcaster light space pass
+    // Shadowcaster light view pass
     lightViewProgram.use();
 
     gBuffer->startWriting();
@@ -213,6 +327,7 @@ void OpenGLVideoController::renderShadowCasters() {
     bool isDirectionalLight = light->type == Light::LightType::DIRECTIONAL;
 
     glDisable(GL_BLEND);
+    glDisable(GL_STENCIL_TEST);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
@@ -240,12 +355,13 @@ void OpenGLVideoController::renderShadowCasters() {
       gBuffer->useFirstShadowCascade();
     }
 
-    // Shadowcaster camera space lighting pass
+    // Camera view shadowcaster lighting pass
     screenShaders[0]->startWriting();
     gBuffer->startReading();
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+    glEnable(GL_STENCIL_TEST);
     glEnable(GL_BLEND);
     glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ZERO);
 
@@ -270,90 +386,4 @@ void OpenGLVideoController::renderShadowCasters() {
   }
 
   glDisable(GL_BLEND);
-}
-
-void OpenGLVideoController::renderGeometry() {
-  auto& geometryProgram = gBuffer->getGeometryProgram();
-
-  geometryProgram.use();
-
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-  glEnable(GL_STENCIL_TEST);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  Matrix4 projectionMatrix = Matrix4::projection(screenSize, 45.0f, 1.0f, 10000.0f).transpose();
-  Matrix4 viewMatrix = createViewMatrix();
-
-  geometryProgram.setMatrix4("projectionMatrix", projectionMatrix);
-  geometryProgram.setMatrix4("viewMatrix", viewMatrix);
-  geometryProgram.setInt("modelTexture", 6);
-  geometryProgram.setInt("normalMap", 7);
-
-  for (auto* glObject : glObjects) {
-    geometryProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
-    geometryProgram.setBool("hasTexture", glObject->hasTexture());
-    geometryProgram.setBool("hasNormalMap", glObject->hasNormalMap());
-    geometryProgram.setFloat("lightingFlag", 1.0f);
-
-    glObject->render();
-  }
-
-  if (glSkybox != nullptr) {
-    geometryProgram.setMatrix4("modelMatrix", glSkybox->getSourceObject()->getMatrix());
-    geometryProgram.setBool("hasTexture", true);
-    geometryProgram.setBool("hasNormalMap", false);
-    geometryProgram.setFloat("lightingFlag", 0.0f);
-
-    glSkybox->render();
-  }
-}
-
-void OpenGLVideoController::renderLighting() {
-  auto& lightingProgram = gBuffer->getLightingProgram();
-
-  lightingProgram.use();
-
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_CULL_FACE);
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  auto& lights = scene->getStage().getLights();
-  int totalLights = lights.size() - scene->getStage().getTotalShadowCasters();
-
-  lightingProgram.setInt("colorTexture", 0);
-  lightingProgram.setInt("normalDepthTexture", 1);
-  lightingProgram.setInt("positionTexture", 2);
-  lightingProgram.setVec3f("cameraPosition", scene->getCamera().position);
-  lightingProgram.setInt("totalLights", totalLights);
-
-  int index = 0;
-
-  for (auto* light : lights) {
-    if (!light->canCastShadows) {
-      std::string idx = std::to_string(index++);
-
-      lightingProgram.setVec3f("lights[" + idx + "].position", light->position);
-      lightingProgram.setVec3f("lights[" + idx + "].direction", light->direction);
-      lightingProgram.setVec3f("lights[" + idx + "].color", light->color);
-      lightingProgram.setFloat("lights[" + idx + "].radius", light->radius);
-      lightingProgram.setInt("lights[" + idx + "].type", light->type);
-    }
-  }
-
-  gBuffer->renderScreenQuad();
-}
-
-void OpenGLVideoController::renderScreenShaders() {
-  for (int i = 0; i < screenShaders.size(); i++) {
-    bool isFinalShader = i == screenShaders.size() - 1;
-
-    if (isFinalShader) {
-      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    } else {
-      screenShaders[i + 1]->startWriting();
-    }
-
-    screenShaders[i]->render();
-  }
 }

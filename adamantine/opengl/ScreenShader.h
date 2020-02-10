@@ -17,6 +17,7 @@ public:
   ~ScreenShader();
 
   void createFrameBuffer(const Region2d<int>& screen);
+  FrameBuffer* getFrameBuffer() const;
   void onCreateFrameBuffer(FrameBufferFactory factory);
   void onRender(RenderHandler handler);
   void render();

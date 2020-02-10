@@ -58,8 +58,10 @@ void ShaderProgram::setVec3f(std::string name, const Vec3f& value) {
 void ShaderProgram::setVertexAttribute(const VertexAttribute& attribute) {
   GLint location = glGetAttribLocation(program, attribute.name);
 
-  glEnableVertexAttribArray(location);
-  glVertexAttribPointer(location, attribute.size, attribute.type, GL_FALSE, attribute.stride, (void*)attribute.offset);
+  if (location != -1) {
+    glEnableVertexAttribArray(location);
+    glVertexAttribPointer(location, attribute.size, attribute.type, GL_FALSE, attribute.stride, (void*)attribute.offset);
+  }
 }
 
 void ShaderProgram::use() const {

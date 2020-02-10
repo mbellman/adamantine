@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include "opengl/FrameBuffer.h"
 #include "opengl/OpenGLPipeline.h"
 #include "opengl/ShaderProgram.h"
@@ -7,15 +9,21 @@
 
 class GBuffer {
 public:
+  enum Shader {
+    GEOMETRY,
+    ILLUMINATION,
+    LIGHT_VIEW,
+    SHADOW_CASTER,
+    ALBEDO
+  };
+
   GBuffer();
   ~GBuffer();
 
   void clearLightViewBuffers();
   void createFrameBuffer(int width, int height);
-  ShaderProgram& getGeometryProgram();
-  ShaderProgram& getLightingProgram();
-  ShaderProgram& getLightViewProgram();
-  ShaderProgram& getShadowCasterProgram();
+  FrameBuffer* getFrameBuffer();
+  ShaderProgram& getShaderProgram(GBuffer::Shader shader);
   void renderScreenQuad();
   void startReading();
   void startWriting();
@@ -25,14 +33,12 @@ public:
 
 private:
   ShaderProgram geometryProgram;
-  ShaderProgram lightingProgram;
+  ShaderProgram illuminationProgram;
   ShaderProgram lightViewProgram;
   ShaderProgram shadowCasterProgram;
+  ShaderProgram albedoProgram;
   FrameBuffer* frameBuffer = nullptr;
   OpenGLPipeline* glScreenQuad = nullptr;
 
-  void createGeometryProgram();
-  void createLightingProgram();
-  void createLightViewProgram();
-  void createShadowCasterProgram();
+  void createShaderPrograms();
 };

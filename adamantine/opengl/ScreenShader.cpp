@@ -36,6 +36,10 @@ void ScreenShader::createFrameBuffer(const Region2d<int>& screen) {
   frameBuffer = frameBufferFactory(program, screen);
 }
 
+FrameBuffer* ScreenShader::getFrameBuffer() const {
+  return frameBuffer;
+}
+
 void ScreenShader::onCreateFrameBuffer(FrameBufferFactory factory) {
   frameBufferFactory = factory;
 }

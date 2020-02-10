@@ -38,8 +38,9 @@ private:
   Matrix4 createViewMatrix();
   void onEntityAdded(Entity* entity);
   void onEntityRemoved(Entity* entity);
-  void renderShadowCasters();
   void renderGeometry();
-  void renderLighting();
+  void renderIlluminatedSurfaces();
+  void renderNonIlluminatedSurfaces();
   void renderScreenShaders();
+  void renderShadowCasters();
 };

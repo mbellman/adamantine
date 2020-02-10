@@ -2,15 +2,13 @@
 #include "opengl/ShaderLoader.h"
 
 GBuffer::GBuffer() {
-  createGeometryProgram();
-  createLightingProgram();
-  createLightViewProgram();
-  createShadowCasterProgram();
+  createShaderPrograms();
 
   glScreenQuad = new OpenGLPipeline();
 
-  lightingProgram.bindVertexInputs();
-  shadowCasterProgram.bindVertexInputs();
+  getShaderProgram(Shader::ILLUMINATION).bindVertexInputs();
+  getShaderProgram(Shader::SHADOW_CASTER).bindVertexInputs();
+  getShaderProgram(Shader::ALBEDO).bindVertexInputs();
 
   glScreenQuad->createScreenQuad();
 }
@@ -32,96 +30,90 @@ void GBuffer::createFrameBuffer(int width, int height) {
 
   frameBuffer = new FrameBuffer(width, height);
 
-  frameBuffer->addColorTexture(GL_RGBA32F, GL_RGBA);   // (0) Color/lighting flag
+  frameBuffer->addColorTexture(GL_RGB32F, GL_RGB);     // (0) Color
   frameBuffer->addColorTexture(GL_RGBA32F, GL_RGBA);   // (1) Normal/depth
   frameBuffer->addColorTexture(GL_RGB32F, GL_RGB);     // (2) Position
   frameBuffer->addColorTexture(GL_R32F, GL_RED);       // (3) Shadowcaster light view buffer, cascade 0
   frameBuffer->addColorTexture(GL_R32F, GL_RED);       // (4) Shadowcaster light view buffer, cascade 1
   frameBuffer->addColorTexture(GL_R32F, GL_RED);       // (5) Shadowcaster light view buffer, cascade 2
-  frameBuffer->addDepthBuffer();
+  frameBuffer->addDepthStencilBuffer();
   frameBuffer->bindColorTextures();
 }
 
-void GBuffer::createGeometryProgram() {
+void GBuffer::createShaderPrograms() {
+  VertexShaderInput geometryInputs[] = {
+    { "vertexPosition", 3, GL_FLOAT },
+    { "vertexNormal", 3, GL_FLOAT},
+    { "vertexTangent", 3, GL_FLOAT },
+    { "vertexColor", 3, GL_FLOAT },
+    { "vertexUv", 2, GL_FLOAT }
+  };
+
+  VertexShaderInput quadInputs[] = {
+    { "vertexPosition", 2, GL_FLOAT },
+    { "vertexUv", 2, GL_FLOAT }
+  };
+
+  // Geometry program
   geometryProgram.create();
   geometryProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/geometry.vertex.glsl"));
   geometryProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/geometry.fragment.glsl"));
   geometryProgram.link();
   geometryProgram.use();
+  geometryProgram.setVertexInputs<float>(5, geometryInputs);
 
-  VertexShaderInput vertexInputs[] = {
-    { "vertexPosition", 3, GL_FLOAT },
-    { "vertexNormal", 3, GL_FLOAT},
-    { "vertexTangent", 3, GL_FLOAT },
-    { "vertexColor", 3, GL_FLOAT },
-    { "vertexUv", 2, GL_FLOAT }
-  };
+  // Lighting program
+  illuminationProgram.create();
+  illuminationProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
+  illuminationProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/illumination.fragment.glsl"));
+  illuminationProgram.link();
+  illuminationProgram.use();
+  illuminationProgram.setVertexInputs<float>(2, quadInputs);
 
-  geometryProgram.setVertexInputs<float>(5, vertexInputs);
-}
-
-void GBuffer::createLightingProgram() {
-  lightingProgram.create();
-  lightingProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
-  lightingProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/light.fragment.glsl"));
-  lightingProgram.link();
-  lightingProgram.use();
-
-  VertexShaderInput inputs[] = {
-    { "vertexPosition", 2, GL_FLOAT },
-    { "vertexUv", 2, GL_FLOAT }
-  };
-
-  lightingProgram.setVertexInputs<float>(2, inputs);
-}
-
-void GBuffer::createLightViewProgram() {
+  // Light view program
   lightViewProgram.create();
   lightViewProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/lightview.vertex.glsl"));
   lightViewProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/lightview.fragment.glsl"));
   lightViewProgram.link();
   lightViewProgram.use();
+  lightViewProgram.setVertexInputs<float>(5, geometryInputs);
 
-  VertexShaderInput vertexInputs[] = {
-    { "vertexPosition", 3, GL_FLOAT },
-    { "vertexNormal", 3, GL_FLOAT},
-    { "vertexTangent", 3, GL_FLOAT },
-    { "vertexColor", 3, GL_FLOAT },
-    { "vertexUv", 2, GL_FLOAT }
-  };
-
-  lightViewProgram.setVertexInputs<float>(5, vertexInputs);
-}
-
-void GBuffer::createShadowCasterProgram() {
+  // Shadow caster program
   shadowCasterProgram.create();
   shadowCasterProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
   shadowCasterProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/shadowcaster.fragment.glsl"));
   shadowCasterProgram.link();
   shadowCasterProgram.use();
+  shadowCasterProgram.setVertexInputs<float>(2, quadInputs);
 
-  VertexShaderInput inputs[] = {
-    { "vertexPosition", 2, GL_FLOAT },
-    { "vertexUv", 2, GL_FLOAT }
-  };
-
-  shadowCasterProgram.setVertexInputs<float>(2, inputs);
+  // Albedo program
+  albedoProgram.create();
+  albedoProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
+  albedoProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/albedo.fragment.glsl"));
+  albedoProgram.link();
+  albedoProgram.use();
+  albedoProgram.setVertexInputs<float>(2, quadInputs);
 }
 
-ShaderProgram& GBuffer::getGeometryProgram() {
-  return geometryProgram;
+FrameBuffer* GBuffer::getFrameBuffer() {
+  return frameBuffer;
 }
 
-ShaderProgram& GBuffer::getLightingProgram() {
-  return lightingProgram;
-}
-
-ShaderProgram& GBuffer::getLightViewProgram() {
-  return lightViewProgram;
-}
-
-ShaderProgram& GBuffer::getShadowCasterProgram() {
-  return shadowCasterProgram;
+ShaderProgram& GBuffer::getShaderProgram(GBuffer::Shader shader) {
+  switch (shader) {
+    case GBuffer::Shader::GEOMETRY:
+      return geometryProgram;
+    case GBuffer::Shader::ILLUMINATION:
+      return illuminationProgram;
+    case GBuffer::Shader::LIGHT_VIEW:
+      return lightViewProgram;
+    case GBuffer::Shader::SHADOW_CASTER:
+      return shadowCasterProgram;
+    case GBuffer::Shader::ALBEDO:
+      return albedoProgram;
+    default:
+      return geometryProgram;
+  }
 }
 
 void GBuffer::renderScreenQuad() {

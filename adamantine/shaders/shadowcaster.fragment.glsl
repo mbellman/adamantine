@@ -107,33 +107,24 @@ vec3 getSpotLightFactor(vec3 surfacePosition, vec3 surfaceNormal, vec3 surfaceTo
 }
 
 void main() {
-  vec4 colorLFlag = texture(colorTexture, fragmentUv);
-  vec3 albedo = colorLFlag.xyz;
+  vec3 albedo = texture(colorTexture, fragmentUv).xyz;
   vec3 position = texture(positionTexture, fragmentUv).xyz;
   vec4 normalDepth = texture(normalDepthTexture, fragmentUv);
-  vec3 outColor;
+  vec3 surfaceToCamera = normalize(cameraPosition - position);
+  vec3 normal = normalDepth.xyz;
+  vec3 lighting = vec3(0.0);
 
-  if (colorLFlag.w < 1.0) {
-    outColor = vec3(0.0);
-  } else {
-    vec3 surfaceToCamera = normalize(cameraPosition - position);
-    vec3 normal = normalDepth.xyz;
-    vec3 lighting = vec3(0.0);
-
-    switch (light.type) {
-      case POINT_LIGHT:
-        lighting = albedo * getPointLightFactor(position, normal, surfaceToCamera);
-        break;
-      case DIRECTIONAL_LIGHT:
-        lighting = albedo * getDirectionalLightFactor(normal, surfaceToCamera);
-        break;
-      case SPOT_LIGHT:
-        lighting = albedo * getSpotLightFactor(position, normal, surfaceToCamera);
-        break;
-    }
-
-    outColor = lighting * getShadowFactor(position);
+  switch (light.type) {
+    case POINT_LIGHT:
+      lighting = albedo * getPointLightFactor(position, normal, surfaceToCamera);
+      break;
+    case DIRECTIONAL_LIGHT:
+      lighting = albedo * getDirectionalLightFactor(normal, surfaceToCamera);
+      break;
+    case SPOT_LIGHT:
+      lighting = albedo * getSpotLightFactor(position, normal, surfaceToCamera);
+      break;
   }
 
-  colorDepth = vec4(outColor, normalDepth.w);
+  colorDepth = vec4(lighting * getShadowFactor(position), normalDepth.w);
 }
