@@ -43,10 +43,6 @@ void FrameBuffer::addColorTexture(GLint internalFormat, GLenum format, GLint cla
 }
 
 void FrameBuffer::addDepthStencilBuffer() {
-  // glGenRenderbuffers(1, &depthStencilBuffer);
-  // glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBuffer);
-  // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, size.width, size.height);
-  // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilBuffer);
   glGenTextures(1, &depthStencilBuffer);
   glBindTexture(GL_TEXTURE_2D, depthStencilBuffer);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, size.width, size.height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 0);

@@ -169,6 +169,19 @@ void DefaultScene::addObjects() {
   model3->setPosition({ 80.0f, 10.0f, 200.0f });
   model3->setColor({ 1.0f, 0.1f, 0.5f });
 
+  auto* lightBall = new Model(ball);
+
+  lightBall->setScale(5.0f);
+  lightBall->setPosition({ 100.0f, 10.0f, 225.0f });
+  lightBall->setColor(Vec3f(1.0f, 0.8f, 0.0f));
+  lightBall->hasLighting = false;
+
+  auto* ballLight = new Light();
+
+  ballLight->color = Vec3f(1.0f, 0.5f, 0.0f);
+  ballLight->radius = 2000.0f;
+  ballLight->position = lightBall->position;
+
   stage.add(mesh);
   stage.add(cube1);
   stage.add(cube2);
@@ -177,6 +190,8 @@ void DefaultScene::addObjects() {
   stage.add(tinyCube);
   stage.add(model2);
   stage.add(model3);
+  stage.add(lightBall);
+  stage.add(ballLight);
 }
 
 void DefaultScene::onInit() {

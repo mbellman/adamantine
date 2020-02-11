@@ -26,10 +26,6 @@ OpenGLVideoController::OpenGLVideoController() {
 }
 
 OpenGLVideoController::~OpenGLVideoController() {
-  if (glSkybox != nullptr) {
-    delete glSkybox;
-  }
-
   for (auto* glObject : glObjects) {
     delete glObject;
   }
@@ -103,13 +99,7 @@ void OpenGLVideoController::onDestroy() {
 }
 
 void OpenGLVideoController::onEntityAdded(Entity* entity) {
-  if (entity->isOfType<Skybox>()) {
-    if (glSkybox != nullptr) {
-      delete glSkybox;
-    }
-
-    glSkybox = createOpenGLObject((Skybox*)entity);
-  } else if (entity->isOfType<Object>()) {
+  if (entity->isOfType<Object>()) {
     auto* glObject = createOpenGLObject((Object*)entity);
 
     glObjects.push_back(glObject);
@@ -147,6 +137,7 @@ void OpenGLVideoController::onInit() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_STENCIL_TEST);
   glCullFace(GL_BACK);
+  glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
   SDL_GL_SetSwapInterval(0);
 
@@ -223,27 +214,32 @@ void OpenGLVideoController::renderGeometry() {
   geometryProgram.setInt("modelTexture", 6);
   geometryProgram.setInt("normalMap", 7);
 
-  glStencilFunc(GL_ALWAYS, 1, 0xFF);
-  glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
-
-  for (auto* glObject : glObjects) {
+  auto renderObject = [&](OpenGLObject* glObject) {
     geometryProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
     geometryProgram.setBool("hasTexture", glObject->hasTexture());
     geometryProgram.setBool("hasNormalMap", glObject->hasNormalMap());
 
     glObject->render();
-  }
+  };
 
-  glDisable(GL_STENCIL_TEST);
+  glStencilFunc(GL_ALWAYS, 1, 0xFF);
   glStencilMask(0x00);
 
-  if (glSkybox != nullptr) {
-    geometryProgram.setMatrix4("modelMatrix", glSkybox->getSourceObject()->getMatrix());
-    geometryProgram.setBool("hasTexture", true);
-    geometryProgram.setBool("hasNormalMap", false);
-
-    glSkybox->render();
+  for (auto* glObject : glObjects) {
+    if (!glObject->getSourceObject()->hasLighting) {
+      renderObject(glObject);
+    }
   }
+
+  glStencilMask(0xFF);
+
+  for (auto* glObject : glObjects) {
+    if (glObject->getSourceObject()->hasLighting) {
+      renderObject(glObject);
+    }
+  }
+
+  glStencilMask(0x00);
 }
 
 void OpenGLVideoController::renderIlluminatedSurfaces() {

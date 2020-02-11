@@ -128,7 +128,15 @@ void LightRoomScene::addObjects() {
       light->position = position + Vec3f(0.0f, 35.0f, 0.0f);
       light->radius = 500.0f;
 
+      auto* lightCube = new Cube();
+
+      lightCube->setColor(Vec3f(1.0f));
+      lightCube->setPosition(light->position);
+      lightCube->setScale(2.0f);
+      lightCube->hasLighting = false;
+
       stage.add(light);
+      stage.add(lightCube);
     }
   }
 }
