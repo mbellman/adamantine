@@ -125,6 +125,7 @@ void DefaultScene::addObjects() {
 
   model->setScale(30.0f);
   model->setPosition({ 0.0f, 15.0f, 250.0f });
+  model->setColor(Vec3f(0.75f));
 
   model->onUpdate = [=](float dt) {
     model->rotate({ 0.0f, dt * 0.5f, 0.0f });
@@ -151,7 +152,7 @@ void DefaultScene::addObjects() {
 
   model2->setScale(15.0f);
   model2->setPosition({ 100.0f, 0.0f, 300.0f });
-  model2->setColor({ 1.0f, 0.5f, 0.3f });
+  model2->setColor({ 0.75f, 0.5f, 0.3f });
 
   model2->onUpdate = [=](float dt) {
     model2->rotate({
@@ -167,13 +168,13 @@ void DefaultScene::addObjects() {
 
   model3->setScale(10.0f);
   model3->setPosition({ 80.0f, 10.0f, 200.0f });
-  model3->setColor({ 1.0f, 0.1f, 0.5f });
+  model3->setColor({ 0.6f, 0.1f, 0.3f });
 
   auto* lightBall = new Model(ball);
 
   lightBall->setScale(5.0f);
   lightBall->setPosition({ 100.0f, 10.0f, 225.0f });
-  lightBall->setColor(Vec3f(1.0f, 0.8f, 0.0f));
+  lightBall->setColor(Vec3f(1.0f));
   lightBall->hasLighting = false;
 
   auto* ballLight = new Light();

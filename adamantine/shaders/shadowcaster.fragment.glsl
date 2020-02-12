@@ -47,7 +47,7 @@ float getShadowFactor(vec3 position) {
 
   float shadowFactor = 0.0;
   vec2 texelSize = 0.5 * 1.0 / textureSize(lightMaps[cascadeIndex], 0);
-  float bias = light.type == DIRECTIONAL_LIGHT ? 0.001 : 0.0001;
+  float bias = light.type == DIRECTIONAL_LIGHT ? 0.001 : 0.00025;
 
   for (int x = -2; x <= 2; x++) {
     for (int y = -2; y <= 2; y++) {

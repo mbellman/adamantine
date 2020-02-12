@@ -58,7 +58,11 @@ OpenGLObject* OpenGLVideoController::createOpenGLObject(Object* object) {
 
 void OpenGLVideoController::createScreenShaders() {
   auto* dofShader = new ScreenShader("./adamantine/shaders/dof.fragment.glsl");
+  auto* preBloomShader = new ScreenShader("./adamantine/shaders/prebloom.fragment.glsl");
+  auto* postBloomShaderH = new ScreenShader("./adamantine/shaders/postbloom-h.fragment.glsl");
+  auto* postBloomShaderV = new ScreenShader("./adamantine/shaders/postbloom-v.fragment.glsl");
 
+  // Depth-of-field
   dofShader->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
     auto* buffer = new FrameBuffer(screen.width, screen.height);
 
@@ -75,8 +79,70 @@ void OpenGLVideoController::createScreenShaders() {
     glScreenQuad->render();
   });
 
+  // Pre-bloom
+  preBloomShader->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
+    auto* buffer = new FrameBuffer(screen.width, screen.height);
+
+    buffer->addColorTexture(GL_RGB32F, GL_RGB, GL_CLAMP_TO_EDGE);   // (0) Color
+    buffer->bindColorTextures();
+
+    return buffer;
+  });
+
+  preBloomShader->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glUniform1i(program.getUniformLocation("screen"), 0);
+
+    glScreenQuad->render();
+  });
+
+  // Post-bloom H
+  postBloomShaderH->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
+    auto* buffer = new FrameBuffer(screen.width, screen.height);
+
+    buffer->addColorTexture(GL_RGB32F, GL_RGB, GL_CLAMP_TO_EDGE);   // (0) Base color
+    buffer->addColorTexture(GL_RGB32F, GL_RGB, GL_CLAMP_TO_EDGE);   // (0) Bright color
+    buffer->bindColorTextures();
+
+    return buffer;
+  });
+
+  postBloomShaderH->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glUniform1i(program.getUniformLocation("baseColor"), 0);
+    glUniform1i(program.getUniformLocation("bloomColor"), 1);
+
+    glScreenQuad->render();
+  });
+
+  // Post-bloom V
+  postBloomShaderV->onCreateFrameBuffer([=](const ShaderProgram& program, auto screen) {
+    auto* buffer = new FrameBuffer(screen.width, screen.height);
+
+    buffer->addColorTexture(GL_RGB32F, GL_RGB, GL_CLAMP_TO_EDGE);   // (0) Base color
+    buffer->addColorTexture(GL_RGB32F, GL_RGB, GL_CLAMP_TO_EDGE);   // (0) Bright color
+    buffer->bindColorTextures();
+
+    return buffer;
+  });
+
+  postBloomShaderV->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glUniform1i(program.getUniformLocation("baseColor"), 0);
+    glUniform1i(program.getUniformLocation("bloomColor"), 1);
+
+    glScreenQuad->render();
+  });
+
   dofShader->createFrameBuffer(screenSize);
+  preBloomShader->createFrameBuffer(screenSize);
+  postBloomShaderH->createFrameBuffer(screenSize);
+  postBloomShaderV->createFrameBuffer(screenSize);
+
   screenShaders.push_back(dofShader);
+  screenShaders.push_back(preBloomShader);
+  screenShaders.push_back(postBloomShaderH);
+  screenShaders.push_back(postBloomShaderV);
 }
 
 Matrix4 OpenGLVideoController::createViewMatrix() {
