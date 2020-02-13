@@ -154,6 +154,7 @@
     <ClCompile Include="demo\DefaultScene.cpp" />
     <ClCompile Include="demo\LightRoomScene.cpp" />
     <ClCompile Include="demo\main.cpp" />
+    <ClCompile Include="demo\StressTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adamantine\opengl\FrameBuffer.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="adamantine\Window.h" />
     <ClInclude Include="demo\DefaultScene.h" />
     <ClInclude Include="demo\LightRoomScene.h" />
+    <ClInclude Include="demo\StressTest.h" />
     <ClInclude Include="subsystem\AbstractVideoController.h" />
     <ClInclude Include="opengl\OpenGLScene.h" />
     <ClInclude Include="opengl\OpenGLVideoController.h" />

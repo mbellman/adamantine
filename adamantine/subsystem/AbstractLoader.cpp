@@ -57,7 +57,7 @@ void AbstractLoader::load(const char* filePath) {
     file = f;
     isLoading = true;
   } else {
-    printf("[Loader] Error opening file: %s\n", filePath);
+    printf("[AbstractLoader] Error opening file: %s\n", filePath);
   }
 }
 
@@ -69,7 +69,7 @@ std::string AbstractLoader::readNextChunk() {
   buffer.clear();
   fillBufferUntil(delimiter);
 
-  return buffer;
+  return buffer.size() == 0 && isLoading ? readNextChunk() : buffer;
 }
 
 void AbstractLoader::nextLine() {
