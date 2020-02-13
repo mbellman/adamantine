@@ -175,7 +175,7 @@ void DefaultScene::addObjects() {
   lightBall->setScale(5.0f);
   lightBall->setPosition({ 100.0f, 10.0f, 225.0f });
   lightBall->setColor(Vec3f(1.0f));
-  lightBall->hasLighting = false;
+  lightBall->isEmissive = true;
 
   auto* ballLight = new Light();
 

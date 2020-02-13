@@ -56,7 +56,7 @@ public:
   float scale = 1.0f;
   const Texture* texture = nullptr;
   const Texture* normalMap = nullptr;
-  bool hasLighting = true;
+  bool isEmissive = false;
 
   virtual ~Object();
 

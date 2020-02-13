@@ -133,7 +133,7 @@ void LightRoomScene::addObjects() {
       lightCube->setColor(Vec3f(1.0f));
       lightCube->setPosition(light->position);
       lightCube->setScale(2.0f);
-      lightCube->hasLighting = false;
+      lightCube->isEmissive = true;
 
       stage.add(light);
       stage.add(lightCube);

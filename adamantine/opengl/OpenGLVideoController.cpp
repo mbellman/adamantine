@@ -237,7 +237,7 @@ void OpenGLVideoController::onRender() {
   screenShaders[0]->startWriting();
   gBuffer->startReading();
 
-  renderNonIlluminatedSurfaces();
+  renderEmissiveSurfaces();
   renderIlluminatedSurfaces();
   renderShadowCasters();
   renderScreenShaders();
@@ -261,6 +261,19 @@ void OpenGLVideoController::onScreenSizeChange(int width, int height) {
   }
 
   gBuffer->getFrameBuffer()->shareDepthStencilBuffer(screenShaders[0]->getFrameBuffer());
+}
+
+void OpenGLVideoController::renderEmissiveSurfaces() {
+  auto& albedoProgram = gBuffer->getShaderProgram(GBuffer::Shader::ALBEDO);
+
+  albedoProgram.use();
+
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_STENCIL_TEST);
+  glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+
+  gBuffer->renderScreenQuad();
 }
 
 void OpenGLVideoController::renderGeometry() {
@@ -292,7 +305,7 @@ void OpenGLVideoController::renderGeometry() {
   glStencilMask(0x00);
 
   for (auto* glObject : glObjects) {
-    if (!glObject->getSourceObject()->hasLighting) {
+    if (glObject->getSourceObject()->isEmissive) {
       renderObject(glObject);
     }
   }
@@ -300,7 +313,7 @@ void OpenGLVideoController::renderGeometry() {
   glStencilMask(0xFF);
 
   for (auto* glObject : glObjects) {
-    if (glObject->getSourceObject()->hasLighting) {
+    if (!glObject->getSourceObject()->isEmissive) {
       renderObject(glObject);
     }
   }
@@ -340,19 +353,6 @@ void OpenGLVideoController::renderIlluminatedSurfaces() {
       illuminationProgram.setInt("lights[" + idx + "].type", light->type);
     }
   }
-
-  gBuffer->renderScreenQuad();
-}
-
-void OpenGLVideoController::renderNonIlluminatedSurfaces() {
-  auto& albedoProgram = gBuffer->getShaderProgram(GBuffer::Shader::ALBEDO);
-
-  albedoProgram.use();
-
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_CULL_FACE);
-  glEnable(GL_STENCIL_TEST);
-  glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 
   gBuffer->renderScreenQuad();
 }

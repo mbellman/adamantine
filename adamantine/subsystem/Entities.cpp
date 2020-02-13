@@ -299,7 +299,7 @@ int Cube::faces[6][4] = {
  */
 Skybox::Skybox(const Texture* texture, float size) {
   this->texture = texture;
-  this->hasLighting = false;
+  this->isEmissive = true;
 
   for (int i = 0; i < 14; i++) {
     addVertex(Skybox::vertexPositions[i], Skybox::uvs[i]);
