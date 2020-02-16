@@ -9,9 +9,8 @@
 class OpenGLObject {
 public:
   OpenGLObject(const Object* object);
-  ~OpenGLObject();
 
-  static void freeTextureCache();
+  static void freeCachedResources();
 
   void bind();
   const Object* getSourceObject() const;
@@ -21,11 +20,13 @@ public:
 
 private:
   static std::map<int, OpenGLTexture*> textureMap;
+  static std::map<int, OpenGLPipeline*> pipelineMap;
 
   const Object* sourceObject = nullptr;
   OpenGLPipeline* glPipeline = nullptr;
   OpenGLTexture* glTexture = nullptr;
   OpenGLTexture* glNormalMap = nullptr;
 
-  static OpenGLTexture* getOpenGLTexture(const Texture* texture, GLenum unit);
+  static OpenGLPipeline* createOpenGLPipeline(const Object* object);
+  static OpenGLTexture* createOpenGLTexture(const Texture* texture, GLenum unit);
 };

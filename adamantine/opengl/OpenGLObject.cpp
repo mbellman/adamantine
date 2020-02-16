@@ -5,21 +5,15 @@
 
 OpenGLObject::OpenGLObject(const Object* object) {
   sourceObject = object;
-  glPipeline = new OpenGLPipeline();
-
-  glPipeline->createFromObject(object);
+  glPipeline = OpenGLObject::createOpenGLPipeline(object);
 
   if (object->texture != nullptr) {
-    glTexture = OpenGLObject::getOpenGLTexture(object->texture, GL_TEXTURE0 + 6);
+    glTexture = OpenGLObject::createOpenGLTexture(object->texture, GL_TEXTURE0 + 6);
   }
 
   if (object->normalMap != nullptr) {
-    glNormalMap = OpenGLObject::getOpenGLTexture(object->normalMap, GL_TEXTURE0 + 7);
+    glNormalMap = OpenGLObject::createOpenGLTexture(object->normalMap, GL_TEXTURE0 + 7);
   }
-}
-
-OpenGLObject::~OpenGLObject() {
-  delete glPipeline;
 }
 
 void OpenGLObject::bind() {
@@ -34,15 +28,22 @@ void OpenGLObject::bind() {
   }
 }
 
-void OpenGLObject::freeTextureCache() {
-  for (auto [ key, glTexture ] : textureMap) {
-    delete glTexture;
-  }
+OpenGLPipeline* OpenGLObject::createOpenGLPipeline(const Object* object) {
+  int referenceId = object->getReference()->id;
 
-  textureMap.clear();
+  if (OpenGLObject::pipelineMap.find(referenceId) != OpenGLObject::pipelineMap.end()) {
+    return OpenGLObject::pipelineMap.at(referenceId);
+  } else {
+    auto* pipeline = new OpenGLPipeline();
+
+    pipeline->createFromObject(object->getReference());
+    pipelineMap.emplace(referenceId, pipeline);
+
+    return pipeline;
+  }
 }
 
-OpenGLTexture* OpenGLObject::getOpenGLTexture(const Texture* texture, GLenum unit) {
+OpenGLTexture* OpenGLObject::createOpenGLTexture(const Texture* texture, GLenum unit) {
   int id = texture->getId();
 
   if (OpenGLObject::textureMap.find(id) != OpenGLObject::textureMap.end()) {
@@ -54,6 +55,19 @@ OpenGLTexture* OpenGLObject::getOpenGLTexture(const Texture* texture, GLenum uni
 
     return openGLTexture;
   }
+}
+
+void OpenGLObject::freeCachedResources() {
+  for (auto [ key, glTexture ] : textureMap) {
+    delete glTexture;
+  }
+
+  for (auto [ key, glPipeline ] : pipelineMap) {
+    delete glPipeline;
+  }
+
+  textureMap.clear();
+  pipelineMap.clear();
 }
 
 const Object* OpenGLObject::getSourceObject() const {
@@ -74,4 +88,5 @@ void OpenGLObject::render() {
   glPipeline->render();
 }
 
+std::map<int, OpenGLPipeline*> OpenGLObject::pipelineMap;
 std::map<int, OpenGLTexture*> OpenGLObject::textureMap;

@@ -124,6 +124,10 @@ const std::vector<Polygon*>& Object::getPolygons() const {
   return polygons;
 }
 
+const Object* Object::getReference() const {
+  return reference;
+}
+
 void Object::recomputeMatrix() {
   matrix = (
     Matrix4::translate({ position.x, position.y, -1.0f * position.z }) *
@@ -154,6 +158,10 @@ void Object::setPosition(const Vec3f& position) {
   this->position = position;
 
   recomputeMatrix();
+}
+
+void Object::setReference(const Object* reference) {
+  this->reference = reference;
 }
 
 void Object::setScale(float scale) {
@@ -370,6 +378,10 @@ Model::Model(const ObjLoader& loader) {
   }
 
   updateNormals();
+}
+
+Model::Model(const Model* reference) {
+  setReference(reference);
 }
 
 void Model::buildTexturedModel(const ObjLoader& loader) {

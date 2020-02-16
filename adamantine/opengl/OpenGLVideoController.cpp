@@ -42,14 +42,13 @@ OpenGLVideoController::~OpenGLVideoController() {
   glObjects.clear();
   glShadowCasters.clear();
 
-  OpenGLObject::freeTextureCache();
+  OpenGLObject::freeCachedResources();
 }
 
 OpenGLObject* OpenGLVideoController::createOpenGLObject(Object* object) {
   auto* glObject = new OpenGLObject(object);
 
   glObject->bind();
-
   gBuffer->getShaderProgram(GBuffer::Shader::GEOMETRY).bindVertexInputs();
   gBuffer->getShaderProgram(GBuffer::Shader::LIGHT_VIEW).bindVertexInputs();
 
@@ -185,11 +184,15 @@ void OpenGLVideoController::onEntityRemoved(Entity* entity) {
       if (glObject->getSourceObject() == object) {
         glObjects.erase(glObjects.begin() + index);
 
+        delete glObject;
+
         break;
       }
 
       index++;
     }
+  } else if (entity->isOfType<Light>() && ((Light*)entity)->canCastShadows) {
+    // TODO: remove entry from glShadowCasters
   }
 }
 

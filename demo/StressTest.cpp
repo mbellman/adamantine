@@ -5,22 +5,25 @@
 #include "subsystem/RNG.h"
 
 void StressTest::addObjects() {
-  ObjLoader bunnyObj("./demo/bunny-high-res.obj");
-
   auto* sandNormalMap = new Texture("./demo/sand-normal-map.png");
 
   assets.addTexture(sandNormalMap);
+
+  ObjLoader bunnyObj("./demo/bunny-high-res.obj");
+
+  auto* referenceBunny = new Model(bunnyObj);
+
+  referenceBunny->setColor(Vec3f(1.0f, 0.75f, 0.1f));
 
   for (int x = -3; x <= 3; x++) {
     for (int z = -3; z <= 3; z++) {
       Vec3f bunnyPosition = Vec3f(x * 100.0f, 0.0f, z * 100.0f) + Vec3f(0.0f, 0.0f, 750.0f);
       Vec3f lightPosition = bunnyPosition + Vec3f(0.0f, 100.0f, 0.0f);
 
-      auto* bunny = new Model(bunnyObj);
+      auto* bunny = new Model(referenceBunny);
 
       bunny->setPosition(bunnyPosition);
       bunny->setScale(30.0f);
-      bunny->setColor(Vec3f(1.0f, 0.75f, 0.1f));
 
       bunny->onUpdate = [=](float dt) {
         bunny->rotate({ 0.0f, dt, 0.0f });

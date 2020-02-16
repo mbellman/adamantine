@@ -62,10 +62,12 @@ public:
 
   const Matrix4& getMatrix() const;
   const std::vector<Polygon*>& getPolygons() const;
+  const Object* getReference() const;
   void rotate(const Vec3f& rotation);
   void setColor(const Vec3f& color);
   void setOrientation(const Vec3f& orientation);
   void setPosition(const Vec3f& position);
+  void setReference(const Object* reference);
   void setScale(float scale);
 
 protected:
@@ -80,6 +82,9 @@ protected:
   void addVertex(const Vec3f& position, const Vec3f& color, const Vec2f& uv);
   void recomputeMatrix();
   void updateNormals();
+
+private:
+  const Object* reference = this;
 };
 
 class Mesh : public Object {
@@ -115,6 +120,7 @@ private:
 class Model : public Object {
 public:
   Model(const ObjLoader& loader);
+  Model(const Model* reference);
 
 private:
   void buildTexturedModel(const ObjLoader& loader);
