@@ -6,10 +6,20 @@
 
 void StressTest::addObjects() {
   auto* sandNormalMap = new Texture("./demo/sand-normal-map.png");
+  auto* skyTexture = new Texture("./demo/sea-skybox.png");
 
   assets.addTexture(sandNormalMap);
+  assets.addTexture(skyTexture);
 
-  ObjLoader bunnyObj("./demo/bunny-high-res.obj");
+  auto* skybox = new Skybox(skyTexture, 5000.0f);
+
+  skybox->onUpdate = [=](float dt) {
+    skybox->setPosition(camera.position);
+  };
+
+  stage.add(skybox);
+
+  ObjLoader bunnyObj("./demo/bunny-low-res.obj");
 
   auto* referenceBunny = new Model(bunnyObj);
 
@@ -23,7 +33,7 @@ void StressTest::addObjects() {
       auto* bunny = new Model(referenceBunny);
 
       bunny->setPosition(bunnyPosition);
-      bunny->setScale(30.0f);
+      bunny->setScale(20.0f);
 
       bunny->onUpdate = [=](float dt) {
         bunny->rotate({ 0.0f, dt, 0.0f });
@@ -33,13 +43,15 @@ void StressTest::addObjects() {
     }
   }
 
-  auto* mesh = new Mesh(2, 2, 500.0f);
+  ObjLoader terrainObj("./demo/terrain.obj");
 
-  mesh->setPosition(Vec3f(0.0f, -25.0f, 750.0f));
-  mesh->setColor(Vec3f(1.0f));
-  mesh->normalMap = sandNormalMap;
+  auto* terrain = new Model(terrainObj);
 
-  stage.add(mesh);
+  terrain->setColor({ 0.1f, 1.0f, 0.15f });
+  terrain->setPosition(Vec3f(0.0f, -300.0f, 750.0f));
+  terrain->setScale(1000.0f);
+
+  stage.add(terrain);
 }
 
 void StressTest::addLights() {

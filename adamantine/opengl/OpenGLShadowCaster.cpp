@@ -33,5 +33,5 @@ Matrix4 OpenGLShadowCaster::getLightMatrixCascade(int cascadeIndex, const Camera
 const float OpenGLShadowCaster::cascadeSizes[3][2] = {
   { 100.0f, 1000.0f },
   { 300.0f, 3000.0f },
-  { 1500.0f, 5000.0f }
+  { 1000.0f, 5000.0f }
 };
