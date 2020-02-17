@@ -1,10 +1,10 @@
-#include "StressTest.h"
+#include "StressTestScene.h"
 #include "subsystem/Entities.h"
 #include "subsystem/ObjLoader.h"
 #include "subsystem/Math.h"
 #include "subsystem/RNG.h"
 
-void StressTest::addObjects() {
+void StressTestScene::addObjects() {
   auto* sandNormalMap = new Texture("./demo/sand-normal-map.png");
   auto* skyTexture = new Texture("./demo/sea-skybox.png");
 
@@ -54,7 +54,7 @@ void StressTest::addObjects() {
   stage.add(terrain);
 }
 
-void StressTest::addLights() {
+void StressTestScene::addLights() {
   auto* light = new Light();
 
   light->type = Light::LightType::DIRECTIONAL;
@@ -65,7 +65,7 @@ void StressTest::addLights() {
   stage.add(light);
 }
 
-void StressTest::onInit() {
+void StressTestScene::onInit() {
   addObjects();
   addLights();
 
@@ -89,7 +89,7 @@ void StressTest::onInit() {
   });
 }
 
-void StressTest::onUpdate(float dt) {
+void StressTestScene::onUpdate(float dt) {
   if (inputSystem.isKeyHeld(Key::W)) {
     camera.position += camera.getDirection() * 100.0f * dt;
   }

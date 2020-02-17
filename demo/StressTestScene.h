@@ -2,7 +2,7 @@
 
 #include "subsystem/AbstractScene.h"
 
-class StressTest : public AbstractScene {
+class StressTestScene : public AbstractScene {
 public:
   void onInit() override;
   void onUpdate(float dt) override;

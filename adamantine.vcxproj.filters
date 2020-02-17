@@ -99,7 +99,10 @@
     <ClCompile Include="demo\LightRoomScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="demo\StressTest.cpp">
+    <ClCompile Include="demo\StressTestScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="demo\PalaceScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -224,7 +227,10 @@
     <ClInclude Include="demo\LightRoomScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="demo\StressTest.h">
+    <ClInclude Include="demo\StressTestScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="demo\PalaceScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
