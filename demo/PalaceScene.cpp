@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "PalaceScene.h"
 #include "subsystem/Texture.h"
 #include "subsystem/Entities.h"
@@ -8,18 +10,46 @@ void PalaceScene::addLights() {
 
   light->type = Light::LightType::DIRECTIONAL;
   light->color = Vec3f(0.1f, 0.5f, 1.0f);
-  light->direction = Vec3f(1.0f, -1.0f, 1.0f);
+  light->direction = Vec3f(0.5f, -0.5f, 1.0f);
   light->canCastShadows = true;
 
   auto* light2 = new Light();
 
   light2->type = Light::LightType::DIRECTIONAL;
   light2->color = Vec3f(1.0f, 0.5f, 1.0f);
-  light2->direction = Vec3f(-1.0f, -1.0f, -1.0f);
+  light2->direction = Vec3f(-0.5f, -1.0f, 0.5f);
   light2->canCastShadows = true;
 
   stage.add(light);
   stage.add(light2);
+
+  ObjLoader ballObj("./demo/ball.obj");
+
+  auto* ball = new Model(ballObj);
+
+  ball->setColor(Vec3f(1.0f, 0.8f, 0.0f));
+
+  for (int i = 0; i < 5; i++) {
+    for (int j = 0; j < 8; j++) {
+      constexpr static float TAU = 3.141592f * 2.0f;
+      auto* light = new Light();
+      float p = j / 8.0f;
+      Vec3f center = Vec3f(0.0f, (i + 1) * 25.0f, 300.0f);
+
+      light->color = Vec3f(1.0f, 0.8f, 0.1f);
+      light->position = center + Vec3f(sinf(p * TAU), 0.0f, cosf(p * TAU)) * (95.0f - i * 10.0f);
+      light->radius = 150.0f;
+
+      auto* lightBall = new Model(ball);
+
+      lightBall->setPosition(light->position);
+      lightBall->setScale(2.0f);
+      lightBall->isEmissive = true;
+
+      stage.add(light);
+      stage.add(lightBall);
+    }
+  }
 }
 
 void PalaceScene::addObjects() {
@@ -38,8 +68,14 @@ void PalaceScene::addObjects() {
   pagoda->setPosition({ 0.0f, 0.0f, 300.0f });
   pagoda->setColor(Vec3f(0.5f));
 
+  auto* mesh = new Mesh(4, 4, 100.0f);
+
+  mesh->setColor(Vec3f(0.2f));
+  mesh->setPosition({ 0.0f, -50.0f, 300.0f });
+
   stage.add(skybox);
   stage.add(pagoda);
+  stage.add(mesh);
   assets.addTexture(skyTexture);
 }
 
