@@ -34,10 +34,10 @@ void PalaceScene::addLights() {
       constexpr static float TAU = 3.141592f * 2.0f;
       auto* light = new Light();
       float p = j / 8.0f;
-      Vec3f center = Vec3f(0.0f, (i + 1) * 25.0f, 300.0f);
+      Vec3f center = Vec3f(0.0f, (i + 1) * 30.0f, 300.0f);
 
       light->color = Vec3f(1.0f, 0.8f, 0.1f);
-      light->position = center + Vec3f(sinf(p * TAU), 0.0f, cosf(p * TAU)) * (95.0f - i * 10.0f);
+      light->position = center + Vec3f(sinf(p * TAU), 0.0f, cosf(p * TAU)) * (110.0f - i * 7.0f);
       light->radius = 150.0f;
 
       auto* lightBall = new Model(ball);
@@ -62,11 +62,15 @@ void PalaceScene::addObjects() {
 
   ObjLoader pagodaObj("./demo/pagoda.obj");
 
+  auto* pagodaTexture = new Texture("./demo/pagoda-texture.png");
   auto* pagoda = new Model(pagodaObj);
 
   pagoda->setScale(100.0f);
   pagoda->setPosition({ 0.0f, 0.0f, 300.0f });
   pagoda->setColor(Vec3f(0.5f));
+  pagoda->texture = pagodaTexture;
+
+  assets.addTexture(pagodaTexture);
 
   auto* mesh = new Mesh(4, 4, 100.0f);
 
