@@ -176,6 +176,7 @@
     <ClInclude Include="adamantine\subsystem\Entities.h" />
     <ClInclude Include="adamantine\subsystem\FileLoader.h" />
     <ClInclude Include="adamantine\subsystem\Geometry.h" />
+    <ClInclude Include="adamantine\subsystem\HeapList.h" />
     <ClInclude Include="adamantine\subsystem\InputSystem.h" />
     <ClInclude Include="adamantine\subsystem\Math.h" />
     <ClInclude Include="adamantine\subsystem\ObjLoader.h" />

@@ -1,7 +1,7 @@
+#include <algorithm>
+
 #include "subsystem/AbstractScene.h"
 #include "subsystem/RNG.h"
-
-#include <cstdio>
 
 AbstractScene::AbstractScene() {
   RNG::seed();
@@ -38,17 +38,25 @@ void AbstractScene::onUpdate(float dt) {}
 void AbstractScene::update(float dt) {
   onUpdate(dt);
 
-  for (auto* object : stage.getObjects()) {
-    if (object->onUpdate) {
-      object->onUpdate(dt);
+  auto updateEntity = [=](Entity* entity) {
+    if (entity->onUpdate) {
+      entity->onUpdate(dt);
     }
+
+    if (entity->lifetime > 0.0f) {
+      entity->lifetime = std::max(entity->lifetime - dt, 0.0f);
+    }
+  };
+
+  for (auto* object : stage.getObjects()) {
+    updateEntity(object);
   }
 
   for (auto* light : stage.getLights()) {
-    if (light->onUpdate) {
-      light->onUpdate(dt);
-    }
+    updateEntity(light);
   }
+
+  stage.removeExpiredEntities();
 
   runningTime += dt;
 }

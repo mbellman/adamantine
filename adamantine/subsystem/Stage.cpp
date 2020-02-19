@@ -1,20 +1,18 @@
 #include <algorithm>
+#include <cstdio>
 
 #include "subsystem/Stage.h"
 
 Stage::~Stage() {
-  for (auto* object : objects) {
-    delete object;
-  }
-
-  objects.clear();
+  objects.free();
+  lights.free();
 }
 
 void Stage::add(Entity* entity) {
   if (entity->isOfType<Object>()) {
-    objects.push_back((Object*)entity);
+    objects.push((Object*)entity);
   } else if (entity->isOfType<Light>()) {
-    lights.push_back((Light*)entity);
+    lights.push((Light*)entity);
   }
 
   if (entityAddedHandler) {
@@ -22,11 +20,11 @@ void Stage::add(Entity* entity) {
   }
 }
 
-const std::vector<Light*>& Stage::getLights() const {
+const HeapList<Light>& Stage::getLights() const {
   return lights;
 }
 
-const std::vector<Object*>& Stage::getObjects() const {
+const HeapList<Object>& Stage::getObjects() const {
   return objects;
 }
 
@@ -51,13 +49,32 @@ void Stage::onEntityRemoved(EntityHandler handler) {
 }
 
 void Stage::remove(Entity* entity) {
-  if (entity->isOfType<Object>()) {
-    objects.erase(std::remove(objects.begin(), objects.end(), entity), objects.end());
-  } else if (entity->isOfType<Light>()) {
-    lights.erase(std::remove(lights.begin(), lights.end(), entity), lights.end());
-  }
-
   if (entityRemovedHandler) {
     entityRemovedHandler(entity);
   }
+
+  if (entity->isOfType<Object>()) {
+    objects.remove((Object*)entity);
+  } else if (entity->isOfType<Light>()) {
+    lights.remove((Light*)entity);
+  }
+}
+
+void Stage::removeExpiredEntities() {
+  auto removeExpired = [=](auto& list) {
+    unsigned int i = 0;
+
+    while (i < list.length()) {
+      auto* item = list[i];
+
+      if (item->lifetime == 0.0f) {
+        remove(item);
+      } else {
+        i++;
+      }
+    }
+  };
+
+  removeExpired(objects);
+  removeExpired(lights);
 }

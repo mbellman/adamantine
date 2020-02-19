@@ -26,21 +26,9 @@ OpenGLVideoController::OpenGLVideoController() {
 }
 
 OpenGLVideoController::~OpenGLVideoController() {
-  for (auto* glObject : glObjects) {
-    delete glObject;
-  }
-
-  for (auto* shader : screenShaders) {
-    delete shader;
-  }
-
-  for (auto* glShadowCaster : glShadowCasters) {
-    delete glShadowCaster;
-  }
-
-  screenShaders.clear();
-  glObjects.clear();
-  glShadowCasters.clear();
+  screenShaders.free();
+  glObjects.free();
+  glShadowCasters.free();
 
   OpenGLObject::freeCachedResources();
 }
@@ -138,10 +126,10 @@ void OpenGLVideoController::createScreenShaders() {
   postBloomShaderH->createFrameBuffer(screenSize);
   postBloomShaderV->createFrameBuffer(screenSize);
 
-  screenShaders.push_back(dofShader);
-  screenShaders.push_back(preBloomShader);
-  screenShaders.push_back(postBloomShaderH);
-  screenShaders.push_back(postBloomShaderV);
+  screenShaders.push(dofShader);
+  screenShaders.push(preBloomShader);
+  screenShaders.push(postBloomShaderH);
+  screenShaders.push(postBloomShaderV);
 }
 
 Matrix4 OpenGLVideoController::createViewMatrix() {
@@ -165,34 +153,21 @@ void OpenGLVideoController::onDestroy() {
 
 void OpenGLVideoController::onEntityAdded(Entity* entity) {
   if (entity->isOfType<Object>()) {
-    auto* glObject = createOpenGLObject((Object*)entity);
-
-    glObjects.push_back(glObject);
+    glObjects.push(createOpenGLObject((Object*)entity));
   } else if (entity->isOfType<Light>() && ((Light*)entity)->canCastShadows) {
-    auto* glShadowCaster = new OpenGLShadowCaster((Light*)entity);
-
-    glShadowCasters.push_back(glShadowCaster);
+    glShadowCasters.push(new OpenGLShadowCaster((Light*)entity));
   }
 }
 
 void OpenGLVideoController::onEntityRemoved(Entity* entity) {
   if (entity->isOfType<Object>()) {
-    const auto* object = (Object*)entity;
-    int index = 0;
-
-    for (auto* glObject : glObjects) {
-      if (glObject->getSourceObject() == object) {
-        glObjects.erase(glObjects.begin() + index);
-
-        delete glObject;
-
-        break;
-      }
-
-      index++;
-    }
+    glObjects.removeWhere([=](OpenGLObject* glObject) {
+      return glObject->getSourceObject() == entity;
+    });
   } else if (entity->isOfType<Light>() && ((Light*)entity)->canCastShadows) {
-    // TODO: remove entry from glShadowCasters
+    glShadowCasters.removeWhere([=](OpenGLShadowCaster* glShadowCaster) {
+      return glShadowCaster->getLight() == entity;
+    });
   }
 }
 
@@ -335,7 +310,7 @@ void OpenGLVideoController::renderIlluminatedSurfaces() {
   glStencilFunc(GL_EQUAL, 1, 0xFF);
 
   auto& lights = scene->getStage().getLights();
-  int totalLights = lights.size() - scene->getStage().getTotalShadowCasters();
+  int totalLights = lights.length() - scene->getStage().getTotalShadowCasters();
 
   illuminationProgram.setInt("colorTexture", 0);
   illuminationProgram.setInt("normalDepthTexture", 1);
@@ -363,8 +338,8 @@ void OpenGLVideoController::renderIlluminatedSurfaces() {
 void OpenGLVideoController::renderScreenShaders() {
   glDisable(GL_STENCIL_TEST);
 
-  for (int i = 0; i < screenShaders.size(); i++) {
-    bool isFinalShader = i == screenShaders.size() - 1;
+  for (int i = 0; i < screenShaders.length(); i++) {
+    bool isFinalShader = i == screenShaders.length() - 1;
 
     if (isFinalShader) {
       glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);

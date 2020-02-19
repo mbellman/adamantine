@@ -12,6 +12,7 @@
 #include "opengl/GBuffer.h"
 #include "subsystem/Geometry.h"
 #include "subsystem/Entities.h"
+#include "subsystem/HeapList.h"
 #include "glut.h"
 
 class OpenGLVideoController final : public AbstractVideoController {
@@ -28,9 +29,9 @@ public:
 private:
   SDL_GLContext glContext;
   GBuffer* gBuffer = nullptr;
-  std::vector<ScreenShader*> screenShaders;
-  std::vector<OpenGLObject*> glObjects;
-  std::vector<OpenGLShadowCaster*> glShadowCasters;
+  HeapList<ScreenShader> screenShaders;
+  HeapList<OpenGLObject> glObjects;
+  HeapList<OpenGLShadowCaster> glShadowCasters;
 
   OpenGLObject* createOpenGLObject(Object* object);
   void createScreenShaders();

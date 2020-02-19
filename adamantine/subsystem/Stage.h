@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "subsystem/Entities.h"
+#include "subsystem/HeapList.h"
 
 typedef std::function<void(Entity*)> EntityHandler;
 
@@ -21,16 +22,17 @@ public:
     add(entity);
   }
 
-  const std::vector<Light*>& getLights() const;
-  const std::vector<Object*>& getObjects() const;
+  const HeapList<Light>& getLights() const;
+  const HeapList<Object>& getObjects() const;
   int getTotalShadowCasters() const;
   void onEntityAdded(EntityHandler handler);
   void onEntityRemoved(EntityHandler handler);
   void remove(Entity* entity);
+  void removeExpiredEntities();
 
 private:
-  std::vector<Object*> objects;
-  std::vector<Light*> lights;
+  HeapList<Object> objects;
+  HeapList<Light> lights;
   EntityHandler entityAddedHandler = nullptr;
   EntityHandler entityRemovedHandler = nullptr;
 };

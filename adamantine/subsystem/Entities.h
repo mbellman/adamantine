@@ -16,7 +16,10 @@ struct Entity {
   int id;
   Vec3f position;
   Vec3f orientation;
+  float lifetime = -1.0f;
   std::function<void(float)> onUpdate = nullptr;
+
+  bool isExpired() const;
 
   template<typename T>
   bool isOfType() {

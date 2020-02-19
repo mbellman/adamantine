@@ -16,6 +16,10 @@ Entity::Entity() {
   id = Entity::total++;
 }
 
+bool Entity::isExpired() const {
+  return lifetime == 0.0f;
+}
+
 int Entity::total = 0;
 
 /**
