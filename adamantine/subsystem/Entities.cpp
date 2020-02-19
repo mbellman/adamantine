@@ -186,7 +186,7 @@ void Object::updateNormals() {
  * Mesh
  * ----
  */
-Mesh::Mesh(int w, int h, float tileSize) {
+void Mesh::create(int w, int h, float tileSize) {
   width = w;
   height = h;
 
@@ -305,7 +305,7 @@ int Cube::faces[6][4] = {
  * Skybox
  * ------
  */
-Skybox::Skybox(const Texture* texture, float size) {
+void Skybox::from(const Texture* texture) {
   this->texture = texture;
   this->isEmissive = true;
 
@@ -326,7 +326,6 @@ Skybox::Skybox(const Texture* texture, float size) {
   addPolygon(9, 5, 3);
   addPolygon(8, 13, 11);
 
-  setScale(size);
   updateNormals();
 }
 
@@ -368,7 +367,7 @@ Vec2f Skybox::uvs[14] = {
  * Model
  * -----
  */
-Model::Model(const ObjLoader& loader) {
+void Model::from(const ObjLoader& loader) {
   bool hasTextureData = loader.textureCoordinates.size() > 0;
 
   if (hasTextureData) {
@@ -380,7 +379,7 @@ Model::Model(const ObjLoader& loader) {
   updateNormals();
 }
 
-Model::Model(const Model* reference) {
+void Model::from(const Model* reference) {
   setReference(reference);
 }
 

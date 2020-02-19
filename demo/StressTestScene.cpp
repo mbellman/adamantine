@@ -11,7 +11,10 @@ void StressTestScene::addObjects() {
   assets.addTexture(sandNormalMap);
   assets.addTexture(skyTexture);
 
-  auto* skybox = new Skybox(skyTexture, 5000.0f);
+  auto* skybox = new Skybox();
+
+  skybox->from(skyTexture);
+  skybox->setScale(5000.0f);
 
   skybox->onUpdate = [=](float dt) {
     skybox->setPosition(camera.position);
@@ -21,8 +24,9 @@ void StressTestScene::addObjects() {
 
   ObjLoader bunnyObj("./demo/bunny-low-res.obj");
 
-  auto* referenceBunny = new Model(bunnyObj);
+  auto* referenceBunny = new Model();
 
+  referenceBunny->from(bunnyObj);
   referenceBunny->setColor(Vec3f(1.0f, 0.75f, 0.1f));
 
   for (int x = -3; x <= 3; x++) {
@@ -30,8 +34,9 @@ void StressTestScene::addObjects() {
       Vec3f bunnyPosition = Vec3f(x * 100.0f, 0.0f, z * 100.0f) + Vec3f(0.0f, 0.0f, 750.0f);
       Vec3f lightPosition = bunnyPosition + Vec3f(0.0f, 100.0f, 0.0f);
 
-      auto* bunny = new Model(referenceBunny);
+      auto* bunny = new Model();
 
+      bunny->from(referenceBunny);
       bunny->setPosition(bunnyPosition);
       bunny->setScale(20.0f);
 
@@ -45,8 +50,9 @@ void StressTestScene::addObjects() {
 
   ObjLoader terrainObj("./demo/terrain.obj");
 
-  auto* terrain = new Model(terrainObj);
+  auto* terrain = new Model();
 
+  terrain->from(terrainObj);
   terrain->setColor({ 0.1f, 1.0f, 0.15f });
   terrain->setPosition(Vec3f(0.0f, -300.0f, 750.0f));
   terrain->setScale(1000.0f);

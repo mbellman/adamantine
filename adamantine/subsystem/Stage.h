@@ -12,6 +12,15 @@ public:
   ~Stage();
 
   void add(Entity* entity);
+
+  template<typename T>
+  void add(std::function<void(T*)> handler) {
+    T* entity = new T();
+
+    handler(entity);
+    add(entity);
+  }
+
   const std::vector<Light*>& getLights() const;
   const std::vector<Object*>& getObjects() const;
   int getTotalShadowCasters() const;

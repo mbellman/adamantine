@@ -66,27 +66,33 @@ void LightRoomScene::addLights() {
 void LightRoomScene::addObjects() {
   constexpr float PI = 3.141592;
 
-  auto* bottom = new Mesh(1, 1, 400.0f);
-  auto* top = new Mesh(1, 1, 400.0f);
-  auto* left = new Mesh(1, 1, 400.0f);
-  auto* right = new Mesh(1, 1, 400.0f);
-  auto* front = new Mesh(1, 1, 400.0f);
-  auto* back = new Mesh(1, 1, 400.0f);
+  auto* bottom = new Mesh();
+  auto* top = new Mesh();
+  auto* left = new Mesh();
+  auto* right = new Mesh();
+  auto* front = new Mesh();
+  auto* back = new Mesh();
 
+  bottom->create(1, 1, 400.0f);
   bottom->setPosition({ 0.0f, 0.0f, 0.0f });
 
+  top->create(1, 1, 400.0f);
   top->rotate({ PI, 0.0f, 0.0f });
   top->setPosition({ 0.0f, 400.0f, 0.0f });
 
+  left->create(1, 1, 400.0f);
   left->rotate({ 0.0f, 0.0f, -PI * 0.5f });
   left->setPosition({ -200.0f, 200.0f, 0.0f });
 
+  right->create(1, 1, 400.0f);
   right->rotate({ 0.0f, 0.0f, PI * 0.5f });
   right->setPosition({ 200.0f, 200.0f, 0.0f });
 
+  front->create(1, 1, 400.0f);
   front->rotate({ PI * 0.5f, 0.0f, 0.0f });
   front->setPosition({ 0.0f, 200.0f, 200.0f });
 
+  back->create(1, 1, 400.0f);
   back->rotate({ -PI * 0.5f, 0.0f, 0.0f });
   back->setPosition({ 0.0f, 200.0f, -200.0f });
 
@@ -111,8 +117,9 @@ void LightRoomScene::addObjects() {
 
     Vec3f position = Vec3f(x, 0.0f, z) * 100.0f;
 
-    auto* lantern = new Model(lanternObj);
+    auto* lantern = new Model();
 
+    lantern->from(lanternObj);
     lantern->setPosition(position);
     lantern->setScale(50.0f);
     lantern->setColor(Vec3f(0.5f));

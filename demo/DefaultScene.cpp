@@ -63,13 +63,14 @@ void DefaultScene::addLights() {
 }
 
 void DefaultScene::addObjects() {
-  auto* mesh = new Mesh(4, 4, 500.0f);
+  auto* mesh = new Mesh();
   auto* sandNormalMap = new Texture("./demo/sand-normal-map.png");
   auto* catTexture = new Texture("./demo/cat.png");
 
   assets.addTexture(catTexture);
   assets.addTexture(sandNormalMap);
 
+  mesh->create(4, 4, 500.0f);
   mesh->setPosition({ 0.0f, -20.0f, 0.0f });
   mesh->setColor({ 0.5f, 0.3f, 0.8f });
   mesh->normalMap = sandNormalMap;
@@ -121,8 +122,9 @@ void DefaultScene::addObjects() {
 
   ObjLoader daVinci("./demo/da-vinci.obj");
 
-  auto* model = new Model(daVinci);
+  auto* model = new Model();
 
+  model->from(daVinci);
   model->setScale(30.0f);
   model->setPosition({ 0.0f, 15.0f, 250.0f });
   model->setColor(Vec3f(0.75f));
@@ -148,8 +150,9 @@ void DefaultScene::addObjects() {
 
   ObjLoader teapot("./demo/teapot.obj");
 
-  auto* model2 = new Model(teapot);
+  auto* model2 = new Model();
 
+  model2->from(teapot);
   model2->setScale(15.0f);
   model2->setPosition({ 100.0f, 0.0f, 300.0f });
   model2->setColor({ 0.75f, 0.5f, 0.3f });
@@ -164,14 +167,16 @@ void DefaultScene::addObjects() {
 
   ObjLoader ball("./demo/ball.obj");
 
-  auto* model3 = new Model(ball);
+  auto* model3 = new Model();
 
+  model3->from(ball);
   model3->setScale(10.0f);
   model3->setPosition({ 80.0f, 10.0f, 200.0f });
   model3->setColor({ 0.6f, 0.1f, 0.3f });
 
-  auto* lightBall = new Model(ball);
+  auto* lightBall = new Model();
 
+  lightBall->from(ball);
   lightBall->setScale(5.0f);
   lightBall->setPosition({ 100.0f, 10.0f, 225.0f });
   lightBall->setColor(Vec3f(1.0f));
@@ -200,8 +205,10 @@ void DefaultScene::onInit() {
   addObjects();
 
   auto* skyboxTexture = new Texture("./demo/sea-skybox.png");
-  auto* skybox = new Skybox(skyboxTexture, 5000.0f);
+  auto* skybox = new Skybox();
 
+  skybox->from(skyboxTexture);
+  skybox->setScale(5000.0f);
   skybox->setColor(Vec3f(1.0f));
 
   stage.add(skybox);

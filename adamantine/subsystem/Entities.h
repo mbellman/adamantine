@@ -89,8 +89,7 @@ private:
 
 class Mesh : public Object {
 public:
-  Mesh(int w, int h, float tileSize);
-
+  void create(int w, int h, float tileSize);
   void defineOffsets(std::function<void(Vec3f&, int, int)> offsetHandler);
 
 private:
@@ -110,7 +109,7 @@ private:
 
 class Skybox : public Object {
 public:
-  Skybox(const Texture* texture, float size);
+  void from(const Texture* texture);
 
 private:
   static Vec3f vertexPositions[14];
@@ -119,8 +118,8 @@ private:
 
 class Model : public Object {
 public:
-  Model(const ObjLoader& loader);
-  Model(const Model* reference);
+  void from(const ObjLoader& loader);
+  void from(const Model* reference);
 
 private:
   void buildTexturedModel(const ObjLoader& loader);
