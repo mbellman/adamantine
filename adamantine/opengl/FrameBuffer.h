@@ -11,6 +11,7 @@ struct ColorTexture {
   unsigned int format;
   GLuint id;
   GLuint attachment;
+  GLenum unit;
 };
 
 class FrameBuffer {
@@ -20,6 +21,7 @@ public:
 
   void addColorTexture(GLint internalFormat, GLenum format);
   void addColorTexture(GLint internalFormat, GLenum format, GLint clamp);
+  void addColorTexture(GLint internalFormat, GLenum format, GLint clamp, GLenum unit);
   void addDepthStencilBuffer();
   void bindColorTexture(GLenum attachment);
   void bindColorTextures();

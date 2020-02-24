@@ -128,7 +128,6 @@ void DefaultScene::addObjects() {
   model->setScale(30.0f);
   model->setPosition({ 0.0f, 15.0f, 250.0f });
   model->setColor(Vec3f(0.75f));
-  model->lifetime = 5.0f;
 
   model->onUpdate = [=](float dt) {
     model->rotate({ 0.0f, dt * 0.5f, 0.0f });
@@ -157,7 +156,6 @@ void DefaultScene::addObjects() {
   model2->setScale(15.0f);
   model2->setPosition({ 100.0f, 0.0f, 300.0f });
   model2->setColor({ 0.75f, 0.5f, 0.3f });
-  model2->lifetime = 8.0f;
 
   model2->onUpdate = [=](float dt) {
     model2->rotate({

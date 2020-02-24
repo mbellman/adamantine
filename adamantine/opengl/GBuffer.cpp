@@ -23,19 +23,16 @@ void GBuffer::clearLightViewBuffers() {
   frameBuffer->clearColorTexture(5);
 }
 
-void GBuffer::createFrameBuffer(int width, int height) {
+void GBuffer::createFrameBuffer(unsigned int width, unsigned int height) {
   if (frameBuffer != nullptr) {
     delete frameBuffer;
   }
 
   frameBuffer = new FrameBuffer(width, height);
 
-  frameBuffer->addColorTexture(GL_RGB32F, GL_RGB);     // (0) Color
-  frameBuffer->addColorTexture(GL_RGBA32F, GL_RGBA);   // (1) Normal/depth
-  frameBuffer->addColorTexture(GL_RGB32F, GL_RGB);     // (2) Position
-  frameBuffer->addColorTexture(GL_R32F, GL_RED);       // (3) Shadowcaster light view buffer, cascade 0
-  frameBuffer->addColorTexture(GL_R32F, GL_RED);       // (4) Shadowcaster light view buffer, cascade 1
-  frameBuffer->addColorTexture(GL_R32F, GL_RED);       // (5) Shadowcaster light view buffer, cascade 2
+  frameBuffer->addColorTexture(GL_RGB32F, GL_RGB, GL_CLAMP_TO_BORDER, GL_TEXTURE0);     // Color
+  frameBuffer->addColorTexture(GL_RGBA32F, GL_RGBA, GL_CLAMP_TO_BORDER, GL_TEXTURE1);   // Normal/depth
+  frameBuffer->addColorTexture(GL_RGB32F, GL_RGB, GL_CLAMP_TO_BORDER, GL_TEXTURE2);     // Position
   frameBuffer->addDepthStencilBuffer();
   frameBuffer->bindColorTextures();
 }
@@ -70,14 +67,6 @@ void GBuffer::createShaderPrograms() {
   illuminationProgram.use();
   illuminationProgram.setVertexInputs<float>(2, quadInputs);
 
-  // Light view program
-  lightViewProgram.create();
-  lightViewProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/lightview.vertex.glsl"));
-  lightViewProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/lightview.fragment.glsl"));
-  lightViewProgram.link();
-  lightViewProgram.use();
-  lightViewProgram.setVertexInputs<float>(5, geometryInputs);
-
   // Shadow caster program
   shadowCasterProgram.create();
   shadowCasterProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
@@ -95,18 +84,12 @@ void GBuffer::createShaderPrograms() {
   albedoProgram.setVertexInputs<float>(2, quadInputs);
 }
 
-FrameBuffer* GBuffer::getFrameBuffer() {
-  return frameBuffer;
-}
-
 ShaderProgram& GBuffer::getShaderProgram(GBuffer::Shader shader) {
   switch (shader) {
     case GBuffer::Shader::GEOMETRY:
       return geometryProgram;
     case GBuffer::Shader::ILLUMINATION:
       return illuminationProgram;
-    case GBuffer::Shader::LIGHT_VIEW:
-      return lightViewProgram;
     case GBuffer::Shader::SHADOW_CASTER:
       return shadowCasterProgram;
     case GBuffer::Shader::ALBEDO:
@@ -120,27 +103,6 @@ void GBuffer::renderScreenQuad() {
   glScreenQuad->render();
 }
 
-void GBuffer::startReading() {
-  frameBuffer->startReading();
-}
-
-void GBuffer::startWriting() {
-  frameBuffer->startWriting();
-}
-
-void GBuffer::useFirstShadowCascade() {
-  GLenum targets[] = {
-    GL_COLOR_ATTACHMENT0 + 4,
-    GL_COLOR_ATTACHMENT0 + 5
-  };
-
-  frameBuffer->transferColorTexture(GL_COLOR_ATTACHMENT0 + 3, targets, 2);
-}
-
 void GBuffer::writeToAllBuffers() {
   frameBuffer->bindColorTextures();
-}
-
-void GBuffer::writeToShadowCascade(int cascadeIndex) {
-  frameBuffer->bindColorTexture(GL_COLOR_ATTACHMENT0 + 3 + cascadeIndex);
 }

@@ -10,6 +10,7 @@
 #include "opengl/FrameBuffer.h"
 #include "opengl/ScreenShader.h"
 #include "opengl/GBuffer.h"
+#include "opengl/SBuffer.h"
 #include "subsystem/Geometry.h"
 #include "subsystem/Entities.h"
 #include "subsystem/HeapList.h"
@@ -29,11 +30,11 @@ public:
 private:
   SDL_GLContext glContext;
   GBuffer* gBuffer = nullptr;
+  SBuffer* sBuffer = nullptr;
   HeapList<ScreenShader> screenShaders;
   HeapList<OpenGLObject> glObjects;
   HeapList<OpenGLShadowCaster> glShadowCasters;
 
-  OpenGLObject* createOpenGLObject(Object* object);
   void createScreenShaders();
   Matrix4 createViewMatrix();
   void onEntityAdded(Entity* entity);

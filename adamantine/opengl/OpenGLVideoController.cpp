@@ -33,16 +33,6 @@ OpenGLVideoController::~OpenGLVideoController() {
   OpenGLObject::freeCachedResources();
 }
 
-OpenGLObject* OpenGLVideoController::createOpenGLObject(Object* object) {
-  auto* glObject = new OpenGLObject(object);
-
-  glObject->bind();
-  gBuffer->getShaderProgram(GBuffer::Shader::GEOMETRY).bindVertexInputs();
-  gBuffer->getShaderProgram(GBuffer::Shader::LIGHT_VIEW).bindVertexInputs();
-
-  return glObject;
-}
-
 void OpenGLVideoController::createScreenShaders() {
   auto* dofShader = new ScreenShader("./adamantine/shaders/dof.fragment.glsl");
   auto* preBloomShader = new ScreenShader("./adamantine/shaders/prebloom.fragment.glsl");
@@ -153,7 +143,13 @@ void OpenGLVideoController::onDestroy() {
 
 void OpenGLVideoController::onEntityAdded(Entity* entity) {
   if (entity->isOfType<Object>()) {
-    glObjects.push(createOpenGLObject((Object*)entity));
+    auto* glObject = new OpenGLObject((Object*)entity);
+
+    glObject->bind();
+    gBuffer->getShaderProgram(GBuffer::Shader::GEOMETRY).bindVertexInputs();
+    sBuffer->getLightViewProgram().bindVertexInputs();
+
+    glObjects.push(glObject);
   } else if (entity->isOfType<Light>() && ((Light*)entity)->canCastShadows) {
     glShadowCasters.push(new OpenGLShadowCaster((Light*)entity));
   }
@@ -186,8 +182,10 @@ void OpenGLVideoController::onInit() {
   SDL_GL_SetSwapInterval(0);
 
   gBuffer = new GBuffer();
+  sBuffer = new SBuffer();
 
   gBuffer->createFrameBuffer(screenSize.width, screenSize.height);
+  sBuffer->createFrameBuffer(2048, 2048);
 
   createScreenShaders();
 
@@ -233,6 +231,7 @@ void OpenGLVideoController::onScreenSizeChange(int width, int height) {
   glViewport(0, 0, width, height);
 
   gBuffer->createFrameBuffer(width, height);
+  sBuffer->createFrameBuffer(2048, 2048);
 
   for (auto* shader : screenShaders) {
     shader->createFrameBuffer({ 0, 0, width, height });
@@ -352,15 +351,14 @@ void OpenGLVideoController::renderScreenShaders() {
 }
 
 void OpenGLVideoController::renderShadowCasters() {
-  auto& lightViewProgram = gBuffer->getShaderProgram(GBuffer::Shader::LIGHT_VIEW);
+  auto& lightViewProgram = sBuffer->getLightViewProgram();
   auto& shadowCasterProgram = gBuffer->getShaderProgram(GBuffer::Shader::SHADOW_CASTER);
 
   for (auto* glShadowCaster : glShadowCasters) {
     // Shadowcaster light view pass
     lightViewProgram.use();
 
-    gBuffer->startWriting();
-    gBuffer->clearLightViewBuffers();
+    sBuffer->startWriting();
 
     const Camera& camera = scene->getCamera();
     auto* light = glShadowCaster->getLight();
@@ -382,7 +380,7 @@ void OpenGLVideoController::renderShadowCasters() {
     for (int i = 0; i < totalCascades; i++) {
       glClear(GL_DEPTH_BUFFER_BIT);
 
-      gBuffer->writeToShadowCascade(i);
+      sBuffer->writeToShadowCascade(i);
       lightViewProgram.setMatrix4("lightMatrix", lightMatrixCascades[i]);
 
       for (auto* glObject : glObjects) {
@@ -392,11 +390,12 @@ void OpenGLVideoController::renderShadowCasters() {
     }
 
     if (!isDirectionalLight) {
-      gBuffer->useFirstShadowCascade();
+      sBuffer->useFirstShadowCascade();
     }
 
     // Camera view shadowcaster lighting pass
     screenShaders[0]->startWriting();
+    sBuffer->startReading();
     gBuffer->startReading();
 
     glDisable(GL_DEPTH_TEST);

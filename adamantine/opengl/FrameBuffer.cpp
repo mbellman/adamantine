@@ -19,11 +19,16 @@ void FrameBuffer::addColorTexture(GLint internalFormat, GLenum format) {
 }
 
 void FrameBuffer::addColorTexture(GLint internalFormat, GLenum format, GLint clamp) {
+  addColorTexture(internalFormat, format, clamp, GL_TEXTURE0 + colorTextures.size());
+}
+
+void FrameBuffer::addColorTexture(GLint internalFormat, GLenum format, GLint clamp, GLenum unit) {
   ColorTexture texture;
 
   texture.internalFormat = internalFormat;
   texture.format = format;
   texture.attachment = GL_COLOR_ATTACHMENT0 + colorTextures.size();
+  texture.unit = unit;
 
   float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -78,7 +83,7 @@ void FrameBuffer::shareDepthStencilBuffer(FrameBuffer* target) {
 
 void FrameBuffer::startReading() {
   for (int i = 0; i < colorTextures.size(); i++) {
-    glActiveTexture(GL_TEXTURE0 + i);
+    glActiveTexture(colorTextures[i].unit);
     glBindTexture(GL_TEXTURE_2D, colorTextures[i].id);
   }
 
@@ -87,6 +92,7 @@ void FrameBuffer::startReading() {
 
 void FrameBuffer::startWriting() {
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+  glViewport(0, 0, size.width, size.height);
 }
 
 void FrameBuffer::transferColorTexture(GLenum source, const GLenum* targets, int size) {

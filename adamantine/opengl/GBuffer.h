@@ -2,17 +2,17 @@
 
 #include <map>
 
+#include "opengl/AbstractBuffer.h"
 #include "opengl/FrameBuffer.h"
 #include "opengl/OpenGLPipeline.h"
 #include "opengl/ShaderProgram.h"
 #include "subsystem/Math.h"
 
-class GBuffer {
+class GBuffer : public AbstractBuffer {
 public:
   enum Shader {
     GEOMETRY,
     ILLUMINATION,
-    LIGHT_VIEW,
     SHADOW_CASTER,
     ALBEDO
   };
@@ -21,24 +21,18 @@ public:
   ~GBuffer();
 
   void clearLightViewBuffers();
-  void createFrameBuffer(int width, int height);
-  FrameBuffer* getFrameBuffer();
+  void createFrameBuffer(unsigned int width, unsigned int height) override;
   ShaderProgram& getShaderProgram(GBuffer::Shader shader);
   void renderScreenQuad();
-  void startReading();
-  void startWriting();
-  void useFirstShadowCascade();
   void writeToAllBuffers();
-  void writeToShadowCascade(int cascadeIndex);
+
+protected:
+  void createShaderPrograms() override;
 
 private:
   ShaderProgram geometryProgram;
   ShaderProgram illuminationProgram;
-  ShaderProgram lightViewProgram;
   ShaderProgram shadowCasterProgram;
   ShaderProgram albedoProgram;
-  FrameBuffer* frameBuffer = nullptr;
   OpenGLPipeline* glScreenQuad = nullptr;
-
-  void createShaderPrograms();
 };
