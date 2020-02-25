@@ -37,7 +37,7 @@ void PalaceScene::addLights() {
       stage.add<Light>([=](auto* light) {
         light->color = Vec3f(1.0f, 0.8f, 0.1f);
         light->position = position;
-        light->radius = 150.0f;
+        light->radius = 500.0f;
       });
 
       stage.add<Model>([=](Model* lightBall) {
@@ -60,14 +60,24 @@ void PalaceScene::addObjects() {
     };
   });
 
-  ObjLoader pagodaObj("./demo/pagoda.obj");
+  ObjLoader pagodaBaseObj("./demo/pagoda-base.obj");
+  ObjLoader pagodaRoofObj("./demo/pagoda-roof.obj");
 
-  stage.add<Model>([&](Model* pagoda) {
-    pagoda->from(pagodaObj);
-    pagoda->setScale(100.0f);
-    pagoda->setPosition({ 0.0f, 0.0f, 300.0f });
-    pagoda->setColor(Vec3f(0.5f));
-    pagoda->texture = assets.createTexture("./demo/pagoda-texture.png");
+  stage.add<Model>([&](Model* pagodaBase) {
+    pagodaBase->from(pagodaBaseObj);
+    pagodaBase->setScale(100.0f);
+    pagodaBase->setPosition({ 0.0f, 0.0f, 300.0f });
+    pagodaBase->setColor(Vec3f(0.5f));
+    pagodaBase->texture = assets.createTexture("./demo/base-texture.png");
+  });
+
+  stage.add<Model>([&](Model* pagodaRoof) {
+    pagodaRoof->from(pagodaRoofObj);
+    pagodaRoof->setScale(100.0f);
+    pagodaRoof->setPosition({ 0.0f, 0.0f, 300.0f });
+    pagodaRoof->setColor(Vec3f(0.5f));
+    pagodaRoof->texture = assets.createTexture("./demo/roof-texture.png");
+    pagodaRoof->normalMap = assets.createTexture("./demo/sand-normal-map.png");
   });
 
   stage.add<Mesh>([](Mesh* mesh) {
