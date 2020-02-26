@@ -13,12 +13,12 @@ void PalaceScene::addLights() {
     light->canCastShadows = true;
   });
 
-  stage.add<Light>([](auto* light) {
-    light->type = Light::LightType::DIRECTIONAL;
-    light->color = Vec3f(1.0f, 0.5f, 1.0f);
-    light->direction = Vec3f(-0.5f, -1.0f, 0.5f);
-    light->canCastShadows = true;
-  });
+  // stage.add<Light>([](auto* light) {
+  //   light->type = Light::LightType::DIRECTIONAL;
+  //   light->color = Vec3f(1.0f, 0.5f, 1.0f);
+  //   light->direction = Vec3f(-0.5f, -1.0f, 0.5f);
+  //   light->canCastShadows = true;
+  // });
 
   ObjLoader ballObj("./demo/ball.obj");
 
@@ -37,7 +37,7 @@ void PalaceScene::addLights() {
       stage.add<Light>([=](auto* light) {
         light->color = Vec3f(1.0f, 0.8f, 0.1f);
         light->position = position;
-        light->radius = 500.0f;
+        light->radius = 250.0f;
       });
 
       stage.add<Model>([=](Model* lightBall) {
@@ -60,25 +60,50 @@ void PalaceScene::addObjects() {
     };
   });
 
-  ObjLoader pagodaBaseObj("./demo/pagoda-base.obj");
-  ObjLoader pagodaRoofObj("./demo/pagoda-roof.obj");
+  ObjLoader wallObj("./demo/pagoda-wall.obj");
 
-  stage.add<Model>([&](Model* pagodaBase) {
-    pagodaBase->from(pagodaBaseObj);
-    pagodaBase->setScale(100.0f);
-    pagodaBase->setPosition({ 0.0f, 0.0f, 300.0f });
-    pagodaBase->setColor(Vec3f(0.5f));
-    pagodaBase->texture = assets.createTexture("./demo/base-texture.png");
+  stage.add<Model>([&](Model* wall) {
+    wall->from(wallObj);
+    wall->setPosition(Vec3f(0.0f, 0.0f, 300.0f));
+    wall->setScale(100.0f);
+    wall->setColor(Vec3f(0.7f, 0.4f, 0.1f));
+
+    wall->onUpdate = [=](float dt) {
+      wall->rotate(Vec3f(0.0f, dt * 0.25f, 0.0f));
+    };
   });
 
-  stage.add<Model>([&](Model* pagodaRoof) {
-    pagodaRoof->from(pagodaRoofObj);
-    pagodaRoof->setScale(100.0f);
-    pagodaRoof->setPosition({ 0.0f, 0.0f, 300.0f });
-    pagodaRoof->setColor(Vec3f(0.5f));
-    pagodaRoof->texture = assets.createTexture("./demo/roof-texture.png");
-    pagodaRoof->normalMap = assets.createTexture("./demo/sand-normal-map.png");
-  });
+  // ObjLoader pagodaBaseObj("./demo/pagoda-base.obj");
+  // ObjLoader pagodaRoofObj("./demo/pagoda-roof.obj");
+
+  // auto* pb = new Model();
+  // auto* pr = new Model();
+
+  // pb->from(pagodaBaseObj);
+  // pr->from(pagodaRoofObj);
+
+  // for (int i = 0; i < 4; i++) {
+  //   float y = 50.0f * i;
+  //   float scale = 1.0f - i * 0.1f;
+  //   Vec3f levelPosition = Vec3f(0.0f, y, 300.0f);
+
+  //   stage.add<Model>([&](Model* pagodaBase) {
+  //     pagodaBase->from(pb);
+  //     pagodaBase->setScale(100.0f * scale);
+  //     pagodaBase->setPosition(levelPosition);
+  //     pagodaBase->setColor(Vec3f(0.5f));
+  //     pagodaBase->texture = assets.createTexture("./demo/base-texture.png");
+  //   });
+
+  //   stage.add<Model>([&](Model* pagodaRoof) {
+  //     pagodaRoof->from(pr);
+  //     pagodaRoof->setScale(100.0f * scale);
+  //     pagodaRoof->setPosition(levelPosition);
+  //     pagodaRoof->setColor(Vec3f(0.5f));
+  //     pagodaRoof->texture = assets.createTexture("./demo/roof-texture.png");
+  //     pagodaRoof->normalMap = assets.createTexture("./demo/sand-normal-map.png");
+  //   });
+  // }
 
   stage.add<Mesh>([](Mesh* mesh) {
     mesh->create(4, 4, 100.0f);
