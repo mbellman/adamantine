@@ -35,13 +35,17 @@ private:
   HeapList<OpenGLObject> glObjects;
   HeapList<OpenGLShadowCaster> glShadowCasters;
 
+  void checkErrors();
   void createScreenShaders();
   Matrix4 createViewMatrix();
   void onEntityAdded(Entity* entity);
   void onEntityRemoved(Entity* entity);
+  void renderDirectionalShadowCaster(OpenGLShadowCaster* glShadowCaster);
   void renderEmissiveSurfaces();
   void renderGeometry();
   void renderIlluminatedSurfaces();
+  void renderPointShadowCaster(OpenGLShadowCaster* glShadowCaster);
   void renderScreenShaders();
   void renderShadowCasters();
+  void renderSpotShadowCaster(OpenGLShadowCaster* glShadowCaster);
 };

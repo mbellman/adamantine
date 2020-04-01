@@ -3,6 +3,14 @@
 
 SBuffer::SBuffer() {
   createShaderPrograms();
+
+  glScreenQuad = new OpenGLPipeline();
+
+  directionalShadowProgram.bindVertexInputs();
+  // pointShadowProgram.bindVertexInputs();
+  spotShadowProgram.bindVertexInputs();
+
+  glScreenQuad->createScreenQuad();
 }
 
 void SBuffer::createFrameBuffer(unsigned int width, unsigned int height) {
@@ -28,6 +36,11 @@ void SBuffer::createShaderPrograms() {
     { "vertexUv", 2, GL_FLOAT }
   };
 
+  VertexShaderInput quadInputs[] = {
+    { "vertexPosition", 2, GL_FLOAT },
+    { "vertexUv", 2, GL_FLOAT }
+  };
+
   // Light view program
   lightViewProgram.create();
   lightViewProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/lightview.vertex.glsl"));
@@ -35,10 +48,41 @@ void SBuffer::createShaderPrograms() {
   lightViewProgram.link();
   lightViewProgram.use();
   lightViewProgram.setVertexInputs<float>(5, geometryInputs);
+
+  // Directional shadow program
+  directionalShadowProgram.create();
+  directionalShadowProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
+  directionalShadowProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/directional-shadowcaster.fragment.glsl"));
+  directionalShadowProgram.link();
+  directionalShadowProgram.use();
+  directionalShadowProgram.setVertexInputs<float>(2, quadInputs);
+
+  // Point shadow program
+  // TODO
+
+  // Spot shadow program
+  spotShadowProgram.create();
+  spotShadowProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
+  spotShadowProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/spot-shadowcaster.fragment.glsl"));
+  spotShadowProgram.link();
+  spotShadowProgram.use();
+  spotShadowProgram.setVertexInputs<float>(2, quadInputs);
+}
+
+ShaderProgram& SBuffer::getDirectionalShadowProgram() {
+  return directionalShadowProgram;
 }
 
 ShaderProgram& SBuffer::getLightViewProgram() {
   return lightViewProgram;
+}
+
+ShaderProgram& SBuffer::getPointShadowProgram() {
+  return pointShadowProgram;
+}
+
+ShaderProgram& SBuffer::getSpotShadowProgram() {
+  return spotShadowProgram;
 }
 
 void SBuffer::useFirstShadowCascade() {

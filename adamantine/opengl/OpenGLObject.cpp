@@ -1,7 +1,7 @@
 #include "opengl/OpenGLObject.h"
-#include "subsystem/Entities.h"
 #include "opengl/OpenGLPipeline.h"
 #include "opengl/OpenGLTexture.h"
+#include "subsystem/Entities.h"
 
 OpenGLObject::OpenGLObject(const Object* object) {
   sourceObject = object;

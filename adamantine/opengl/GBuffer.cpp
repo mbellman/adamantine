@@ -7,7 +7,6 @@ GBuffer::GBuffer() {
   glScreenQuad = new OpenGLPipeline();
 
   getShaderProgram(Shader::ILLUMINATION).bindVertexInputs();
-  getShaderProgram(Shader::SHADOW_CASTER).bindVertexInputs();
   getShaderProgram(Shader::ALBEDO).bindVertexInputs();
 
   glScreenQuad->createScreenQuad();
@@ -15,12 +14,6 @@ GBuffer::GBuffer() {
 
 GBuffer::~GBuffer() {
 
-}
-
-void GBuffer::clearLightViewBuffers() {
-  frameBuffer->clearColorTexture(3);
-  frameBuffer->clearColorTexture(4);
-  frameBuffer->clearColorTexture(5);
 }
 
 void GBuffer::createFrameBuffer(unsigned int width, unsigned int height) {
@@ -67,14 +60,6 @@ void GBuffer::createShaderPrograms() {
   illuminationProgram.use();
   illuminationProgram.setVertexInputs<float>(2, quadInputs);
 
-  // Shadow caster program
-  shadowCasterProgram.create();
-  shadowCasterProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
-  shadowCasterProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/shadowcaster.fragment.glsl"));
-  shadowCasterProgram.link();
-  shadowCasterProgram.use();
-  shadowCasterProgram.setVertexInputs<float>(2, quadInputs);
-
   // Albedo program
   albedoProgram.create();
   albedoProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
@@ -90,8 +75,6 @@ ShaderProgram& GBuffer::getShaderProgram(GBuffer::Shader shader) {
       return geometryProgram;
     case GBuffer::Shader::ILLUMINATION:
       return illuminationProgram;
-    case GBuffer::Shader::SHADOW_CASTER:
-      return shadowCasterProgram;
     case GBuffer::Shader::ALBEDO:
       return albedoProgram;
     default:

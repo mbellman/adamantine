@@ -13,14 +13,12 @@ public:
   enum Shader {
     GEOMETRY,
     ILLUMINATION,
-    SHADOW_CASTER,
     ALBEDO
   };
 
   GBuffer();
   ~GBuffer();
 
-  void clearLightViewBuffers();
   void createFrameBuffer(unsigned int width, unsigned int height) override;
   ShaderProgram& getShaderProgram(GBuffer::Shader shader);
   void renderScreenQuad();
@@ -32,7 +30,5 @@ protected:
 private:
   ShaderProgram geometryProgram;
   ShaderProgram illuminationProgram;
-  ShaderProgram shadowCasterProgram;
   ShaderProgram albedoProgram;
-  OpenGLPipeline* glScreenQuad = nullptr;
 };
