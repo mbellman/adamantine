@@ -136,22 +136,12 @@ void DefaultScene::addObjects() {
   stage.add<Light>([=](Light* light) {
     light->type = Light::LightType::POINT;
     light->position = Vec3f(0.0f, 15.0f, 250.0f);
-    light->color = Vec3f(1.5f, 0.6f, 0.0f);
+    light->color = Vec3f(1.5f, 0.15f, 0.0f);
     light->radius = 1000.0f;
     light->canCastShadows = true;
 
     light->onUpdate = [=](float dt) {
       light->position = Vec3f(0.0f, 15.0f, 250.0f) + Vec3f(0.0f, 10.0f, 0.0f) * sinf(getRunningTime() * 2.0f);
-    };
-  });
-
-  stage.add<Cube>([=](Cube* cube) {
-    cube->setColor(Vec3f(1.0f, 0.0f, 0.0f));
-    cube->setScale(3.0f);
-    cube->isEmissive = true;
-
-    cube->onUpdate = [=](float dt) {
-      cube->setPosition(Vec3f(0.0f, 15.0f, 250.0f) + Vec3f(0.0f, 10.0f, 0.0f) * sinf(getRunningTime() * 2.0f));
     };
   });
 
@@ -201,12 +191,12 @@ void DefaultScene::addObjects() {
   lightBall->from(ball);
   lightBall->setScale(5.0f);
   lightBall->setPosition({ 100.0f, 10.0f, 225.0f });
-  lightBall->setColor(Vec3f(1.0f));
+  lightBall->setColor(Vec3f(0.0f, 0.2f, 1.0f));
   lightBall->isEmissive = true;
 
   auto* ballLight = new Light();
 
-  ballLight->color = Vec3f(1.0f, 0.5f, 0.0f);
+  ballLight->color = Vec3f(0.0f, 0.5f, 1.0f);
   ballLight->radius = 2000.0f;
   ballLight->position = lightBall->position;
 
