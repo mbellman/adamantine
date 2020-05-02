@@ -45,6 +45,10 @@ GLuint ShaderLoader::loadFragmentShader(const char* path) {
   return load(GL_FRAGMENT_SHADER, path);
 }
 
+GLuint ShaderLoader::loadGeometryShader(const char* path) {
+  return load(GL_GEOMETRY_SHADER, path);
+}
+
 GLuint ShaderLoader::loadVertexShader(const char* path) {
   return load(GL_VERTEX_SHADER, path);
 }

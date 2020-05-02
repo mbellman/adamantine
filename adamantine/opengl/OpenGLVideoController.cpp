@@ -31,6 +31,10 @@ OpenGLVideoController::~OpenGLVideoController() {
   glShadowCasters.free();
 
   OpenGLObject::freeCachedResources();
+
+  delete gBuffer;
+  delete sBuffer;
+  delete pointShadowBuffer;
 }
 
 void OpenGLVideoController::checkErrors() {
@@ -191,9 +195,11 @@ void OpenGLVideoController::onInit() {
 
   gBuffer = new GBuffer();
   sBuffer = new SBuffer();
+  pointShadowBuffer = new PointShadowBuffer();
 
   gBuffer->createFrameBuffer(screenSize.width, screenSize.height);
   sBuffer->createFrameBuffer(2048, 2048);
+  pointShadowBuffer->createFrameBuffer(1024, 1024);
 
   createScreenShaders();
 
@@ -266,9 +272,9 @@ void OpenGLVideoController::renderDirectionalShadowCaster(OpenGLShadowCaster* gl
   glEnable(GL_CULL_FACE);
 
   Matrix4 lightMatrixCascades[] = {
-    glShadowCaster->getLightMatrixCascade(0, camera),
-    glShadowCaster->getLightMatrixCascade(1, camera),
-    glShadowCaster->getLightMatrixCascade(2, camera)
+    glShadowCaster->getCascadedLightMatrix(0, camera),
+    glShadowCaster->getCascadedLightMatrix(1, camera),
+    glShadowCaster->getCascadedLightMatrix(2, camera)
   };
 
   for (int i = 0; i < 3; i++) {
@@ -343,8 +349,8 @@ void OpenGLVideoController::renderGeometry() {
 
   geometryProgram.setMatrix4("projectionMatrix", projectionMatrix);
   geometryProgram.setMatrix4("viewMatrix", viewMatrix);
-  geometryProgram.setInt("modelTexture", 6);
-  geometryProgram.setInt("normalMap", 7);
+  geometryProgram.setInt("modelTexture", 7);
+  geometryProgram.setInt("normalMap", 8);
 
   auto renderObject = [&](OpenGLObject* glObject) {
     geometryProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
@@ -411,7 +417,68 @@ void OpenGLVideoController::renderIlluminatedSurfaces() {
 }
 
 void OpenGLVideoController::renderPointShadowCaster(OpenGLShadowCaster* glShadowCaster) {
-  
+  auto& pointLightViewProgram = pointShadowBuffer->getPointLightViewProgram();
+  auto& pointShadowProgram = pointShadowBuffer->getPointShadowProgram();
+
+  // Point light view pass
+  pointLightViewProgram.use();
+  pointShadowBuffer->startWriting();
+
+  const Camera& camera = scene->getCamera();
+  auto* light = glShadowCaster->getLight();
+
+  glDisable(GL_BLEND);
+  glDisable(GL_STENCIL_TEST);
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
+  glClear(GL_DEPTH_BUFFER_BIT);
+
+  Matrix4 lightMatrices[6] = {
+    glShadowCaster->getLightMatrix(Vec3f(1.0f, 0.0f, 0.0f), Vec3f(0.0f, -1.0f, 0.0f)),
+    glShadowCaster->getLightMatrix(Vec3f(-1.0f, 0.0f, 0.0f), Vec3f(0.0f, -1.0f, 0.0f)),
+    glShadowCaster->getLightMatrix(Vec3f(0.0f, 1.0f, 0.0f), Vec3f(0.0f, 0.0f, 1.0f)),
+    glShadowCaster->getLightMatrix(Vec3f(0.0f, -1.0f, 0.0f), Vec3f(0.0f, 0.0f, -1.0f)),
+    glShadowCaster->getLightMatrix(Vec3f(0.0f, 0.0f, -1.0f), Vec3f(0.0f, -1.0f, 0.0f)),
+    glShadowCaster->getLightMatrix(Vec3f(0.0f, 0.0f, 1.0f), Vec3f(0.0f, -1.0f, 0.0f))
+  };
+
+  pointLightViewProgram.setVec3f("lightPosition", light->position * Vec3f(1.0f, 1.0f, -1.0f));
+  pointLightViewProgram.setFloat("farPlane", light->radius + 1000.0f);
+
+  for (int i = 0; i < 6; i++) {
+    pointLightViewProgram.setMatrix4("lightMatrices[" + std::to_string(i) + "]", lightMatrices[i]);
+  }
+
+  for (auto* glObject : glObjects) {
+    pointLightViewProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
+    glObject->render();
+  }
+
+  // Camera view shadowcaster lighting pass
+  screenShaders[0]->startWriting();
+  pointShadowBuffer->startReading();
+  gBuffer->startReading();
+
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_STENCIL_TEST);
+  glEnable(GL_BLEND);
+  glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ZERO);
+
+  pointShadowProgram.use();
+  pointShadowProgram.setInt("colorTexture", 0);
+  pointShadowProgram.setInt("normalDepthTexture", 1);
+  pointShadowProgram.setInt("positionTexture", 2);
+  pointShadowProgram.setInt("lightCubeMap", 3);
+  pointShadowProgram.setFloat("farPlane", light->radius + 1000.0f);
+  pointShadowProgram.setVec3f("cameraPosition", camera.position);
+  pointShadowProgram.setVec3f("light.position", light->position);
+  pointShadowProgram.setVec3f("light.direction", light->direction);
+  pointShadowProgram.setVec3f("light.color", light->color);
+  pointShadowProgram.setFloat("light.radius", light->radius);
+  pointShadowProgram.setInt("light.type", light->type);
+
+  pointShadowBuffer->renderScreenQuad();
 }
 
 void OpenGLVideoController::renderScreenShaders() {
@@ -459,16 +526,14 @@ void OpenGLVideoController::renderSpotShadowCaster(OpenGLShadowCaster* glShadowC
 
   sBuffer->startWriting();
 
-  const Camera& camera = scene->getCamera();
-
   glDisable(GL_BLEND);
   glDisable(GL_STENCIL_TEST);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
-
-  Matrix4 lightMatrix = glShadowCaster->getLightMatrixCascade(0, camera);
-
   glClear(GL_DEPTH_BUFFER_BIT);
+
+  auto* light = glShadowCaster->getLight();
+  Matrix4 lightMatrix = glShadowCaster->getLightMatrix(light->direction, Vec3f(0.0f, 1.0f, 0.0f));
 
   sBuffer->writeToShadowCascade(0);
   lightViewProgram.setMatrix4("lightMatrix", lightMatrix);
@@ -479,7 +544,7 @@ void OpenGLVideoController::renderSpotShadowCaster(OpenGLShadowCaster* glShadowC
   }
 
   // Camera view shadowcaster lighting pass
-  auto* light = glShadowCaster->getLight();
+  const Camera& camera = scene->getCamera();
 
   screenShaders[0]->startWriting();
   sBuffer->startReading();

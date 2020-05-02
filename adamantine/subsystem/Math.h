@@ -76,7 +76,7 @@ struct Matrix4 {
 
   static Matrix4 fromMatrix3(const Matrix3& matrix);
   static Matrix4 identity();
-  static Matrix4 lookAt(const Vec3f& eye, const Vec3f& direction);
+  static Matrix4 lookAt(const Vec3f& eye, const Vec3f& direction, const Vec3f& top);
   static Matrix4 orthographic(float top, float bottom, float left, float right, float near, float far);
   static Matrix4 projection(const Region2d<int>& area, float fov, float near, float far);
   static Matrix4 rotate(const Vec3f& rotation);

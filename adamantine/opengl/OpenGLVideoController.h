@@ -11,6 +11,7 @@
 #include "opengl/ScreenShader.h"
 #include "opengl/GBuffer.h"
 #include "opengl/SBuffer.h"
+#include "opengl/PointShadowBuffer.h"
 #include "subsystem/Geometry.h"
 #include "subsystem/Entities.h"
 #include "subsystem/HeapList.h"
@@ -31,6 +32,7 @@ private:
   SDL_GLContext glContext;
   GBuffer* gBuffer = nullptr;
   SBuffer* sBuffer = nullptr;
+  PointShadowBuffer* pointShadowBuffer = nullptr;
   HeapList<ScreenShader> screenShaders;
   HeapList<OpenGLObject> glObjects;
   HeapList<OpenGLShadowCaster> glShadowCasters;

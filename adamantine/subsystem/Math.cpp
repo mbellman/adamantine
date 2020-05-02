@@ -119,9 +119,9 @@ Matrix4 Matrix4::identity() {
   };
 }
 
-Matrix4 Matrix4::lookAt(const Vec3f& eye, const Vec3f& direction) {
+Matrix4 Matrix4::lookAt(const Vec3f& eye, const Vec3f& direction, const Vec3f& top) {
   Vec3f forward = direction.unit();
-  Vec3f right = Vec3f::crossProduct(Vec3f(0.0f, 1.0f, 0.0f), forward).unit();
+  Vec3f right = Vec3f::crossProduct(top, forward).unit();
   Vec3f up = Vec3f::crossProduct(forward, right).unit();
   Matrix4 translation = Matrix4::translate(eye);
 

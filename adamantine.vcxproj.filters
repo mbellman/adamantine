@@ -111,6 +111,9 @@
     <ClCompile Include="adamantine\opengl\SBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="adamantine\opengl\PointShadowBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="subsystem\FileLoader.h">
@@ -246,6 +249,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="adamantine\opengl\SBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="adamantine\opengl\PointShadowBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

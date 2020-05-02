@@ -8,11 +8,11 @@ OpenGLObject::OpenGLObject(const Object* object) {
   glPipeline = OpenGLObject::createOpenGLPipeline(object);
 
   if (object->texture != nullptr) {
-    glTexture = OpenGLObject::createOpenGLTexture(object->texture, GL_TEXTURE6);
+    glTexture = OpenGLObject::createOpenGLTexture(object->texture, GL_TEXTURE7);
   }
 
   if (object->normalMap != nullptr) {
-    glNormalMap = OpenGLObject::createOpenGLTexture(object->normalMap, GL_TEXTURE7);
+    glNormalMap = OpenGLObject::createOpenGLTexture(object->normalMap, GL_TEXTURE8);
   }
 }
 

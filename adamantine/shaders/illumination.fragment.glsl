@@ -25,23 +25,23 @@ void main() {
   vec4 normalDepth = texture(normalDepthTexture, fragmentUv);
   vec3 surfaceToCamera = normalize(cameraPosition - position);
   vec3 normal = normalDepth.xyz;
-  vec3 combinedLighting = vec3(0.0);
+  vec3 illuminatedColor = vec3(0.0);
 
   for (int i = 0; i < totalLights; i++) {
     Light light = lights[i];
 
     switch (light.type) {
       case POINT_LIGHT:
-        combinedLighting += albedo * getPointLightFactor(lights[i], position, normal, surfaceToCamera);
+        illuminatedColor += albedo * getPointLightFactor(lights[i], position, normal, surfaceToCamera);
         break;
       case DIRECTIONAL_LIGHT:
-        combinedLighting += albedo * getDirectionalLightFactor(lights[i], normal, surfaceToCamera);
+        illuminatedColor += albedo * getDirectionalLightFactor(lights[i], normal, surfaceToCamera);
         break;
       case SPOT_LIGHT:
-        combinedLighting += albedo * getSpotLightFactor(lights[i], position, normal, surfaceToCamera);
+        illuminatedColor += albedo * getSpotLightFactor(lights[i], position, normal, surfaceToCamera);
         break;
     }
   }
 
-  colorDepth = vec4(combinedLighting, normalDepth.w);
+  colorDepth = vec4(illuminatedColor, normalDepth.w);
 }

@@ -22,6 +22,7 @@ public:
   void addColorTexture(GLint internalFormat, GLenum format);
   void addColorTexture(GLint internalFormat, GLenum format, GLint clamp);
   void addColorTexture(GLint internalFormat, GLenum format, GLint clamp, GLenum unit);
+  void addDepthCubeMap(GLenum unit);
   void addDepthStencilBuffer();
   void bindColorTexture(GLenum attachment);
   void bindColorTextures();
@@ -34,6 +35,8 @@ public:
 private:
   GLuint fbo;
   GLuint depthStencilBuffer;
+  GLuint depthCubeMap;
+  GLenum depthCubeMapUnit;
   std::vector<ColorTexture> colorTextures;
   Region2d<int> size;
 };

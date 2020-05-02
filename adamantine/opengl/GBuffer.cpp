@@ -44,7 +44,6 @@ void GBuffer::createShaderPrograms() {
     { "vertexUv", 2, GL_FLOAT }
   };
 
-  // Geometry program
   geometryProgram.create();
   geometryProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/geometry.vertex.glsl"));
   geometryProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/geometry.fragment.glsl"));
@@ -52,7 +51,6 @@ void GBuffer::createShaderPrograms() {
   geometryProgram.use();
   geometryProgram.setVertexInputs<float>(5, geometryInputs);
 
-  // Lighting program
   illuminationProgram.create();
   illuminationProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
   illuminationProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/illumination.fragment.glsl"));
@@ -60,7 +58,6 @@ void GBuffer::createShaderPrograms() {
   illuminationProgram.use();
   illuminationProgram.setVertexInputs<float>(2, quadInputs);
 
-  // Albedo program
   albedoProgram.create();
   albedoProgram.attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/quad.vertex.glsl"));
   albedoProgram.attachShader(ShaderLoader::loadFragmentShader("./adamantine/shaders/albedo.fragment.glsl"));

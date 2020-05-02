@@ -12,7 +12,8 @@ public:
   OpenGLShadowCaster(const Light* light);
 
   const Light* getLight() const;
-  Matrix4 getLightMatrixCascade(int cascadeIndex, const Camera& camera) const;
+  Matrix4 getCascadedLightMatrix(int cascadeIndex, const Camera& camera) const;
+  Matrix4 getLightMatrix(const Vec3f& direction, const Vec3f& top) const;
   void startCasting();
   void startReading();
 

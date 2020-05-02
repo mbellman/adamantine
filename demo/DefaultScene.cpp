@@ -7,28 +7,28 @@
 #include "subsystem/Texture.h"
 
 void DefaultScene::addLights() {
-  auto* directionalLight = new Light();
-  auto* directionalLight2 = new Light();
-  auto* directionalLight3 = new Light();
+  // auto* directionalLight = new Light();
+  // auto* directionalLight2 = new Light();
+  // auto* directionalLight3 = new Light();
 
-  directionalLight->type = Light::LightType::DIRECTIONAL;
-  directionalLight->color = Vec3f(1.0f, 0.0f, 0.0f);
-  directionalLight->direction = Vec3f(-1.0f, -0.4f, 1.5f);
-  directionalLight->canCastShadows = true;
+  // directionalLight->type = Light::LightType::DIRECTIONAL;
+  // directionalLight->color = Vec3f(1.0f, 0.0f, 0.0f);
+  // directionalLight->direction = Vec3f(-1.0f, -0.4f, 1.5f);
+  // directionalLight->canCastShadows = true;
 
-  directionalLight2->type = Light::LightType::DIRECTIONAL;
-  directionalLight2->color = Vec3f(0.5f, 0.25f, 0.1f);
-  directionalLight2->direction = Vec3f(0.0f, -1.0f, 1.0f);
-  directionalLight2->canCastShadows = true;
+  // directionalLight2->type = Light::LightType::DIRECTIONAL;
+  // directionalLight2->color = Vec3f(0.5f, 0.25f, 0.1f);
+  // directionalLight2->direction = Vec3f(0.0f, -1.0f, 1.0f);
+  // directionalLight2->canCastShadows = true;
 
-  directionalLight3->type = Light::LightType::DIRECTIONAL;
-  directionalLight3->color = Vec3f(0.1f, 0.25f, 0.5f);
-  directionalLight3->direction = Vec3f(1.0f, -1.0f, 1.0f);
-  directionalLight3->canCastShadows = true;
+  // directionalLight3->type = Light::LightType::DIRECTIONAL;
+  // directionalLight3->color = Vec3f(0.1f, 0.25f, 0.5f);
+  // directionalLight3->direction = Vec3f(1.0f, -1.0f, 1.0f);
+  // directionalLight3->canCastShadows = true;
 
-  stage.add(directionalLight);
-  stage.add(directionalLight2);
-  stage.add(directionalLight3);
+  // stage.add(directionalLight);
+  // stage.add(directionalLight2);
+  // stage.add(directionalLight3);
 
   for (int i = 0; i < 100; i++) {
     auto* light = new Light();
@@ -56,7 +56,7 @@ void DefaultScene::addLights() {
       RNG::random()
     };
 
-    light->radius = RNG::random(100.0f, 500.0f);
+    light->radius = RNG::random(50.0f, 250.0f);
 
     stage.add(light);
   }
@@ -132,6 +132,28 @@ void DefaultScene::addObjects() {
   model->onUpdate = [=](float dt) {
     model->rotate({ 0.0f, dt * 0.5f, 0.0f });
   };
+
+  stage.add<Light>([=](Light* light) {
+    light->type = Light::LightType::POINT;
+    light->position = Vec3f(0.0f, 15.0f, 250.0f);
+    light->color = Vec3f(1.5f, 0.6f, 0.0f);
+    light->radius = 1000.0f;
+    light->canCastShadows = true;
+
+    light->onUpdate = [=](float dt) {
+      light->position = Vec3f(0.0f, 15.0f, 250.0f) + Vec3f(0.0f, 10.0f, 0.0f) * sinf(getRunningTime() * 2.0f);
+    };
+  });
+
+  stage.add<Cube>([=](Cube* cube) {
+    cube->setColor(Vec3f(1.0f, 0.0f, 0.0f));
+    cube->setScale(3.0f);
+    cube->isEmissive = true;
+
+    cube->onUpdate = [=](float dt) {
+      cube->setPosition(Vec3f(0.0f, 15.0f, 250.0f) + Vec3f(0.0f, 10.0f, 0.0f) * sinf(getRunningTime() * 2.0f));
+    };
+  });
 
   auto* tinyCube = new Cube();
 

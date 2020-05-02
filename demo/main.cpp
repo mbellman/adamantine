@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
   Window window;
   auto* controller = new OpenGLVideoController();
 
-  controller->setScene(new LightRoomScene());
+  controller->setScene(new DefaultScene());
 
   window.setVideoController(controller);
   window.open("Adamantine", { 100, 100, 1200, 720 });

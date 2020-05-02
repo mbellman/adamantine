@@ -47,6 +47,29 @@ void FrameBuffer::addColorTexture(GLint internalFormat, GLenum format, GLint cla
   colorTextures.push_back(texture);
 }
 
+void FrameBuffer::addDepthCubeMap(GLenum unit) {
+  this->depthCubeMapUnit = unit;
+
+  glGenTextures(1, &depthCubeMap);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMap);
+
+  for (unsigned int i = 0; i < 6; i++) {
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, size.width, size.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+  }
+
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubeMap, 0);
+  glDrawBuffer(GL_NONE);
+  glReadBuffer(GL_NONE);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void FrameBuffer::addDepthStencilBuffer() {
   glGenTextures(1, &depthStencilBuffer);
   glBindTexture(GL_TEXTURE_2D, depthStencilBuffer);
@@ -85,6 +108,11 @@ void FrameBuffer::startReading() {
   for (int i = 0; i < colorTextures.size(); i++) {
     glActiveTexture(colorTextures[i].unit);
     glBindTexture(GL_TEXTURE_2D, colorTextures[i].id);
+  }
+
+  if (depthCubeMap > 0) {
+    glActiveTexture(depthCubeMapUnit);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMap);
   }
 
   glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
