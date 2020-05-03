@@ -130,18 +130,18 @@ void DefaultScene::addObjects() {
   model->setColor(Vec3f(0.75f));
 
   model->onUpdate = [=](float dt) {
-    model->rotate({ 0.0f, dt * 0.5f, 0.0f });
+    model->rotate({ 0.0f, dt * 0.25f, 0.0f });
   };
 
   stage.add<Light>([=](Light* light) {
     light->type = Light::LightType::POINT;
     light->position = Vec3f(0.0f, 15.0f, 250.0f);
-    light->color = Vec3f(1.5f, 0.15f, 0.0f);
-    light->radius = 1000.0f;
+    light->color = Vec3f(1.5f, 0.15f, 0.0f) * 2.0f;
+    light->radius = 2000.0f;
     light->canCastShadows = true;
 
     light->onUpdate = [=](float dt) {
-      light->position = Vec3f(0.0f, 15.0f, 250.0f) + Vec3f(0.0f, 10.0f, 0.0f) * sinf(getRunningTime() * 2.0f);
+      light->position = Vec3f(0.0f, 15.0f, 250.0f) + Vec3f(0.0f, 10.0f, 0.0f) * sinf(getRunningTime());
     };
   });
 
@@ -191,13 +191,13 @@ void DefaultScene::addObjects() {
   lightBall->from(ball);
   lightBall->setScale(5.0f);
   lightBall->setPosition({ 100.0f, 10.0f, 225.0f });
-  lightBall->setColor(Vec3f(0.0f, 0.2f, 1.0f));
+  lightBall->setColor(Vec3f(0.5f, 0.0f, 1.0f));
   lightBall->isEmissive = true;
 
   auto* ballLight = new Light();
 
-  ballLight->color = Vec3f(0.0f, 0.5f, 1.0f);
-  ballLight->radius = 2000.0f;
+  ballLight->color = Vec3f(0.5f, 0.0f, 1.0f);
+  ballLight->radius = 500.0f;
   ballLight->position = lightBall->position;
 
   stage.add(mesh);
@@ -216,7 +216,7 @@ void DefaultScene::onInit() {
   addLights();
   addObjects();
 
-  auto* skyboxTexture = new Texture("./demo/sea-skybox.png");
+  auto* skyboxTexture = new Texture("./demo/sunset-skybox.png");
   auto* skybox = new Skybox();
 
   skybox->from(skyboxTexture);
