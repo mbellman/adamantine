@@ -6,22 +6,6 @@
 #include "subsystem/RNG.h"
 
 void LightRoomScene::addLights() {
-  // for (int i = 0; i < 10; i++) {
-  //   auto* light = new Light();
-
-  //   Vec3f position = Vec3f(
-  //     RNG::random() - 0.5f,
-  //     RNG::random(),
-  //     RNG::random() - 0.5f
-  //   ).unit() * 150.0f;
-
-  //   light->color = Vec3f(RNG::random(), 0.0f, RNG::random());
-  //   light->position = position;
-  //   light->radius = 1000.0f;
-
-  //   stage.add(light);
-  // }
-
   auto* cameraLight = new Light();
 
   cameraLight->type = Light::LightType::SPOTLIGHT;
@@ -38,29 +22,25 @@ void LightRoomScene::addLights() {
 
   stage.add(cameraLight);
 
-  for (int i = 0; i < 10; i++) {
-    auto* light = new Light();
+  inputSystem.onMouseButton([=](const SDL_MouseButtonEvent& event) {
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
+      cameraLight->power = 1.0f - cameraLight->power;
+    }
+  });
 
-    Vec3f basePosition = {
-      RNG::random() * 400.0f - 200.0f,
-      100.0f,
-      RNG::random() * 400.0f - 200.0f
-    };
-
-    light->type = Light::LightType::SPOTLIGHT;
-    light->color = Vec3f(1.0f, RNG::random(), 0.0f);
-    light->radius = 1500.0f;
+  stage.add<Light>([=](Light* light) {
+    light->radius = 1000.0f;
+    light->color = Vec3f(1.0f, 0.0f, 0.0f);
     light->canCastShadows = true;
 
     light->onUpdate = [=](float dt) {
-      Vec3f direction = Vec3f(sinf(getRunningTime()), -1.0f, cosf(getRunningTime()));
-
-      light->direction = direction;
-      light->position = basePosition + direction.unit() * 25.0f;
+      light->position = Vec3f(0.0f, 25.0f, 0.0f) + Vec3f(
+        70.0f * sinf(getRunningTime()),
+        0.0f,
+        70.0f * cosf(getRunningTime())
+      );
     };
-
-    stage.add(light);
-  }
+  });
 }
 
 void LightRoomScene::addObjects() {
@@ -131,9 +111,13 @@ void LightRoomScene::addObjects() {
     if (i % 2 == 0) {
       auto* light = new Light();
 
-      light->color = Vec3f(1.0f, 0.75f, 0.1f);
+      light->color = Vec3f(1.5f, 0.5f, 0.1f);
       light->position = position + Vec3f(0.0f, 35.0f, 0.0f);
       light->radius = 500.0f;
+
+      light->onUpdate = [=](float dt) {
+        light->power = 1.0f + sinf(getRunningTime() * 7.0f) * 0.2f;
+      };
 
       auto* lightCube = new Cube();
 

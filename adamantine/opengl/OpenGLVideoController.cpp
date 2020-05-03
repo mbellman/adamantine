@@ -137,7 +137,7 @@ void OpenGLVideoController::createScreenShaders() {
 Matrix4 OpenGLVideoController::createViewMatrix() {
   const Camera& camera = scene->getCamera();
   Vec3f rotation = camera.orientation * Vec3f(-1.0f, 1.0f, 1.0f);
-  Vec3f translation = camera.position * Vec3f(-1.0f, -1.0f, 1.0f);
+  Vec3f translation = camera.position.invert().gl();
 
   return (
     Matrix4::rotate(rotation) *
@@ -315,7 +315,7 @@ void OpenGLVideoController::renderDirectionalShadowCaster(OpenGLShadowCaster* gl
   directionalShadowProgram.setVec3f("cameraPosition", camera.position);
   directionalShadowProgram.setVec3f("light.position", light->position);
   directionalShadowProgram.setVec3f("light.direction", light->direction);
-  directionalShadowProgram.setVec3f("light.color", light->color);
+  directionalShadowProgram.setVec3f("light.color", light->color * light->power);
   directionalShadowProgram.setFloat("light.radius", light->radius);
   directionalShadowProgram.setInt("light.type", light->type);
 
@@ -407,7 +407,7 @@ void OpenGLVideoController::renderIlluminatedSurfaces() {
 
       illuminationProgram.setVec3f("lights[" + idx + "].position", light->position);
       illuminationProgram.setVec3f("lights[" + idx + "].direction", light->direction);
-      illuminationProgram.setVec3f("lights[" + idx + "].color", light->color);
+      illuminationProgram.setVec3f("lights[" + idx + "].color", light->color * light->power);
       illuminationProgram.setFloat("lights[" + idx + "].radius", light->radius);
       illuminationProgram.setInt("lights[" + idx + "].type", light->type);
     }
@@ -442,7 +442,7 @@ void OpenGLVideoController::renderPointShadowCaster(OpenGLShadowCaster* glShadow
     glShadowCaster->getLightMatrix(Vec3f(0.0f, 0.0f, 1.0f), Vec3f(0.0f, -1.0f, 0.0f))
   };
 
-  pointLightViewProgram.setVec3f("lightPosition", light->position * Vec3f(1.0f, 1.0f, -1.0f));
+  pointLightViewProgram.setVec3f("lightPosition", light->position.gl());
   pointLightViewProgram.setFloat("farPlane", light->radius + 1000.0f);
 
   for (int i = 0; i < 6; i++) {
@@ -474,7 +474,7 @@ void OpenGLVideoController::renderPointShadowCaster(OpenGLShadowCaster* glShadow
   pointShadowProgram.setVec3f("cameraPosition", camera.position);
   pointShadowProgram.setVec3f("light.position", light->position);
   pointShadowProgram.setVec3f("light.direction", light->direction);
-  pointShadowProgram.setVec3f("light.color", light->color);
+  pointShadowProgram.setVec3f("light.color", light->color * light->power);
   pointShadowProgram.setFloat("light.radius", light->radius);
   pointShadowProgram.setInt("light.type", light->type);
 
@@ -565,7 +565,7 @@ void OpenGLVideoController::renderSpotShadowCaster(OpenGLShadowCaster* glShadowC
   spotShadowProgram.setVec3f("cameraPosition", camera.position);
   spotShadowProgram.setVec3f("light.position", light->position);
   spotShadowProgram.setVec3f("light.direction", light->direction);
-  spotShadowProgram.setVec3f("light.color", light->color);
+  spotShadowProgram.setVec3f("light.color", light->color * light->power);
   spotShadowProgram.setFloat("light.radius", light->radius);
   spotShadowProgram.setInt("light.type", light->type);
 

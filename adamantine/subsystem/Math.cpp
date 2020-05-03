@@ -73,6 +73,14 @@ const float* Vec3f::float3() const {
   return &x;
 }
 
+Vec3f Vec3f::gl() const {
+  return *this * Vec3f(1.0f, 1.0f, -1.0f);
+}
+
+Vec3f Vec3f::invert() const {
+  return *this * -1.0f;
+}
+
 float Vec3f::magnitude() const {
   return sqrtf(x*x + y*y + z*z);
 }

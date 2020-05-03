@@ -31,7 +31,7 @@ float getPointShadowFactor(vec3 surfacePosition, vec3 surfaceNormal) {
     vec3 lightToSurface = surfacePosition - light.position;
     vec3 surfaceToLight = lightToSurface * -1.0;
     float surfaceDistance = length(lightToSurface);
-    vec3 sampleOffset = offsets[i] * surfaceDistance * 0.01;
+    vec3 sampleOffset = offsets[i] * surfaceDistance * 0.005;
     float closestDepth = texture(lightCubeMap, lightToSurface * vec3(1.0, 1.0, -1.0) + sampleOffset).r * farPlane;
     float bias = 0.1 + (1.0 - dot(normalize(surfaceToLight), surfaceNormal)) * surfaceDistance * 0.1;
 

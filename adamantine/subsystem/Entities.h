@@ -41,6 +41,7 @@ struct Light : Entity {
   Vec3f color = Vec3f(1.0f);
   Vec3f direction;
   float radius = 100.0f;
+  float power = 1.0f;
   bool canCastShadows = false;
 };
 

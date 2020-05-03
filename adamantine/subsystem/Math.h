@@ -57,6 +57,8 @@ struct Vec3f : Vec2f {
 
   void debug() const;
   const float* float3() const;
+  Vec3f gl() const;
+  Vec3f invert() const;
   float magnitude() const;
   Vec3f unit() const;
 };
