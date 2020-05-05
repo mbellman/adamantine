@@ -14,6 +14,7 @@ public:
 
   const Camera& getCamera() const;
   virtual InputSystem& getInputSystem() final;
+  float getRunningTime();
   virtual const Stage& getStage() const final;
   void onEntityAdded(EntityHandler handler);
   void onEntityRemoved(EntityHandler handler);
@@ -26,8 +27,6 @@ protected:
   AssetCache assets;
   InputSystem inputSystem;
   Camera camera;
-
-  float getRunningTime();
 
 private:
   float runningTime = 0.0f;

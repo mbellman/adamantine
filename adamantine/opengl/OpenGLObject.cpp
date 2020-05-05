@@ -1,6 +1,8 @@
 #include "opengl/OpenGLObject.h"
 #include "opengl/OpenGLPipeline.h"
 #include "opengl/OpenGLTexture.h"
+#include "opengl/ShaderProgram.h"
+#include "opengl/ShaderLoader.h"
 #include "subsystem/Entities.h"
 
 OpenGLObject::OpenGLObject(const Object* object) {
@@ -13,6 +15,12 @@ OpenGLObject::OpenGLObject(const Object* object) {
 
   if (object->normalMap != nullptr) {
     glNormalMap = OpenGLObject::createOpenGLTexture(object->normalMap, GL_TEXTURE8);
+  }
+
+  if (object->shader != nullptr) {
+    std::string path(object->shader);
+
+    customShader = OpenGLObject::createShaderProgram(path);
   }
 }
 
@@ -37,7 +45,8 @@ OpenGLPipeline* OpenGLObject::createOpenGLPipeline(const Object* object) {
     auto* pipeline = new OpenGLPipeline();
 
     pipeline->createFromObject(object->getReference());
-    pipelineMap.emplace(referenceId, pipeline);
+
+    OpenGLObject::pipelineMap.emplace(referenceId, pipeline);
 
     return pipeline;
   }
@@ -57,6 +66,33 @@ OpenGLTexture* OpenGLObject::createOpenGLTexture(const Texture* texture, GLenum 
   }
 }
 
+ShaderProgram* OpenGLObject::createShaderProgram(std::string path) {
+  if (OpenGLObject::shaderMap.find(path) != OpenGLObject::shaderMap.end()) {
+    return OpenGLObject::shaderMap.at(path);
+  } else {
+    VertexShaderInput geometryInputs[] = {
+      { "vertexPosition", 3, GL_FLOAT },
+      { "vertexNormal", 3, GL_FLOAT},
+      { "vertexTangent", 3, GL_FLOAT },
+      { "vertexColor", 3, GL_FLOAT },
+      { "vertexUv", 2, GL_FLOAT }
+    };
+
+    auto* program = new ShaderProgram();
+
+    program->create();
+    program->attachShader(ShaderLoader::loadVertexShader("./adamantine/shaders/geometry.vertex.glsl"));
+    program->attachShader(ShaderLoader::loadFragmentShader(path.c_str()));
+    program->link();
+    program->use();
+    program->setVertexInputs<float>(5, geometryInputs);
+
+    OpenGLObject::shaderMap.emplace(path, program);
+
+    return program;
+  }
+}
+
 void OpenGLObject::freeCachedResources() {
   for (auto [ key, glTexture ] : textureMap) {
     delete glTexture;
@@ -66,12 +102,25 @@ void OpenGLObject::freeCachedResources() {
     delete glPipeline;
   }
 
+  for (auto [ key, shader ] : shaderMap) {
+    delete shader;
+  }
+
   textureMap.clear();
   pipelineMap.clear();
+  shaderMap.clear();
 }
 
 const Object* OpenGLObject::getSourceObject() const {
   return sourceObject;
+}
+
+ShaderProgram* OpenGLObject::getCustomShader() const {
+  return customShader;
+}
+
+bool OpenGLObject::hasCustomShader() const {
+  return customShader != nullptr;
 }
 
 bool OpenGLObject::hasNormalMap() const {
@@ -90,3 +139,4 @@ void OpenGLObject::render() {
 
 std::map<int, OpenGLPipeline*> OpenGLObject::pipelineMap;
 std::map<int, OpenGLTexture*> OpenGLObject::textureMap;
+std::map<std::string, ShaderProgram*> OpenGLObject::shaderMap;

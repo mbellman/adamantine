@@ -31,7 +31,7 @@ void PalaceScene::addLights() {
     for (int j = 0; j < 8; j++) {
       constexpr static float TAU = 3.141592f * 2.0f;
       float p = j / 8.0f;
-      Vec3f center = Vec3f(0.0f, (i + 1) * 30.0f, 300.0f);
+      Vec3f center = Vec3f(0.0f, 50.0f + (i + 1) * 30.0f, 300.0f);
       Vec3f position = center + Vec3f(sinf(p * TAU), 0.0f, cosf(p * TAU)) * (110.0f - i * 7.0f);
 
       stage.add<Light>([=](auto* light) {
@@ -60,55 +60,62 @@ void PalaceScene::addObjects() {
     };
   });
 
-  ObjLoader wallObj("./demo/pagoda-wall.obj");
+  // ObjLoader wallObj("./demo/pagoda-wall.obj");
 
-  stage.add<Model>([&](Model* wall) {
-    wall->from(wallObj);
-    wall->setPosition(Vec3f(0.0f, 0.0f, 300.0f));
-    wall->setScale(100.0f);
-    wall->setColor(Vec3f(0.7f, 0.4f, 0.1f));
+  // stage.add<Model>([&](Model* wall) {
+  //   wall->from(wallObj);
+  //   wall->setPosition(Vec3f(0.0f, 0.0f, 300.0f));
+  //   wall->setScale(100.0f);
+  //   wall->setColor(Vec3f(0.7f, 0.4f, 0.1f));
 
-    wall->onUpdate = [=](float dt) {
-      wall->rotate(Vec3f(0.0f, dt * 0.25f, 0.0f));
-    };
-  });
+  //   wall->onUpdate = [=](float dt) {
+  //     wall->rotate(Vec3f(0.0f, dt * 0.25f, 0.0f));
+  //   };
+  // });
 
-  // ObjLoader pagodaBaseObj("./demo/pagoda-base.obj");
-  // ObjLoader pagodaRoofObj("./demo/pagoda-roof.obj");
+  ObjLoader pagodaBaseObj("./demo/pagoda-base.obj");
+  ObjLoader pagodaRoofObj("./demo/pagoda-roof.obj");
 
-  // auto* pb = new Model();
-  // auto* pr = new Model();
+  auto* pb = new Model();
+  auto* pr = new Model();
 
-  // pb->from(pagodaBaseObj);
-  // pr->from(pagodaRoofObj);
+  pb->from(pagodaBaseObj);
+  pr->from(pagodaRoofObj);
 
-  // for (int i = 0; i < 4; i++) {
-  //   float y = 50.0f * i;
-  //   float scale = 1.0f - i * 0.1f;
-  //   Vec3f levelPosition = Vec3f(0.0f, y, 300.0f);
+  for (int i = 0; i < 4; i++) {
+    float y = 50.0f * (i + 1);
+    float scale = 1.0f - i * 0.1f;
+    Vec3f levelPosition = Vec3f(0.0f, y, 300.0f);
 
-  //   stage.add<Model>([&](Model* pagodaBase) {
-  //     pagodaBase->from(pb);
-  //     pagodaBase->setScale(100.0f * scale);
-  //     pagodaBase->setPosition(levelPosition);
-  //     pagodaBase->setColor(Vec3f(0.5f));
-  //     pagodaBase->texture = assets.createTexture("./demo/base-texture.png");
-  //   });
+    stage.add<Model>([&](Model* pagodaBase) {
+      pagodaBase->from(pb);
+      pagodaBase->setScale(100.0f * scale);
+      pagodaBase->setPosition(levelPosition);
+      pagodaBase->setColor(Vec3f(0.5f));
+      pagodaBase->texture = assets.createTexture("./demo/base-texture.png");
+    });
 
-  //   stage.add<Model>([&](Model* pagodaRoof) {
-  //     pagodaRoof->from(pr);
-  //     pagodaRoof->setScale(100.0f * scale);
-  //     pagodaRoof->setPosition(levelPosition);
-  //     pagodaRoof->setColor(Vec3f(0.5f));
-  //     pagodaRoof->texture = assets.createTexture("./demo/roof-texture.png");
-  //     pagodaRoof->normalMap = assets.createTexture("./demo/sand-normal-map.png");
-  //   });
-  // }
+    stage.add<Model>([&](Model* pagodaRoof) {
+      pagodaRoof->from(pr);
+      pagodaRoof->setScale(100.0f * scale);
+      pagodaRoof->setPosition(levelPosition);
+      pagodaRoof->setColor(Vec3f(0.5f));
+      pagodaRoof->texture = assets.createTexture("./demo/roof-texture.png");
+      pagodaRoof->normalMap = assets.createTexture("./demo/sand-normal-map.png");
+    });
+  }
 
   stage.add<Mesh>([](Mesh* mesh) {
     mesh->create(4, 4, 100.0f);
     mesh->setColor(Vec3f(0.2f));
     mesh->setPosition({ 0.0f, -50.0f, 300.0f });
+    mesh->shader = "./demo/water.fragment.glsl";
+  });
+
+  stage.add<Light>([](Light* light) {
+    light->position = Vec3f(0.0f, -40.0f, 300.0f);
+    light->color = Vec3f(1.0f, 1.0f, 0.2f);
+    light->radius = 750.0f;
   });
 }
 

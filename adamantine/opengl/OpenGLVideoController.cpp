@@ -63,7 +63,8 @@ void OpenGLVideoController::createScreenShaders() {
 
   dofShader->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
     glClear(GL_COLOR_BUFFER_BIT);
-    glUniform1i(program.getUniformLocation("screen"), 0);
+
+    program.setInt("screen", 0);
 
     glScreenQuad->render();
   });
@@ -80,7 +81,8 @@ void OpenGLVideoController::createScreenShaders() {
 
   preBloomShader->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
     glClear(GL_COLOR_BUFFER_BIT);
-    glUniform1i(program.getUniformLocation("screen"), 0);
+
+    program.setInt("screen", 0);
 
     glScreenQuad->render();
   });
@@ -98,8 +100,9 @@ void OpenGLVideoController::createScreenShaders() {
 
   postBloomShaderH->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
     glClear(GL_COLOR_BUFFER_BIT);
-    glUniform1i(program.getUniformLocation("baseColor"), 0);
-    glUniform1i(program.getUniformLocation("bloomColor"), 1);
+
+    program.setInt("baseColor", 0);
+    program.setInt("bloomColor", 1);
 
     glScreenQuad->render();
   });
@@ -117,8 +120,9 @@ void OpenGLVideoController::createScreenShaders() {
 
   postBloomShaderV->onRender([=](const ShaderProgram& program, OpenGLPipeline* glScreenQuad) {
     glClear(GL_COLOR_BUFFER_BIT);
-    glUniform1i(program.getUniformLocation("baseColor"), 0);
-    glUniform1i(program.getUniformLocation("bloomColor"), 1);
+
+    program.setInt("baseColor", 0);
+    program.setInt("bloomColor", 1);
 
     glScreenQuad->render();
   });
@@ -158,8 +162,13 @@ void OpenGLVideoController::onEntityAdded(Entity* entity) {
     auto* glObject = new OpenGLObject((Object*)entity);
 
     glObject->bind();
+
     gBuffer->getShaderProgram(GBuffer::Shader::GEOMETRY).bindVertexInputs();
     sBuffer->getLightViewProgram().bindVertexInputs();
+
+    if (glObject->hasCustomShader()) {
+      glObject->getCustomShader()->bindVertexInputs();
+    }
 
     glObjects.push(glObject);
   } else if (entity->isOfType<Light>() && ((Light*)entity)->canCastShadows) {
@@ -247,7 +256,6 @@ void OpenGLVideoController::onScreenSizeChange(int width, int height) {
   glViewport(0, 0, width, height);
 
   gBuffer->createFrameBuffer(width, height);
-  sBuffer->createFrameBuffer(2048, 2048);
 
   for (auto* shader : screenShaders) {
     shader->createFrameBuffer({ 0, 0, width, height });
@@ -338,8 +346,6 @@ void OpenGLVideoController::renderEmissiveSurfaces() {
 void OpenGLVideoController::renderGeometry() {
   auto& geometryProgram = gBuffer->getShaderProgram(GBuffer::Shader::GEOMETRY);
 
-  geometryProgram.use();
-
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_STENCIL_TEST);
@@ -347,15 +353,20 @@ void OpenGLVideoController::renderGeometry() {
   Matrix4 projectionMatrix = Matrix4::projection(screenSize, 45.0f, 1.0f, 10000.0f).transpose();
   Matrix4 viewMatrix = createViewMatrix();
 
-  geometryProgram.setMatrix4("projectionMatrix", projectionMatrix);
-  geometryProgram.setMatrix4("viewMatrix", viewMatrix);
-  geometryProgram.setInt("modelTexture", 7);
-  geometryProgram.setInt("normalMap", 8);
-
   auto renderObject = [&](OpenGLObject* glObject) {
-    geometryProgram.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
-    geometryProgram.setBool("hasTexture", glObject->hasTexture());
-    geometryProgram.setBool("hasNormalMap", glObject->hasNormalMap());
+    auto& program = glObject->hasCustomShader()
+      ? *glObject->getCustomShader()
+      : geometryProgram;
+
+    program.use();
+    program.setMatrix4("projectionMatrix", projectionMatrix);
+    program.setMatrix4("viewMatrix", viewMatrix);
+    program.setMatrix4("modelMatrix", glObject->getSourceObject()->getMatrix());
+    program.setBool("hasTexture", glObject->hasTexture());
+    program.setBool("hasNormalMap", glObject->hasNormalMap());
+    program.setInt("modelTexture", 7);
+    program.setInt("normalMap", 8);
+    program.setFloat("time", scene->getRunningTime());
 
     glObject->render();
   };

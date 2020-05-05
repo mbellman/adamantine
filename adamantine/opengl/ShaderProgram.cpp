@@ -35,23 +35,23 @@ void ShaderProgram::link() {
   glLinkProgram(program);
 }
 
-void ShaderProgram::setBool(std::string name, bool value) {
+void ShaderProgram::setBool(std::string name, bool value) const {
   setInt(name, value);
 }
 
-void ShaderProgram::setFloat(std::string name, float value) {
+void ShaderProgram::setFloat(std::string name, float value) const {
   glUniform1f(getUniformLocation(name), value);
 }
 
-void ShaderProgram::setInt(std::string name, int value) {
+void ShaderProgram::setInt(std::string name, int value) const {
   glUniform1i(getUniformLocation(name), value);
 }
 
-void ShaderProgram::setMatrix4(std::string name, const Matrix4& value) {
+void ShaderProgram::setMatrix4(std::string name, const Matrix4& value) const {
   glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, value.m);
 }
 
-void ShaderProgram::setVec3f(std::string name, const Vec3f& value) {
+void ShaderProgram::setVec3f(std::string name, const Vec3f& value) const {
   glUniform3fv(getUniformLocation(name), 1, value.float3());
 }
 

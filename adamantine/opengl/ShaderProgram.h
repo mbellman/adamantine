@@ -31,11 +31,11 @@ public:
   GLint getUniformLocation(const char* name) const;
   GLint getUniformLocation(std::string name) const;
   void link();
-  void setBool(std::string name, bool value);
-  void setFloat(std::string name, float value);
-  void setInt(std::string name, int value);
-  void setMatrix4(std::string name, const Matrix4& value);
-  void setVec3f(std::string name, const Vec3f& value);
+  void setBool(std::string name, bool value) const;
+  void setFloat(std::string name, float value) const;
+  void setInt(std::string name, int value) const;
+  void setMatrix4(std::string name, const Matrix4& value) const;
+  void setVec3f(std::string name, const Vec3f& value) const;
 
   template<typename T>
   void setVertexInputs(int number, const VertexShaderInput* inputs) {

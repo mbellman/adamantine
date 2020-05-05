@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <functional>
+#include <string>
 
 #include "subsystem/Math.h"
 #include "subsystem/Geometry.h"
@@ -60,6 +61,7 @@ public:
   float scale = 1.0f;
   const Texture* texture = nullptr;
   const Texture* normalMap = nullptr;
+  const char* shader = nullptr;
   bool isEmissive = false;
 
   virtual ~Object();
