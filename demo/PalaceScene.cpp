@@ -8,17 +8,17 @@
 void PalaceScene::addLights() {
   stage.add<Light>([](auto* light) {
     light->type = Light::LightType::DIRECTIONAL;
-    light->color = Vec3f(0.1f, 0.5f, 1.0f);
-    light->direction = Vec3f(0.5f, -0.5f, 1.0f);
+    light->color = Vec3f(1.0f, 1.0f, 0.5f);
+    light->direction = Vec3f(0.0f, -0.2f, -1.0f);
     light->canCastShadows = true;
   });
 
-  // stage.add<Light>([](auto* light) {
-  //   light->type = Light::LightType::DIRECTIONAL;
-  //   light->color = Vec3f(1.0f, 0.5f, 1.0f);
-  //   light->direction = Vec3f(-0.5f, -1.0f, 0.5f);
-  //   light->canCastShadows = true;
-  // });
+  stage.add<Light>([](auto* light) {
+    light->type = Light::LightType::DIRECTIONAL;
+    light->color = Vec3f(0.1f, 0.5f, 1.0f);
+    light->direction = Vec3f(0.0f, -1.0f, -0.5f);
+    light->power = 0.5f;
+  });
 
   ObjLoader ballObj("./demo/ball.obj");
 
@@ -31,7 +31,7 @@ void PalaceScene::addLights() {
     for (int j = 0; j < 8; j++) {
       constexpr static float TAU = 3.141592f * 2.0f;
       float p = j / 8.0f;
-      Vec3f center = Vec3f(0.0f, 50.0f + (i + 1) * 30.0f, 300.0f);
+      Vec3f center = Vec3f(0.0f, 50.0f + i * 30.0f, 300.0f);
       Vec3f position = center + Vec3f(sinf(p * TAU), 0.0f, cosf(p * TAU)) * (110.0f - i * 7.0f);
 
       stage.add<Light>([=](auto* light) {
@@ -60,19 +60,6 @@ void PalaceScene::addObjects() {
     };
   });
 
-  // ObjLoader wallObj("./demo/pagoda-wall.obj");
-
-  // stage.add<Model>([&](Model* wall) {
-  //   wall->from(wallObj);
-  //   wall->setPosition(Vec3f(0.0f, 0.0f, 300.0f));
-  //   wall->setScale(100.0f);
-  //   wall->setColor(Vec3f(0.7f, 0.4f, 0.1f));
-
-  //   wall->onUpdate = [=](float dt) {
-  //     wall->rotate(Vec3f(0.0f, dt * 0.25f, 0.0f));
-  //   };
-  // });
-
   ObjLoader pagodaBaseObj("./demo/pagoda-base.obj");
   ObjLoader pagodaRoofObj("./demo/pagoda-roof.obj");
 
@@ -83,7 +70,7 @@ void PalaceScene::addObjects() {
   pr->from(pagodaRoofObj);
 
   for (int i = 0; i < 4; i++) {
-    float y = 50.0f * (i + 1);
+    float y = -30.0f + 50.0f * i;
     float scale = 1.0f - i * 0.1f;
     Vec3f levelPosition = Vec3f(0.0f, y, 300.0f);
 
@@ -106,16 +93,27 @@ void PalaceScene::addObjects() {
   }
 
   stage.add<Mesh>([](Mesh* mesh) {
-    mesh->create(4, 4, 100.0f);
+    mesh->create(4, 4, 200.0f);
     mesh->setColor(Vec3f(0.2f));
     mesh->setPosition({ 0.0f, -50.0f, 300.0f });
     mesh->shader = "./demo/water.fragment.glsl";
   });
 
-  stage.add<Light>([](Light* light) {
-    light->position = Vec3f(0.0f, -40.0f, 300.0f);
+  stage.add<Light>([=](Light* light) {
+    Vec3f position = Vec3f(0.0f, 30.0f, 300.0f);
+
+    light->position = position;
     light->color = Vec3f(1.0f, 1.0f, 0.2f);
-    light->radius = 750.0f;
+    light->radius = 1500.0f;
+    light->canCastShadows = true;
+
+    light->onUpdate = [=](float dt) {
+      light->position = position + Vec3f(
+        sinf(getRunningTime()) * 170.0f,
+        sinf(getRunningTime()) * 20.0f,
+        cosf(getRunningTime()) * 170.0f
+      );
+    };
   });
 }
 

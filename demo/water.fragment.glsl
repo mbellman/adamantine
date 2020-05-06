@@ -17,7 +17,7 @@ layout (location = 1) out vec4 normalDepth;
 layout (location = 2) out vec3 position;
 
 vec3 getColor() {
-  return vec3(0.0, 0.25, 1.0);
+  return vec3(1.0);
 }
 
 mat3 getTBNMatrix() {
@@ -32,12 +32,21 @@ mat3 getTBNMatrix() {
 }
 
 vec3 getNormal() {
-  float t = sin(fragmentUv.x * 100.0);
-  float x = sin(fragmentUv.y * 200.0);
+  float x = (
+    sin((fragmentUv.x + sin(fragmentUv.y * 10.0) * 0.1) * 50.0) * sin(time * 2.0) * 0.3 +
+    sin(fragmentUv.x * 70.0) * 0.2 +
+    sin((fragmentUv.x + sin(fragmentUv.y * 5.0) * 0.1) * 200.0 + time * 3.0) * 0.1
+  );
+
+  float y = (
+    sin((fragmentUv.y + sin(fragmentUv.x * 10.0) * 0.1) * 50.0) * cos(time * 2.0) * 0.3 +
+    sin(fragmentUv.y * 70.0 + time * 3.0) * 0.2 +
+    sin((fragmentUv.y + sin(fragmentUv.x * 5.0) * 0.1) * 200.0 + time * 5.0) * 0.1
+  );
 
   vec3 normal = vec3(
-    0.25 * t * sin(fragmentUv.y * 50.0),
-    0.0,
+    x,
+    y,
     1.0
   );
 
