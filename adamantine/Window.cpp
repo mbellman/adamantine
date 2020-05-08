@@ -20,7 +20,9 @@ Window::~Window() {
 void Window::handleStats() {
   char title[100];
 
-  sprintf_s(title, sizeof(title), "FPS: %d", stats.getFPS());
+  auto stageStats = videoController->getScene()->getStage().getStats();
+
+  sprintf_s(title, sizeof(title), "FPS: %d, Vertices: %d, Lights: %d, Shadowcasters: %d", stats.getFPS(), stageStats.totalVertices, stageStats.totalLights, stageStats.totalShadowCasters);
 
   SDL_SetWindowTitle(videoController->getWindow(), title);
 }

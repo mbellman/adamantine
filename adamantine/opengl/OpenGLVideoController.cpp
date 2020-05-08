@@ -402,7 +402,7 @@ void OpenGLVideoController::renderIlluminatedSurfaces() {
   glStencilFunc(GL_EQUAL, 1, 0xFF);
 
   auto& lights = scene->getStage().getLights();
-  int totalLights = lights.length() - scene->getStage().getTotalShadowCasters();
+  int totalLights = lights.length() - scene->getStage().getStats().totalShadowCasters;
 
   illuminationProgram.setInt("colorTexture", 0);
   illuminationProgram.setInt("normalDepthTexture", 1);

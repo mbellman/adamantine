@@ -8,6 +8,12 @@
 
 typedef std::function<void(Entity*)> EntityHandler;
 
+struct StageStats {
+  unsigned int totalVertices = 0;
+  unsigned int totalLights = 0;
+  unsigned int totalShadowCasters = 0;
+};
+
 class Stage {
 public:
   ~Stage();
@@ -24,7 +30,7 @@ public:
 
   const HeapList<Light>& getLights() const;
   const HeapList<Object>& getObjects() const;
-  int getTotalShadowCasters() const;
+  StageStats getStats() const;
   void onEntityAdded(EntityHandler handler);
   void onEntityRemoved(EntityHandler handler);
   void remove(Entity* entity);

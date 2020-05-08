@@ -31,24 +31,44 @@ mat3 getTBNMatrix() {
   return mat3(surfaceTangent, surfaceBitangent, surfaceNormal);
 }
 
+float createRadialWave(float x, float y, float frequency, float offset) {
+  const float PI = 3.141592;
+  const float HALF_PI = PI * 0.5;
+
+  float cx = 2.0 * (x - 0.5);
+  float cy = 2.0 * (y - 0.5);
+  float radius = sqrt(cx * cx + cy * cy);
+
+  return sin(cx * HALF_PI + radius * PI * frequency + offset) * cos(cy * HALF_PI);
+}
+
 vec3 getNormal() {
+  float u = fragmentUv.x;
+  float v = fragmentUv.y;
+
   float x = (
-    sin((fragmentUv.x + sin(fragmentUv.y * 10.0) * 0.1) * 50.0) * sin(time * 2.0) * 0.3 +
-    sin(fragmentUv.x * 70.0) * 0.2 +
-    sin((fragmentUv.x + sin(fragmentUv.y * 5.0) * 0.1) * 200.0 + time * 3.0) * 0.1
+    createRadialWave(u, v, 10.0, -time) * 0.3 +
+    createRadialWave(u + 0.5, v - 0.3, 10.0, -time) * 0.6 +
+    sin((u + (sin(v * 10.0) + sin(v * (6.0 + v))) * 0.05) * 20.0) * sin(time * 2.0) * 0.2 +
+    sin((u + sin(v * 5.0) * 0.1) * 200.0 + time * 3.0) * 0.01
   );
 
   float y = (
-    sin((fragmentUv.y + sin(fragmentUv.x * 10.0) * 0.1) * 50.0) * cos(time * 2.0) * 0.3 +
-    sin(fragmentUv.y * 70.0 + time * 3.0) * 0.2 +
-    sin((fragmentUv.y + sin(fragmentUv.x * 5.0) * 0.1) * 200.0 + time * 5.0) * 0.1
+    createRadialWave(v, u, 10.0, -time) * 0.3 +
+    createRadialWave(v + 0.5, u - 0.3, 10.0, -time) * 0.6 +
+    sin((v + (sin(u * 10.0) + sin(u * (3.7 + u))) * 0.05) * 20.0) * cos(time * 2.0) * 0.2 +
+    sin(v * 70.0 + time * 3.0) * 0.2 +
+    sin((v + sin(u * 5.0) * 0.1) * 200.0 + time * 5.0) * 0.2 +
+    cos((v + sin(u * 10.0) * 0.025) * 300.0 + time * 5.0) * 0.01
   );
+
+  vec3 bumpMappedNormal = (texture(normalMap, fragmentUv + vec2(time * 0.01)).xyz * 2.0 - vec3(1.0)) * 2.0;
 
   vec3 normal = vec3(
     x,
     y,
     1.0
-  );
+  ) + bumpMappedNormal;
 
   return normalize(getTBNMatrix() * normal);
 }

@@ -6,6 +6,10 @@ AbstractVideoController::~AbstractVideoController() {
   SDL_Quit();
 }
 
+const AbstractScene* AbstractVideoController::getScene() const {
+  return scene;
+}
+
 SDL_Window* AbstractVideoController::getWindow() {
   return sdlWindow;
 }

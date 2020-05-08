@@ -9,6 +9,7 @@ public:
   virtual ~AbstractVideoController();
 
   virtual SDL_Window* createWindow(const char* title, Region2d<int> region) = 0;
+  virtual const AbstractScene* getScene() const final;
   virtual SDL_Window* getWindow() final;
   virtual void initWindow(const char* title, Region2d<int> region) final;
   virtual bool isActive() const final;

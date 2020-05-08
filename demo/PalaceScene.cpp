@@ -9,14 +9,14 @@ void PalaceScene::addLights() {
   stage.add<Light>([](auto* light) {
     light->type = Light::LightType::DIRECTIONAL;
     light->color = Vec3f(1.0f, 1.0f, 0.5f);
-    light->direction = Vec3f(0.0f, -0.2f, -1.0f);
+    light->direction = Vec3f(0.1f, -0.1f, -1.0f);
     light->canCastShadows = true;
   });
 
   stage.add<Light>([](auto* light) {
     light->type = Light::LightType::DIRECTIONAL;
-    light->color = Vec3f(0.1f, 0.5f, 1.0f);
-    light->direction = Vec3f(0.0f, -1.0f, -0.5f);
+    light->color = Vec3f(0.1f, 0.9f, 1.0f);
+    light->direction = Vec3f(0.1f, -1.0f, -0.5f);
     light->power = 0.5f;
   });
 
@@ -92,15 +92,16 @@ void PalaceScene::addObjects() {
     });
   }
 
-  stage.add<Mesh>([](Mesh* mesh) {
-    mesh->create(4, 4, 200.0f);
+  stage.add<Mesh>([&](Mesh* mesh) {
+    mesh->create(4, 4, 300.0f);
     mesh->setColor(Vec3f(0.2f));
     mesh->setPosition({ 0.0f, -50.0f, 300.0f });
+    mesh->normalMap = assets.createTexture("./demo/water-normal-map.png");
     mesh->shader = "./demo/water.fragment.glsl";
   });
 
   stage.add<Light>([=](Light* light) {
-    Vec3f position = Vec3f(0.0f, 30.0f, 300.0f);
+    Vec3f position = Vec3f(0.0f, 100.0f, 300.0f);
 
     light->position = position;
     light->color = Vec3f(1.0f, 1.0f, 0.2f);
@@ -109,9 +110,9 @@ void PalaceScene::addObjects() {
 
     light->onUpdate = [=](float dt) {
       light->position = position + Vec3f(
-        sinf(getRunningTime()) * 170.0f,
+        sinf(getRunningTime()) * 150.0f,
         sinf(getRunningTime()) * 20.0f,
-        cosf(getRunningTime()) * 170.0f
+        cosf(getRunningTime()) * 150.0f
       );
     };
   });

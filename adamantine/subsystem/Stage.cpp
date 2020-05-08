@@ -28,16 +28,22 @@ const HeapList<Object>& Stage::getObjects() const {
   return objects;
 }
 
-int Stage::getTotalShadowCasters() const {
-  int total = 0;
+StageStats Stage::getStats() const {
+  StageStats stats;
+
+  for (auto* object : objects) {
+    stats.totalVertices += object->getReference()->getPolygons().size() * 3;
+  }
+
+  stats.totalLights = lights.length();
 
   for (auto* light : lights) {
     if (light->canCastShadows) {
-      total++;
+      stats.totalShadowCasters++;
     }
   }
 
-  return total;
+  return stats;
 }
 
 void Stage::onEntityAdded(EntityHandler handler) {
