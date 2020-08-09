@@ -14,24 +14,24 @@ in vec2 fragmentUv;
 
 layout (location = 0) out vec4 colorDepth;
 
-float getPointShadowFactor(vec3 surfacePosition, vec3 surfaceNormal) {
-  const vec3 offsets[7] = vec3[7](
-    vec3(0.0),
-    vec3(1.0, 0.0, 0.0),
-    vec3(-1.0, 0.0, 0.0),
-    vec3(0.0, 1.0, 0.0),
-    vec3(0.0, -1.0, 0.0),
-    vec3(0.0, 0.0, 1.0),
-    vec3(0.0, 0.0, -1.0)
-  );
+const vec3 SAMPLE_OFFSETS[7] = vec3[7](
+  vec3(0.0),
+  vec3(1.0, 0.0, 0.0),
+  vec3(-1.0, 0.0, 0.0),
+  vec3(0.0, 1.0, 0.0),
+  vec3(0.0, -1.0, 0.0),
+  vec3(0.0, 0.0, 1.0),
+  vec3(0.0, 0.0, -1.0)
+);
 
+float getPointShadowFactor(vec3 surfacePosition, vec3 surfaceNormal) {
   float factor = 0.0;
 
   for (int i = 0; i < 7; i++) {
     vec3 lightToSurface = surfacePosition - light.position;
     vec3 surfaceToLight = lightToSurface * -1.0;
     float surfaceDistance = length(lightToSurface);
-    vec3 sampleOffset = offsets[i] * surfaceDistance * 0.005;
+    vec3 sampleOffset = SAMPLE_OFFSETS[i] * surfaceDistance * 0.005;
     float closestDepth = texture(lightCubeMap, lightToSurface * vec3(1.0, 1.0, -1.0) + sampleOffset).r * farPlane;
     float bias = 0.1 + (1.0 - dot(normalize(surfaceToLight), surfaceNormal)) * surfaceDistance * 0.1;
 
